@@ -59,4 +59,6 @@ Par construction IRC utilise le protocol TCP (sans perte de donnees) pour commun
 socket = une connexion réseau
 
 
+https://www.youtube.com/watch?v=D26sUZ6DHNQ
+
 
