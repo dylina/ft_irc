@@ -7,7 +7,11 @@
 
 <center><h2>Datagram Sockets( TCP) (Transmission Control Protocol) est un protocole fondamental de la couche transport des réseaux informatiques. Il garantit une transmission fiable, ordonnée et sans erreur des données entre des applications connectées à Internet, fonctionnant de concert avec le protocole IP.Fonctionnement principalMode connecté : Une liaison est établie entre l'émetteur et le récepteur avant tout échange de données.Poignée de main en trois étapes (3-way handshake) : La connexion s'initialise via l'envoi successif de signaux SYN, SYN-ACK et ACK.Fiabilité : Chaque paquet envoyé possède un numéro de séquence et nécessite un accusé de réception (ACK).Correction des pertes : Si un segment est perdu en chemin, TCP le détecte et demande sa retransmission.Contrôle de flux et congestion : Le protocole ajuste dynamiquement la vitesse d'envoi pour éviter de saturer le réseau ou la machine réceptrice.* </center>
 
-<center> [▶️ Voir la vidéo TCP](videos/tcp.mp4) </center>
+<center>
+
+[▶️ Voir la vidéo TCP](videos/tcp.mp4)
+
+</center>
 
 
 <center>UDP:</center>
@@ -18,7 +22,11 @@
 	<h2>
 </center>
 
-<center>[▶️ Voir la vidéo UDP](videos/udp.mp4)</center>
+<center>
+
+[▶️ Voir la vidéo UDP](videos/udp.mp4)
+
+</center>
 
 <center>IRC</center>
 
