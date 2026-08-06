@@ -9,7 +9,7 @@
 
 <center>
 
-[▶️ Voir la vidéo TCP](videos/tcp.mp4)
+[▶️ Voir la vidéo TCP](videos/tcp.gif)
 
 </center>
 
@@ -24,7 +24,7 @@
 
 <center>
 
-[▶️ Voir la vidéo UDP](videos/udp.mp4)
+[▶️ Voir la vidéo UDP](videos/udp.gif)
 
 </center>
 
