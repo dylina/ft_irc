@@ -162,3 +162,6 @@ https://www.youtube.com/watch?v=D26sUZ6DHNQ
 
  - <h5>client IRC </h5>
 	permet de se connecter à un serveur pour discuter en direct par texte sur le réseau IRC (Internet Relay Chat). Il sert à échanger des messages de groupe dans des salons ou en privé, et à partager des fichiers.
+
+	
+https://youtu.be/hDLvHKEASRE?si=Y0SBig43sWt_B7g0
