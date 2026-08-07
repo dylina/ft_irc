@@ -55,7 +55,8 @@
 [sockets](#socket) :
 
 [bloquants](#mode-bloquant),
-[non bloquants](#mode-non-bloquant) et [asynchrones](#)</h5>
+[non bloquants](#mode-non-bloquant) et
+[asynchrones](#asynchrones)</h5>
 
 
 <center><h2>Specificite d'IRC</h2></center>
@@ -104,6 +105,11 @@
 	</h3>
 </center>
 
+<center>
+	<h3>
+		asynchrones
+	</h3>
+</center>
 
 
 
