@@ -483,4 +483,4 @@ Quelle est la syntaxe des commandes IRC ?
 
 <u><center>SOURCES :<center></u>
 
-https://www.youtube.com/watch?v=D26sUZ6DHNQ
+https://www.youtube.com/watch?v=D26sUZ6DHNQ /
