@@ -28,9 +28,9 @@
 
 
 <center>
-	<h5>
-		UDP (User Datagram Protocol) - est un protocole de la couche transport (couche 4) des modèles OSI et TCP/IP. Il fonctionne en mode non connecté : il envoie des données (datagrammes) rapidement sans vérifier la liaison, sans accuser réception et sans garantir l'ordre d'arrivée des paquets.Caractéristiques principales d'UDPNon orienté connexion : aucun échange préalable (pas de handshake) n'est requis avant l'envoi.Léger et rapide : l'en-tête fait seulement 8 octets, ce qui réduit la surcharge réseau.Non fiable : pas de retransmission en cas de perte, de duplication ou de désordre des données.
-	<h5>
+<h5>
+UDP (User Datagram Protocol) - est un protocole de la couche transport (couche 4) des modèles OSI et TCP/IP. Il fonctionne en mode non connecté : il envoie des données (datagrammes) rapidement sans vérifier la liaison, sans accuser réception et sans garantir l'ordre d'arrivée des paquets.Caractéristiques principales d'UDPNon orienté connexion : aucun échange préalable (pas de handshake) n'est requis avant l'envoi.Léger et rapide : l'en-tête fait seulement 8 octets, ce qui réduit la surcharge réseau.Non fiable : pas de retransmission en cas de perte, de duplication ou de désordre des données.
+<h5>
 </center>
 
 <center>
@@ -42,7 +42,7 @@
 <center><h3><u>IRC (Internet Relay Chat):</u></h3></center>
 
 <center>
-	<h5>Internet Relay Chat (IRC ; en français : « discussion relayée par Internet ») est un protocole de communication textuel sur Internet. Il sert à la communication instantanée principalement sous la forme de discussions en groupe par l’intermédiaire de canaux de discussion, mais il peut aussi être utilisé pour de la communication entre deux personnes seulement. Il peut par ailleurs être utilisé pour faire du transfert de fichier
+<h5>Internet Relay Chat (IRC ; en français : « discussion relayée par Internet ») est un protocole de communication textuel sur Internet. Il sert à la communication instantanée principalement sous la forme de discussions en groupe par l’intermédiaire de canaux de discussion, mais il peut aussi être utilisé pour de la communication entre deux personnes seulement. Il peut par ailleurs être utilisé pour faire du transfert de fichier
 
 <br>
 
@@ -93,7 +93,7 @@
 </center>
 
 <h5>
-	L’élément de base pour communiquer sur un réseau est le canal (channel dans la spécification). Un canal est défini par une liste d’utilisateurs connectés sur celui-ci. En français, un canal est comparable au mot "salon"
+L’élément de base pour communiquer sur un réseau est le canal (channel dans la spécification). Un canal est défini par une liste d’utilisateurs connectés sur celui-ci. En français, un canal est comparable au mot "salon"
 
 <br>
 
@@ -127,37 +127,37 @@
 <center><h3><u>Les commandes IRC et leur définition</u></h3></center>
 
 <center>
-	<p>Par exemple, pour rejoindre un canal, un utilisateur doit effectuer</p>
+<p>Par exemple, pour rejoindre un canal, un utilisateur doit effectuer</p>
 
 	/join #channelname
 <center>
 
 <center>
-	<p> C’est l’une des principales commandes, car elle liste toutes les commandes disponibles dans le canal. Pour commencer, elle vous donne une bonne vue d’ensemble de toutes vos options dans l’IRC.</p>
+<p> C’est l’une des principales commandes, car elle liste toutes les commandes disponibles dans le canal. Pour commencer, elle vous donne une bonne vue d’ensemble de toutes vos options dans l’IRC.</p>
 
 	/help
 <center>
 
 <center>
-	<p>Il est important, tout particulièrement pour les nouveaux venus dans un canal, de s’informer sur les règles en vigueur. Cette commande vous fournit toutes les règles du serveur.</p>
+<p>Il est important, tout particulièrement pour les nouveaux venus dans un canal, de s’informer sur les règles en vigueur. Cette commande vous fournit toutes les règles du serveur.</p>
 
 	/rules
 <center>
 
 <center>
-	<p>Grâce à cette commande, vous pouvez changer votre pseudonyme sous lequel vous écrivez avec les autres dans le canal. Néanmoins, cette pratique ne doit pas être trop fréquente afin d’éviter toute confusion inutile.</p>
+<p>Grâce à cette commande, vous pouvez changer votre pseudonyme sous lequel vous écrivez avec les autres dans le canal. Néanmoins, cette pratique ne doit pas être trop fréquente afin d’éviter toute confusion inutile.</p>
 
 	/nick <nouveau pseudonyme>&nbsp;: </nouveau>
 <center>
 
 <center>
-	<p> Si vous voulez inviter une personne spécifique au canal dans lequel vous êtes actuellement, vous pouvez utiliser cette commande. Vous devrez peut-être ajouter « #channelname » à la commande si les membres du canal sont les seuls à être autorisés à inviter d’autres personnes.</p>
+<p> Si vous voulez inviter une personne spécifique au canal dans lequel vous êtes actuellement, vous pouvez utiliser cette commande. Vous devrez peut-être ajouter « #channelname » à la commande si les membres du canal sont les seuls à être autorisés à inviter d’autres personnes.</p>
 
 	/invite <pseudonyme>&nbsp;</pseudonyme>
 <center>
 
 <center>
-	<p>Si vous souhaitez envoyer un message texte destiné à une seule personne du chat, utilisez cette commande afin d’établir un dialogue privé.</p>
+<p>Si vous souhaitez envoyer un message texte destiné à une seule personne du chat, utilisez cette commande afin d’établir un dialogue privé.</p>
 
 	/msg <pseudonyme>&nbsp;: </pseudonyme>
 <center>
@@ -204,7 +204,8 @@
 	</h3>
 </center>
 <h5>
-	Mode non bloquant ircMode non bloquant ircLe mode non bloquant (ou non-blocking) dans le contexte d'un serveur ou d'un client IRC (Internet Relay Chat) signifie que les opérations d'entrée/sortie (E/S ou I/O) sur les sockets réseau s'exécutent immédiatement sans jamais interrompre ou figer le programme, même si aucune donnée n'est prête à être l'ue ou écrite.Cette architecture est indispensable pour qu'un serveur IRC puisse gérer des milliers de connexions simultanées de manière fluide.
+
+Mode non bloquant ircMode non bloquant ircLe mode non bloquant (ou non-blocking) dans le contexte d'un serveur ou d'un client IRC (Internet Relay Chat) signifie que les opérations d'entrée/sortie (E/S ou I/O) sur les sockets réseau s'exécutent immédiatement sans jamais interrompre ou figer le programme, même si aucune donnée n'est prête à être l'ue ou écrite.Cette architecture est indispensable pour qu'un serveur IRC puisse gérer des milliers de connexions simultanées de manière fluide.
 
 <br>
 
@@ -223,6 +224,7 @@
 
 L'IRC asynchrone (ou Asynchronous IRC) désigne l'utilisation du protocole Internet Relay Chat de manière différée, permettant à un utilisateur de lire et d'envoyer des messages sans être connecté en permanence et en temps réel au serveur.Pour transformer ce protocole initialement synchrone en un outil de communication asynchrone (similaire à Slack, Discord ou Matrix), plusieurs méthodes et outils sont utilisés :
 </center>
+
 <center>
 
 [Les Bouncers IRC (BNC)](#bouncers)
@@ -256,11 +258,15 @@ L'IRC asynchrone (ou Asynchronous IRC) désigne l'utilisation du protocole Inter
 <h5>
 	- modes :
   </h5>
-	Les modes sont des options positionnées sur des canaux ou des utilisateurs, et qui affectent leur mode de fonctionnement, leurs privilèges et leurs interactions avec les autres entités de l’IRC.
+
+Les modes sont des options positionnées sur des canaux ou des utilisateurs, et qui affectent leur mode de fonctionnement, leurs privilèges et leurs interactions avec les autres entités de l’IRC.
 
 <h5>
 	- socket :
-  </h5>  Dans le contexte des logiciels, on peut le traduire par « connecteur réseau » ou « interface de connexion »
+  </h5>
+
+
+Dans le contexte des logiciels, on peut le traduire par « connecteur réseau » ou « interface de connexion »
 
   <br>
 
@@ -290,44 +296,56 @@ Exemple : Votre navigateur web utilise des sockets pour dialoguer avec les serve
 <h5>
 	 - RFC (Request for comments) :
  </h5>
+
  	Les Requests for comments (RFC), littéralement « demandes de commentaires », sont une série numérotée de documents décrivant les aspects et spécifications techniques d'Internet, ou de différents matériels informatiques (routeurs, serveur DHCP). Peu de RFC sont des standards, mais tous les documents publiés par l'IETF sont des RFC.
   </h5>
 
 <h5> - DHCP (Dynamic Host Configuration Protocol)</h5> DHCP, protocole de configuration dynamique des hôtes est un protocole réseau dont le rôle est d’assurer la configuration automatique des paramètres IP d’une station ou d'une machine, notamment en lui attribuant automatiquement une adresse IP et un masque de sous-réseau. DHCP peut aussi configurer l’adresse de la passerelle par défaut et configurer des serveurs de noms comme DNS ou NBNS
 
 <h5>- IP</h5>
+
 	internet Protocol (littéralement protocole Internet, abrégé en IP) est une famille de protocoles de communication de réseaux informatiques conçus pour être utilisés sur Internet. Les protocoles IP sont au niveau 3 dans le modèle OSI. Les protocoles IP s'intègrent dans la suite des protocoles Internet et permettent un service d'adressage unique pour l'ensemble des terminaux connectés.
 
 <h5>- Internet</h5>
+
 	Internet est le réseau informatique mondial accessible au public.Il est constitué de millions de réseaux tant publics que privés, universitaires, commerciaux et gouvernementaux, à commutation de paquets, sans centre névralgique. Ceux-ci sont regroupés en réseaux autonomes. Il existe plus de 91 000 réseaux distincts en 2019[1].Les données échangées sont retransmises par Internet grâce à un ensemble standardisé de protocoles de transfert de données, lesquels permettent différentes applications comme le courrier électronique, le World Wide Web, la messagerie instantanée, le partage de fichiers en pair-à-pair, le streaming, etc.
 
 <h5>- WWW (World Wide Web)</h5>
+
 	Le World Wide Web (/ˌwɜːld waɪd ˈweb/[a]), abrégé en WWW, W3, le Web, la toile mondiale ou simplement la toile[1], est un système hypertexte public fonctionnant sur Internet. Le Web permet de consulter, à l'aide d'un navigateur, des pages regroupées en sites. Web signifie littéralement « toile (d’araignée) », image représentant les hyperliens qui lient les pages web entre elles[b].Le Web est une des applications d'Internet[2], qui est distincte d'autres applications comme les réseaux sociaux, le courrier électronique et la visioconférence. Inventé en 1989-1990 au CERN par Tim Berners-Lee épaulé de Robert Cailliau, le Web popularise Internet[3]. Depuis, il est fréquemment confondu avec ce dernier[4].
 </h5>
 
  <h5> - client IRC </h5>
+
 	permet de se connecter à un serveur pour discuter en direct par texte sur le réseau IRC (Internet Relay Chat). Il sert à échanger des messages de groupe dans des salons ou en privé, et à partager des fichiers.
 
 
 <h5> - bouncers</h5>
+
 	Un BNC est un proxy applicatif qui reste connecté à un serveur IRC 24h/24 à votre place.Persistance : Lorsque vous fermez votre client IRC, le BNC reste en ligne et accumule les messages manqués.Rattrapage : À votre reconnexion, le BNC vous rejoue l'historique des discussions (le buffer).Logiciels populaires : ZNC (le plus connu) ou Sozu.
 
 <h5> - clients-irc</h5>
+
 	Certains outils récents intègrent nativement cette logique asynchrone sans nécessiter de configurer un BNC séparé.Quassel IRC : Sépare l'application en deux parties (un cœur qui reste connecté sur un serveur distant et un client graphique pour l'utilisateur).The Lounge : Un client IRC web auto-hébergeable qui gère l'historique et reste connecté en permanence en arrière-plan.
 
 <h5>- protocoles asynchrones</h5>
+
 	Il est fréquent de coupler IRC à des réseaux modernes nativement asynchrones.Matrix : Utilise des ponts applicatifs robustes permettant de lire et répondre à des salons IRC depuis un client Matrix (comme Element) avec un historique persistant et des notifications hors-ligne.Souhaitez-vous :Un guide de configuration pour installer un bouncer comme ZNC ?Des recommandations de clients IRC modernes clés en main ?Des explications sur le pontage entre IRC et Matrix ?
 <h5> -DCC :</h5>
+
 	Alors que les utilisateurs d'un même réseau IRC reçoivent les messages d'une personne, après que ceux-ci sont passés par un ou plusieurs serveurs, le protocole DCC permet d'établir une connexion directe entre utilisateurs.
 	Cette méthode est plus communément utilisée pour envoyer des fichiers, mais peut également être utilisée pour chatter plus rapidement et de manière plus sécurisée avec un autre utilisateur.
 
 <h5> - Robots IRC :</h5>
+
 	Les robots IRC ou bots IRC sont des programmes exécutés depuis des serveurs ou des ordinateurs permettant de faire des actions automatiquement sur un canal IRC.
 
 <h5> - Protocole de communication</h5>
+
 	Dans les réseaux informatiques et les télécommunications, un protocole de communication est une spécification de plusieurs règles pour un type de communication particulier.
 
 <h5> - Transport Layer Security (TLS)</h5>
+
 	Transport Layer Security (TLS) ou « Sécurité de la couche de transport », et son prédécesseur Secure Sockets Layer (SSL) ou « Couche de sockets sécurisée »[1], sont des protocoles de sécurisation des échanges par réseau informatique, notamment par Internet. Le protocole SSL a été développé à l'origine par Netscape Communications Corporation pour son navigateur Web. L'organisme de normalisation Internet Engineering Task Force (IETF) en a poursuivi le développement en le rebaptisant Transport Layer Security (TLS). On parle parfois de SSL/TLS pour désigner indifféremment SSL ou TLS.
 
 <br>
@@ -342,15 +360,19 @@ Exemple : Votre navigateur web utilise des sockets pour dialoguer avec les serve
 
 
 <b><center>- ack</center></b>
+
 	ACK (pour acknowledgment) est un accusé de réception informatique qui confirme la bonne réception d'un signal ou d'un paquet de données
 
 <b><center>- synck-ack</center></b>
+
 	Un paquet SYN-ACK (Synchronize-Acknowledgment) est la deuxième étape de la poignée de main en trois temps (three-way handshake) du protocole TCP. Il est envoyé par le serveur en réponse au paquet initial SYN du client pour accuser réception de la demande de connexion et indiquer qu'il est prêt à communiquer.
 
 <b><center>- Handshake TCP</center></b>
+
 	Le handshake TCP (ou poignée de main en trois temps) est la méthode utilisée par le protocole TCP pour créer un lien sûr et stable entre deux machines avant de transférer des données.Les 3 étapesSYN : Le client envoie un message avec le drapeau SYN pour demander une liaison.SYN-ACK : Le serveur répond avec SYN-ACK pour valider et donner son accord.ACK : Le client envoie ACK pour confirmer la liaison.
 
 <b><center>- EAGAIN</center></b>
+
 	EAGAIN (« Resource temporarily unavailable ») est un code d'erreur système (errno 11 sur les systèmes type Unix) qui signifie qu'une ressource est momentanément occupée et que l'opération demandée aurait provoqué un blocage. Ce n'est pas une erreur fatale ; elle indique simplement qu'il faut réessayer plus tard.
 
 		Contextes d'apparition E/S non bloquantes :
