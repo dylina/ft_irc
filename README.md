@@ -346,7 +346,9 @@ Exemple : Votre navigateur web utilise des sockets pour dialoguer avec les serve
 		Les sockets sont implémentés dans différents langages (C, Java, ...) . En langage C, ils utilisent des fonctions et des structures disponibles dans la bibliothèque <sys/socket.h>.
 
 <h5>
-	 - RFC (Request for comments) :
+
+## RFC (Request for comments) :
+
  </h5>
 
  	Les Requests for comments (RFC), littéralement « demandes de commentaires », sont une série numérotée de documents décrivant les aspects et spécifications techniques d'Internet, ou de différents matériels informatiques (routeurs, serveur DHCP). Peu de RFC sont des standards, mais tous les documents publiés par l'IETF sont des RFC.
@@ -354,11 +356,19 @@ Exemple : Votre navigateur web utilise des sockets pour dialoguer avec les serve
 
 <h5> - DHCP (Dynamic Host Configuration Protocol)</h5> DHCP, protocole de configuration dynamique des hôtes est un protocole réseau dont le rôle est d’assurer la configuration automatique des paramètres IP d’une station ou d'une machine, notamment en lui attribuant automatiquement une adresse IP et un masque de sous-réseau. DHCP peut aussi configurer l’adresse de la passerelle par défaut et configurer des serveurs de noms comme DNS ou NBNS
 
-<h5>- IP</h5>
+<h5>
+
+## IP
+
+</h5>
 
 	internet Protocol (littéralement protocole Internet, abrégé en IP) est une famille de protocoles de communication de réseaux informatiques conçus pour être utilisés sur Internet. Les protocoles IP sont au niveau 3 dans le modèle OSI. Les protocoles IP s'intègrent dans la suite des protocoles Internet et permettent un service d'adressage unique pour l'ensemble des terminaux connectés.
 
-<h5>- Internet</h5>
+<h5>
+
+## Internet
+
+</h5>
 
 	Internet est le réseau informatique mondial accessible au public.Il est constitué de millions de réseaux tant publics que privés, universitaires, commerciaux et gouvernementaux, à commutation de paquets, sans centre névralgique. Ceux-ci sont regroupés en réseaux autonomes. Il existe plus de 91 000 réseaux distincts en 2019[1].Les données échangées sont retransmises par Internet grâce à un ensemble standardisé de protocoles de transfert de données, lesquels permettent différentes applications comme le courrier électronique, le World Wide Web, la messagerie instantanée, le partage de fichiers en pair-à-pair, le streaming, etc.
 
@@ -367,36 +377,68 @@ Exemple : Votre navigateur web utilise des sockets pour dialoguer avec les serve
 	Le World Wide Web (/ˌwɜːld waɪd ˈweb/[a]), abrégé en WWW, W3, le Web, la toile mondiale ou simplement la toile[1], est un système hypertexte public fonctionnant sur Internet. Le Web permet de consulter, à l'aide d'un navigateur, des pages regroupées en sites. Web signifie littéralement « toile (d’araignée) », image représentant les hyperliens qui lient les pages web entre elles[b].Le Web est une des applications d'Internet[2], qui est distincte d'autres applications comme les réseaux sociaux, le courrier électronique et la visioconférence. Inventé en 1989-1990 au CERN par Tim Berners-Lee épaulé de Robert Cailliau, le Web popularise Internet[3]. Depuis, il est fréquemment confondu avec ce dernier[4].
 </h5>
 
- <h5> - client IRC </h5>
+ <h5>
+
+ ## client IRC
+
+ </h5>
 
 	permet de se connecter à un serveur pour discuter en direct par texte sur le réseau IRC (Internet Relay Chat). Il sert à échanger des messages de groupe dans des salons ou en privé, et à partager des fichiers.
 
 
-<h5> - bouncers</h5>
+<h5>
+
+## bouncers
+
+</h5>
 
 	Un BNC est un proxy applicatif qui reste connecté à un serveur IRC 24h/24 à votre place.Persistance : Lorsque vous fermez votre client IRC, le BNC reste en ligne et accumule les messages manqués.Rattrapage : À votre reconnexion, le BNC vous rejoue l'historique des discussions (le buffer).Logiciels populaires : ZNC (le plus connu) ou Sozu.
 
-<h5> - clients-irc</h5>
+<h5>
+
+## clients-irc
+
+</h5>
 
 	Certains outils récents intègrent nativement cette logique asynchrone sans nécessiter de configurer un BNC séparé.Quassel IRC : Sépare l'application en deux parties (un cœur qui reste connecté sur un serveur distant et un client graphique pour l'utilisateur).The Lounge : Un client IRC web auto-hébergeable qui gère l'historique et reste connecté en permanence en arrière-plan.
 
-<h5>- protocoles asynchrones</h5>
+<h5>
+
+## protocoles asynchrones
+
+</h5>
 
 	Il est fréquent de coupler IRC à des réseaux modernes nativement asynchrones.Matrix : Utilise des ponts applicatifs robustes permettant de lire et répondre à des salons IRC depuis un client Matrix (comme Element) avec un historique persistant et des notifications hors-ligne.Souhaitez-vous :Un guide de configuration pour installer un bouncer comme ZNC ?Des recommandations de clients IRC modernes clés en main ?Des explications sur le pontage entre IRC et Matrix ?
-<h5> -DCC :</h5>
+<h5>
+
+## DCC :
+
+</h5>
 
 	Alors que les utilisateurs d'un même réseau IRC reçoivent les messages d'une personne, après que ceux-ci sont passés par un ou plusieurs serveurs, le protocole DCC permet d'établir une connexion directe entre utilisateurs.
 	Cette méthode est plus communément utilisée pour envoyer des fichiers, mais peut également être utilisée pour chatter plus rapidement et de manière plus sécurisée avec un autre utilisateur.
 
-<h5> - Robots IRC :</h5>
+<h5>
+
+## Robots IRC :
+
+</h5>
 
 	Les robots IRC ou bots IRC sont des programmes exécutés depuis des serveurs ou des ordinateurs permettant de faire des actions automatiquement sur un canal IRC.
 
-<h5> - Protocole de communication</h5>
+<h5>
+
+## Protocole de communication
+
+</h5>
 
 	Dans les réseaux informatiques et les télécommunications, un protocole de communication est une spécification de plusieurs règles pour un type de communication particulier.
 
-<h5> - Transport Layer Security (TLS)</h5>
+<h5>
+
+## Transport Layer Security (TLS)
+
+</h5>
 
 	Transport Layer Security (TLS) ou « Sécurité de la couche de transport », et son prédécesseur Secure Sockets Layer (SSL) ou « Couche de sockets sécurisée »[1], sont des protocoles de sécurisation des échanges par réseau informatique, notamment par Internet. Le protocole SSL a été développé à l'origine par Netscape Communications Corporation pour son navigateur Web. L'organisme de normalisation Internet Engineering Task Force (IETF) en a poursuivi le développement en le rebaptisant Transport Layer Security (TLS). On parle parfois de SSL/TLS pour désigner indifféremment SSL ou TLS.
 
@@ -411,7 +453,11 @@ Exemple : Votre navigateur web utilise des sockets pour dialoguer avec les serve
 	- de manière optionnelle, l'authentification du client (mais dans la réalité celle-ci est souvent assurée par la couche applicative).
 
 
-<b><center>## ack</center></b>
+<b><center>
+
+## ack
+
+</center></b>
 
 	ACK (pour acknowledgment) est un accusé de réception informatique qui confirme la bonne réception d'un signal ou d'un paquet de données
 
