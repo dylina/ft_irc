@@ -640,4 +640,4 @@ Quelle est la syntaxe des commandes IRC ?
 
 <center></u>
 
-https://www.youtube.com/watch?v=D26sUZ6DHNQ /
+ [ ▶︎ ] [99% of Developers Don't Get Sockets](https://www.youtube.com/watch?v=D26sUZ6DHNQ)
