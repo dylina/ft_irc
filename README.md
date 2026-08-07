@@ -76,7 +76,7 @@ UDP (User Datagram Protocol) - est un protocole de la couche transport (couche 4
 </center>
 <center>
 
-[bloquants](#mode-bloquant-(default-mode)),
+[bloquants](#mode-bloquant),
 [non bloquants](#mode-non-bloquant) et
 [asynchrones](#asynchrones)
 
@@ -218,7 +218,7 @@ L’élément de base pour communiquer sur un réseau est le canal (channel dans
 	<h3>
 		<u>
 
-## Mode bloquant (Default mode)
+## Mode bloquant
 
 </u>
 	</h3>
@@ -226,6 +226,7 @@ L’élément de base pour communiquer sur un réseau est le canal (channel dans
 
 
 <center>
+		<h6>PAR DEFAUT<h/6>
 	<h5>
 	Le programme s'arrête complètement et attend que l'action soit terminée avant de continuer. Par exemple, s'il attend une connexion d'un client, rien d'autre ne se passe tant que ce client n'arrive pas. C'est simple à programmer mais ça peut « geler » l'application.
 	</h5>
@@ -305,7 +306,7 @@ L'IRC asynchrone (ou Asynchronous IRC) désigne l'utilisation du protocole Inter
 
 <h5>
 
-## modes :
+## modes
 
 </h5>
 
@@ -313,7 +314,7 @@ Les modes sont des options positionnées sur des canaux ou des utilisateurs, et 
 
 <h5>
 
-## socket :
+## socket
 
 </h5>
 
