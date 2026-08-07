@@ -240,11 +240,9 @@ L’élément de base pour communiquer sur un réseau est le canal (channel dans
 
 <center>
 	<h3>
-		<u>
 
 ## Mode non bloquant
 
-</u>
 	</h3>
 </center>
 <h5>
