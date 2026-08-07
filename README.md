@@ -9,11 +9,11 @@
 
 <center>
 
-[acknowledgment (ACK)](#--ack)
+[acknowledgment (ACK)](#ack)
 
-[Un paquet SYN-ACK (SYNC ACK)](#--synck-ack)
+[Un paquet SYN-ACK (SYNC ACK)](#synck-ack)
 
-[handshake TCP](#--handshake-tcp)
+[handshake TCP](#handshake-tcp)
 
 </center>
 
@@ -359,15 +359,15 @@ Exemple : Votre navigateur web utilise des sockets pour dialoguer avec les serve
 	- de manière optionnelle, l'authentification du client (mais dans la réalité celle-ci est souvent assurée par la couche applicative).
 
 
-<b><center>##- ack</center></b>
+<b><center>## ack</center></b>
 
 	ACK (pour acknowledgment) est un accusé de réception informatique qui confirme la bonne réception d'un signal ou d'un paquet de données
 
-<b><center>##- synck ack</center></b>
+<b><center>## synck ack</center></b>
 
 	Un paquet SYN-ACK (Synchronize-Acknowledgment) est la deuxième étape de la poignée de main en trois temps (three-way handshake) du protocole TCP. Il est envoyé par le serveur en réponse au paquet initial SYN du client pour accuser réception de la demande de connexion et indiquer qu'il est prêt à communiquer.
 
-<b><center>##- Handshake TCP</center></b>
+<b><center>## Handshake TCP</center></b>
 
 	Le handshake TCP (ou poignée de main en trois temps) est la méthode utilisée par le protocole TCP pour créer un lien sûr et stable entre deux machines avant de transférer des données.Les 3 étapesSYN : Le client envoie un message avec le drapeau SYN pour demander une liaison.SYN-ACK : Le serveur répond avec SYN-ACK pour valider et donner son accord.ACK : Le client envoie ACK pour confirmer la liaison.
 
