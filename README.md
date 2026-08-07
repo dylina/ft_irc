@@ -54,7 +54,7 @@
 
 [sockets](#socket) :
 
-[bloquants](#mode-bloquant),
+[bloquants](#mode-bloquant-(default-mode)),
 [non bloquants](#mode-non-bloquant) et
 [asynchrones](#asynchrones)</h5>
 
