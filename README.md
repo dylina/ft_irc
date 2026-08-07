@@ -75,9 +75,12 @@ UDP (User Datagram Protocol) - est un protocole de la couche transport (couche 4
 
 </center>
 <center>
+<center>3 Modes</center>
 
-[bloquants](#mode-bloquant),
-[non bloquants](#mode-non-bloquant),
+[bloquants](#mode-bloquant)
+
+[non bloquants](#mode-non-bloquant)
+
 [asynchrones](#asynchrones)
 
 </h5>
