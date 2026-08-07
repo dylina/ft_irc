@@ -255,7 +255,8 @@ Mode non bloquant ircMode non bloquant ircLe mode non bloquant (ou non-blocking)
 	En configurant les sockets en non-bloquant, les fonctions de lecture et d'écriture renvoient instantanément une erreur spécifique (comme EWOULDBLOCK ou EAGAIN) si l'opération ne peut pas être effectuée immédiatement. Le programme passe alors instantanément à la suite sans perdre de temps.
 </h5>
 
-[EWOULDBLOCK](#ewoulblock)
+[EWOULDBLOCK](#ewouldblock)
+
 [EAGAIN](#eagain)
 
 <center>
