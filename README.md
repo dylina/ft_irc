@@ -24,7 +24,11 @@
 </center>
 
 
-<center><h3>User Datagram Protocol (UDP):</h3></center>
+<center><h3>
+
+## User Datagram Protocol (UDP):
+
+</h3></center>
 
 
 <center>
@@ -39,7 +43,11 @@ UDP (User Datagram Protocol) - est un protocole de la couche transport (couche 4
 
 </center>
 
-<center><h3><u>IRC (Internet Relay Chat):</u></h3></center>
+<center><h3><u>
+
+## IRC (Internet Relay Chat):
+
+</u></h3></center>
 
 <center>
 <h5>Internet Relay Chat (IRC ; en français : « discussion relayée par Internet ») est un protocole de communication textuel sur Internet. Il sert à la communication instantanée principalement sous la forme de discussions en groupe par l’intermédiaire de canaux de discussion, mais il peut aussi être utilisé pour de la communication entre deux personnes seulement. Il peut par ailleurs être utilisé pour faire du transfert de fichier
@@ -70,16 +78,28 @@ UDP (User Datagram Protocol) - est un protocole de la couche transport (couche 4
 
 [bloquants](#mode-bloquant-(default-mode)),
 [non bloquants](#mode-non-bloquant) et
-[asynchrones](#asynchrones)</h5>
+[asynchrones](#asynchrones)
+
+</h5>
 
 </center>
 
-<center><h2><u>Specificite d'IRC</u></h2></center>
+<center><h2><u>
+
+## Specificite d'IRC
+
+</u></h2></center>
+
+
 <h5>La plupart des serveurs IRC ne nécessitent pas l’enregistrement par l’intermédiaire d’un compte, l'utilisateur pouvant alors choisir son nickname (surnom) librement tant qu'il est disponible.</h5>
 
 <center>
 <h3>
-	<u>Moyen d'accès:</u>
+<u>
+
+## Moyen d'accès:
+
+</u>
 </h3>
 </center>
 
@@ -88,7 +108,11 @@ UDP (User Datagram Protocol) - est un protocole de la couche transport (couche 4
 
 <center>
 	<h3>
-		<u>Channel :</u>
+		<u>
+
+## Channel :
+
+</u>
 	</h3>
 </center>
 
@@ -100,7 +124,11 @@ L’élément de base pour communiquer sur un réseau est le canal (channel dans
 	Les canaux peuvent être vus de tout le réseau, leur nom est alors préfixé par le caractère croisillon « # » ; ils peuvent aussi être des canaux locaux, portés par un serveur uniquement, leur nom est dans ce cas préfixé par le caractère esperluette « & ».
 </h5>
 
-<center><h3><u>Les Grades</u></h3></center>
+<center><h3><u>
+
+## Les Grades
+
+</u></h3></center>
 
 <h5>En IRC, il existe plusieurs grades principaux :</h5>
 
@@ -124,7 +152,11 @@ L’élément de base pour communiquer sur un réseau est le canal (channel dans
 	L'**Owner** et le **Founder** est un utilisateur ayant reçu le mode +q sur un canal de discussion. L'Owner peut modifier complêtement la configuration du canal de discussion et déléguer son statut d'owner à un autre utilisateur.
 
 
-<center><h3><u>Les commandes IRC et leur définition</u></h3></center>
+<center><h3><u>
+
+## Les commandes IRC et leur définition
+
+</u></h3></center>
 
 <center>
 <p>Par exemple, pour rejoindre un canal, un utilisateur doit effectuer</p>
@@ -184,7 +216,11 @@ L’élément de base pour communiquer sur un réseau est le canal (channel dans
 
 <center>
 	<h3>
-		<u>Mode bloquant (Default mode)</u>
+		<u>
+
+## Mode bloquant (Default mode)
+
+</u>
 	</h3>
 </center>
 
@@ -200,7 +236,11 @@ L’élément de base pour communiquer sur un réseau est le canal (channel dans
 
 <center>
 	<h3>
-		<u>Mode non bloquant</u>
+		<u>
+
+## Mode non bloquant
+
+</u>
 	</h3>
 </center>
 <h5>
@@ -219,7 +259,11 @@ Mode non bloquant ircMode non bloquant ircLe mode non bloquant (ou non-blocking)
 
 <center>
 	<h3>
-		<u>asynchrones</u>
+		<u>
+
+## asynchrones
+
+</u>
 	</h3>
 
 L'IRC asynchrone (ou Asynchronous IRC) désigne l'utilisation du protocole Internet Relay Chat de manière différée, permettant à un utilisateur de lire et d'envoyer des messages sans être connecté en permanence et en temps réel au serveur.Pour transformer ce protocole initialement synchrone en un outil de communication asynchrone (similaire à Slack, Discord ou Matrix), plusieurs méthodes et outils sont utilisés :
@@ -250,20 +294,28 @@ L'IRC asynchrone (ou Asynchronous IRC) désigne l'utilisation du protocole Inter
 
 <center>
 	<h3>
-		<u>Vocabulaire</u>
+		<u>
+
+## Vocabulaire
+
+</u>
 	</h3>
 </center>
 
 
 <h5>
-	- modes :
-  </h5>
+
+## modes :
+
+</h5>
 
 Les modes sont des options positionnées sur des canaux ou des utilisateurs, et qui affectent leur mode de fonctionnement, leurs privilèges et leurs interactions avec les autres entités de l’IRC.
 
 <h5>
-	- socket :
-  </h5>
+
+## socket :
+
+</h5>
 
 
 Dans le contexte des logiciels, on peut le traduire par « connecteur réseau » ou « interface de connexion »
@@ -363,15 +415,27 @@ Exemple : Votre navigateur web utilise des sockets pour dialoguer avec les serve
 
 	ACK (pour acknowledgment) est un accusé de réception informatique qui confirme la bonne réception d'un signal ou d'un paquet de données
 
-<b><center>## synck ack</center></b>
+<b><center>
+
+## synck ack
+
+</center></b>
 
 	Un paquet SYN-ACK (Synchronize-Acknowledgment) est la deuxième étape de la poignée de main en trois temps (three-way handshake) du protocole TCP. Il est envoyé par le serveur en réponse au paquet initial SYN du client pour accuser réception de la demande de connexion et indiquer qu'il est prêt à communiquer.
 
-<b><center>## Handshake TCP</center></b>
+<b><center>
+
+## Handshake TCP
+
+</center></b>
 
 	Le handshake TCP (ou poignée de main en trois temps) est la méthode utilisée par le protocole TCP pour créer un lien sûr et stable entre deux machines avant de transférer des données.Les 3 étapesSYN : Le client envoie un message avec le drapeau SYN pour demander une liaison.SYN-ACK : Le serveur répond avec SYN-ACK pour valider et donner son accord.ACK : Le client envoie ACK pour confirmer la liaison.
 
-<b><center>- EAGAIN</center></b>
+<b><center>
+
+## EAGAIN
+
+</center></b>
 
 	EAGAIN (« Resource temporarily unavailable ») est un code d'erreur système (errno 11 sur les systèmes type Unix) qui signifie qu'une ressource est momentanément occupée et que l'opération demandée aurait provoqué un blocage. Ce n'est pas une erreur fatale ; elle indique simplement qu'il faut réessayer plus tard.
 
@@ -390,7 +454,11 @@ Exemple : Votre navigateur web utilise des sockets pour dialoguer avec les serve
 		Compatibilité :
 			Noter que EAGAIN a souvent la même valeur numérique que EWOULDBLOCK sur de nombreux systèmes, mais qu'il est recommandé de tester les deux par portabilité.
 
-<b><center>- EWOULDBLOCK</center></b>
+<b><center>
+
+## EWOULDBLOCK
+
+</center></b>
 
 	Fonctionnement et contexteMode non bloquant :
 		 Signale que le processus ne doit pas s'endormir (bloquer) en attendant une ressource indisponible, mais reprendre la main immédiatement.
@@ -413,7 +481,11 @@ Exemple : Votre navigateur web utilise des sockets pour dialoguer avec les serve
 <br>
 
 
-<center><h3><u>Different modes de canal<center></h3></u>
+<center><h3><u>
+
+## Different modes de canal
+
+<center></h3></u>
 
 <u><h5>Mode d'utilisateur</h5></u>
 
@@ -425,7 +497,11 @@ Exemple : Votre navigateur web utilise des sockets pour dialoguer avec les serve
 | o     |    | L'utilisateur est un opérateur IRC (à ne pas confondre avec le mode de canal « o »).    |
 
 
-<u><h5>Modes de canal</h5></u>
+<u><h5>
+
+## Modes de canal
+
+</h5></u>
 
 | Lettre | Lettre | Paramètre | Description |
 |:--------: |:--------:| :--------:| :--------:|
@@ -450,7 +526,11 @@ Exemple : Votre navigateur web utilise des sockets pour dialoguer avec les serve
 <br>
 <br>
 
-<h1><u>Questions et reponses :</u></h1>
+<h1><u>
+
+## Questions et reponses :
+
+</u></h1>
 
 
 Qu'est-ce que l'Internet Relay Chat (IRC) ?
@@ -503,6 +583,10 @@ Quelle est la syntaxe des commandes IRC ?
 <br>
 <br>
 
-<u><center>SOURCES :<center></u>
+<u><center>
+
+## SOURCES :
+
+<center></u>
 
 https://www.youtube.com/watch?v=D26sUZ6DHNQ /
