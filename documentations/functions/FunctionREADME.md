@@ -1,6 +1,5 @@
 ## Sommaire des Fonctions pour IRC
 - 🌐 1. Création et gestion des sockets
-<br>
 
 
 	- [`socket()`](./socket()/SOCKET.md)
@@ -8,21 +7,18 @@
 	- [`setsockopt()`](./setsockopt()/SETSOCKETOPt.md)
 	- [`getsockname()`](./getsockname()/getsockname.md)
 - 🔎 2. Résolution réseau
-<br>
 
 	- [`getprotobyname()`](./getprobebyname()/getprobebyname.md)
 	- [`gethostbyname()`](./gethostbyname()/gethostbyname.md)
 	- [`getaddrinfo()`](./getaddrinfo()/getaddrinfo.md)
 	- [`freeaddrinfo()`](./freeaddrinfo()/freeaddrinfo.md)
 - 🔌 3. Connexion TCP
-<br>
 
 	- [`bind()`](./bind()/bind.md)
 	- [`connect()`](./connect()/connect.md)
 	- [`listen()`](./listen()/listen.md)
 	- [`accept()`](./accept()/accept.md)
 - [🔢 4. Conversion des adresses et ports](../global_knowledge/ports.md)
-<br>
 
 	- [`htons()`](./hton()/hton.md)
 	- [`htonl()`](./htonl()/htonl.md)
