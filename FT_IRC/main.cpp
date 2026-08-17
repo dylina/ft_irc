@@ -26,6 +26,9 @@ int main(int argc, char **argv)
 	{
 		char *port = argv[1];
 		Socket socket(AF_INET, "localhost", port);
+		Server irc(socket);
+		listen(socket.getFd(), 10);
+
 	}
 	catch (...)
 	{
