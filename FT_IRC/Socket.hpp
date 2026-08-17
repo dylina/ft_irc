@@ -9,15 +9,16 @@
 #include <string.h>
 #include <sstream>
 #include <vector>
+#include <cstdlib>
+#include <unistd.h>
+#include "colors.hpp"
 
 class Socket
 {
 	public:
 
-		Socket(int domain, std::string ip, int port);
-
-		//create hostname in usable network information.
-		int createNetwork();
+		Socket(int domain, std::string ip, std::string port);
+		~Socket();
 
 		class ErrorOfSocket : public std::exception
 		{
@@ -35,24 +36,32 @@ class Socket
 					const char* what() const throw();
 		};
 
-	private:
-
-		//Translates a hostname and a service into usable network information.
-		struct addrinfo hints;
-		struct addrinfo *result;
-
-		//socket parameters
-		int socketDomain;
-		int socketType;
-		int socketProtocol;
-		int sockFd;
-
-		//network parameter
-		std::string ip;
-		std::string port;
+		struct sockaddr_in getSocket() const;
+		int getDomain() const;
+		int getType() const;
+		int getProtocol() const;
+		int getFd() const;
 
 		//test functions or debugs
 		void printAll();
+
+	private:
+
+		struct sockaddr_in adress;
+
+
+		//socket parameters :
+
+		int sockDomain;
+		int sockType;
+		int sockProtocol;
+		int sockFd;
+
+		//Network parameter ip
+		std::string ip;
+
+		//Network parameter port
+		std::string port;
 
 
 };
