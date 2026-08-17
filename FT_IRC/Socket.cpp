@@ -83,9 +83,6 @@ Socket::Socket(int domain, std::string ip, std::string port)
 	this->adress.sin_family = this->sockDomain;
 	this->adress.sin_port = htons(atoi(this->port.c_str()));
 	this->adress.sin_addr.s_addr = INADDR_ANY;
-
-	//test
-	this->printAll();
 }
 
 struct sockaddr_in Socket::getSocket() const
