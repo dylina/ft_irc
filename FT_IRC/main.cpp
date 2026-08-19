@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 {
 		// Domain :	AF_INET	ou	AF_INET6	ou	AF_UNIX	ou	AF_LOCAL
 		//IP : localhost
-		// Port: entre 0 et 65535
+		// Port: entre 1020 et 65535
 
 
 	if (argc != 3)
@@ -24,14 +24,17 @@ int main(int argc, char **argv)
 
 	try
 	{
-		char *port = argv[1];
-		Socket socket(AF_INET, "localhost", port);
-		Server irc(socket);
-		listen(socket.getFd(), 10);
+		std::string port = argv[1];
+
+		// start with 127.0.0.1 == "localhost"
+		Server irc(AF_INET, "127.0.0.1", port);
+
+		irc.on();
 
 	}
-	catch (...)
+	catch (std::exception &e)
 	{
+		std::cerr << "!Error :" << e.what() << std::endl;
 		return 1;
 	}
 
