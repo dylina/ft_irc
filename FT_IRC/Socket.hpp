@@ -11,7 +11,7 @@
 #include <vector>
 #include <cstdlib>
 #include <unistd.h>
-#include "colors.hpp"
+
 
 class Socket
 {
@@ -36,7 +36,7 @@ class Socket
 					const char* what() const throw();
 		};
 
-		struct sockaddr_in getSocket() const;
+		struct sockaddr_in &getSocket();
 		int getDomain() const;
 		int getType() const;
 		int getProtocol() const;

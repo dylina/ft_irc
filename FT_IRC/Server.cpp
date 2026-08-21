@@ -1,4 +1,11 @@
 #include "Server.hpp"
+#include "Socket.hpp"
+#include "colors.hpp"
+#include <cstddef>
+#include <netinet/in.h>
+#include <sys/poll.h>
+#include <sys/socket.h>
+
 
 const char* Server::BindErr::what() const throw()
 {
@@ -16,24 +23,20 @@ const char* Server::AcceptErr::what() const throw()
 }
 
 
-Server::Server(int domain, std::string ip, std::string port) : _serverSocket(domain, ip, port), _addr()
+Server::Server(int domain, std::string ip, std::string port) : _serverSocket(domain, ip, port)
 {
-
-	this->_addr.sin_family = AF_INET;
-	this->_addr.sin_port = htons(atoi(port.c_str()));
-    _addr.sin_addr.s_addr = inet_addr(ip.c_str());
 
 	if (	bind(
 			this->_serverSocket.getFd(),
-			reinterpret_cast<const struct sockaddr*>(&this->_addr),
-			sizeof(this->_addr)
+			reinterpret_cast<const struct sockaddr*>(&this->_serverSocket.getSocket()),
+			sizeof(this->_serverSocket.getSocket())
 			) == -1 )
 	{
 		perror("bind");
 		throw BindErr();
 	}
+	std::cerr << BOLDGREEN << "Server bind() success!" << RESET << std::endl;
 
-	std::cerr << "Server bind() success" << std::endl;
 }
 
 void Server::on()
@@ -43,28 +46,44 @@ void Server::on()
 		perror("listen");
 		throw ListenErr();
 	}
+	std::cout << "Server listening on " << ntohs(this->_serverSocket.getSocket().sin_port) << " .." << std::endl;
 
-	std::cout << "Server listening .." << std::endl;
+	struct pollfd fds[10];
+	fds[0].fd = this->_serverSocket.getFd();
+	fds[0].events = POLLIN;
+	fds[0].revents = 0;
 
-	struct sockaddr_in clientAddr;
-	socklen_t addrLen = sizeof(clientAddr);
-
-
-	// test for client connect
-		int clientFd = accept(
-			this->_serverSocket.getFd(),
-			reinterpret_cast<struct sockaddr *>(&clientAddr),
-			&addrLen
-		);
-
-		if (clientFd == -1)
-		{
-			perror("accept");
-			throw AcceptErr();
+	// Loop principale de poll qui check les fds en continue
+	while (true)
+	{
+		int ret = poll(fds, 10, -1);
+		if (ret == -1)
+		{	
+			std::cerr << BOLDRED << "Error in poll() loop" << RESET << std::endl;
+			break;
 		}
 
-		std::cout << clientFd << std::endl;
-		close(clientFd);
-	// end test --------------------
+		for (int i = 0; i < 10; ++i)
+		{
+			// connexion flags : POLLIN = Il y a des données en attente de lecture.
+			if (fds[i].revents & POLLIN) 
+			{
+				if (fds[i].fd == this->_serverSocket.getFd())
+				{
+					sockaddr_in clientSocket;
+					socklen_t clientLen = sizeof(clientSocket);
+
+					std::cerr << "log: connexion of new client ..." << std::endl;
+					int clientFd = accept(fds[i].fd, reinterpret_cast<struct sockaddr *>(&clientSocket), &clientLen);
+
+					if (clientFd)
+						std::cerr << GREEN << "New client [" << clientFd << "] connected" << RESET << std::endl;
+					else
+						std::cerr << RED << "!New client error received" << RESET << std::endl;
+				}
+			}
+		}
+	}
+
 }
 

@@ -1,4 +1,5 @@
 #include "Socket.hpp"
+#include "colors.hpp"
 
 const char* Socket::ErrorOfSocket::what() const throw()
 {
@@ -54,17 +55,22 @@ Socket::Socket(int domain, std::string ip, std::string port)
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "Error :" << e.what() << '\n';
+		std::cerr << RED << "Error :" << e.what() << RESET << '\n';
 		throw e.what();
 	}
+
+	std::cerr << BOLDGREEN  << "	Valid Args\n"
+							<< "Domain : "; if(domain == AF_INET){std::cerr << "ipv4\n";}else if (domain == AF_INET6){std::cerr << "ipv6\n";}else if (domain == AF_UNIX){std::cerr << "local\n";}else{std::cerr << domain << '\n';} std::cerr
+							<< "Ip : " << ip << '\n'
+							<< "Port : " << port << '\n' << RESET << std::endl;
 
 	// atribute the good domain
 	this->sockDomain = domain;
 
-	// it's the flux type
+	// it's the flux type for TCP uses
 	this->sockType = SOCK_STREAM;
 
-	//Standard protocol = TCP
+	//Standard protocol 0 = TCP
 	this->sockProtocol = 0;
 
 	//create a socket FD
@@ -76,6 +82,7 @@ Socket::Socket(int domain, std::string ip, std::string port)
 		perror("socket");
 		throw Socket::ErrorOfSocket();
 	}
+	std::cerr << BOLDGREEN << "socket() success!" << RESET << std::endl;
 
 	this->port = port;
 	this->ip = ip;
@@ -85,7 +92,7 @@ Socket::Socket(int domain, std::string ip, std::string port)
 	this->adress.sin_addr.s_addr = INADDR_ANY;
 }
 
-struct sockaddr_in Socket::getSocket() const
+struct sockaddr_in &Socket::getSocket()
 {
 	return this->adress;
 }

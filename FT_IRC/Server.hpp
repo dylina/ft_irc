@@ -2,6 +2,10 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/poll.h>
+#include <vector>
+#include <iterator>
+#include "Client.hpp"
 #include "Socket.hpp"
 
 class Server
@@ -31,5 +35,5 @@ class Server
 	private:
 
 		Socket _serverSocket;
-		struct sockaddr_in _addr;
+		std::vector<Client> clients;
 };

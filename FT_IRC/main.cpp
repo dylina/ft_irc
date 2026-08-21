@@ -5,6 +5,7 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <string.h>
+#include "colors.hpp"
 #include "Socket.hpp"
 #include "Server.hpp"
 
@@ -34,7 +35,7 @@ int main(int argc, char **argv)
 	}
 	catch (std::exception &e)
 	{
-		std::cerr << "!Error :" << e.what() << std::endl;
+		std::cerr << BOLDRED << "!Error :" << e.what() << RESET << std::endl;
 		return 1;
 	}
 
