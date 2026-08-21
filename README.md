@@ -14,38 +14,38 @@ Call by [`Server`](#Server) constructor check all args passed and return a varia
 
 #### getter
 
-`Socket::getSocket()`
-- return  adress;
+`getSocket()`
+- return  adress [`sockaddr_in`](../structure/sockaddr_in.md)
 
 `getDomain()`
-- return  sockDomain;
+- return  sockDomain `int`
 
 `getType()`
-- return  sockType;
+- return  sockType `int`
 
 `getProtocol()`
-- return  sockProtocol;
+- return  sockProtocol `int`
 
 `getFd()`
-- return  sockFd;
+- return  sockFd `int`
 
 
 
 ## Server()
 
-Create a server with socket base on args at construct and call [bind()](documentations/functions/bind()/bind.md) , or throw() an exception if have error
+Create a IRC server with socket base on args at construct and call [bind()](documentations/functions/bind()/bind.md) , or throw() an exception if have error
 
 
 #### Have Members:
 
 
-[on](#) :
+`on()` :
 
->call listen() and test it for now
+- call [listen()](documentations/functions/listen()/listen.md) and test it for now
 
 #### variables
 
-- [`sockaddr_in`](../structure/sockaddr_in.md) _addr;
+- [`sockaddr_in`](documentations/structure/sockaddr_in.md) _addr;
 - [`Socket`]() _serverSocket;
 
 </br>
