@@ -1,11 +1,4 @@
 #include "Server.hpp"
-#include "Socket.hpp"
-#include "colors.hpp"
-#include <cstddef>
-#include <netinet/in.h>
-#include <sys/poll.h>
-#include <sys/socket.h>
-
 
 const char* Server::BindErr::what() const throw()
 {
@@ -20,6 +13,11 @@ const char* Server::ListenErr::what() const throw()
 const char* Server::AcceptErr::what() const throw()
 {
 	return "accept() error";
+}
+
+const char* Server::RecvError::what() const throw()
+{
+	return "recv() error";
 }
 
 
@@ -48,17 +46,19 @@ void Server::on()
 	}
 	std::cout << "Server listening on " << ntohs(this->_serverSocket.getSocket().sin_port) << " .." << std::endl;
 
-	struct pollfd fds[10];
-	fds[0].fd = this->_serverSocket.getFd();
-	fds[0].events = POLLIN;
-	fds[0].revents = 0;
+	struct pollfd server;
+	server.fd = this->_serverSocket.getFd();
+	server.events = POLLIN;
+	server.revents = 0;
+
+	this->fds.push_back(server);
 
 	// Loop principale de poll qui check les fds en continue
 	while (true)
 	{
-		int ret = poll(fds, 10, -1);
-		if (ret == -1)
-		{	
+		int retPoll = poll(&this->fds[0], this->fds.size(), -1);
+		if (retPoll == -1)
+		{
 			std::cerr << BOLDRED << "Error in poll() loop" << RESET << std::endl;
 			break;
 		}
@@ -66,7 +66,7 @@ void Server::on()
 		for (int i = 0; i < 10; ++i)
 		{
 			// connexion flags : POLLIN = Il y a des données en attente de lecture.
-			if (fds[i].revents & POLLIN) 
+			if (fds[i].revents & POLLIN)
 			{
 				if (fds[i].fd == this->_serverSocket.getFd())
 				{
@@ -76,10 +76,26 @@ void Server::on()
 					std::cerr << "log: connexion of new client ..." << std::endl;
 					int clientFd = accept(fds[i].fd, reinterpret_cast<struct sockaddr *>(&clientSocket), &clientLen);
 
-					if (clientFd)
-						std::cerr << GREEN << "New client [" << clientFd << "] connected" << RESET << std::endl;
-					else
-						std::cerr << RED << "!New client error received" << RESET << std::endl;
+					try
+					{
+						this->addNewClient(clientFd);
+					}
+					catch(const std::exception& e)
+					{
+						std::cerr << BOLDRED << e.what() << RESET << std::endl;
+					}
+				}
+				else
+				{
+					try
+					{
+						this->dataReceived(fds, i);
+					}
+					catch(const std::exception& e)
+					{
+						std::cerr << BOLDRED << e.what() << RESET << std::endl;
+					}
+
 				}
 			}
 		}
@@ -87,3 +103,50 @@ void Server::on()
 
 }
 
+
+void Server::addNewClient(int clientFd)
+{
+	if (clientFd < 0)
+		throw AcceptErr();
+	struct pollfd newClient;
+
+	newClient.fd = clientFd;
+	newClient.events = POLLIN;
+	newClient.revents = 0;
+	this->fds.push_back(newClient);
+	std::vector<struct pollfd>::iterator it = fds.end() - 1;
+	std::cerr << GREEN << "New client add, fd: [" << (*it).fd << "], connected" << RESET << std::endl;
+}
+
+void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
+{
+	char buffer[BUFFER_SIZE];
+
+	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer), 0);
+	//message by client
+	if (retRecv > 0)
+	{
+		std::cerr << "new message from client fd [" << fds[i].fd << "] :" << std::endl;
+		std::cerr << "\"" << BOLDBLUE;
+		for (int m = 0; m < BUFFER_SIZE && buffer[m]; m++)
+		{
+			std::cerr << buffer[m];
+			if (buffer[m + 1] == '\n' && buffer[m + 2] == 0)
+			{
+				std::cerr << RESET << "\"" << std::endl;
+				break;
+			}
+		}
+	}
+	//client lost
+	else if (retRecv == 0)
+	{
+		std::vector<struct pollfd>::iterator it = fds.begin() + i;
+		std::cerr << "client fd [" << (*it).fd << "] disconnected" << std::endl;
+		close((*it).fd);
+		this->fds.erase(it);
+	}
+	// error
+	else
+		std::cerr << "Error client received" << std::endl;
+}

@@ -15,7 +15,7 @@ Call by [`Server`](#Server) constructor check all args passed and return a varia
 #### getter
 
 `getSocket()`
-- return  adress [`sockaddr_in`](../structure/sockaddr_in.md)
+- return  adress [`sockaddr_in`](documentations/structure/sockaddr_in.md)
 
 `getDomain()`
 - return  sockDomain `int`
@@ -41,12 +41,12 @@ Create a IRC server with socket base on args at construct and call [bind()](docu
 
 `on()` :
 
-- call [listen()](documentations/functions/listen()/listen.md) and test it for now
+- call [listen()](documentations/functions/listen()/listen.md), do a [`struct pollfd`](documentations/functions/poll()/struct_pollfd.md) and surveys on a loop;
 
 #### variables
 
 - [`sockaddr_in`](documentations/structure/sockaddr_in.md) _addr;
-- [`Socket`]() _serverSocket;
+- [`Socket`](documentations/functions/socket()/SOCKET.md) _serverSocket;
 
 </br>
 
@@ -63,22 +63,22 @@ Create a IRC server with socket base on args at construct and call [bind()](docu
 
 # Sources
 
-https://www.geeksforgeeks.org/cpp/socket-programming-in-cpp/ 
+https://www.geeksforgeeks.org/cpp/socket-programming-in-cpp/
 
-https://www.ibm.com/docs/en/zos/2.5.0?topic=otap-clientserver-socket-programs-blocking-nonblocking-asynchronous-socket-calls 
+https://www.ibm.com/docs/en/zos/2.5.0?topic=otap-clientserver-socket-programs-blocking-nonblocking-asynchronous-socket-calls
 
-http://manpagesfr.free.fr/man/man2/listen.2.html 
+http://manpagesfr.free.fr/man/man2/listen.2.html
 
-https://www.frameip.com/c-mode-connecte/ 
+https://www.frameip.com/c-mode-connecte/
 
-https://www.csd.uoc.gr/~hy556/material/tutorials/cs556-3rd-tutorial.pdf 
+https://www.csd.uoc.gr/~hy556/material/tutorials/cs556-3rd-tutorial.pdf
 
-https://www.codequoi.com/programmation-reseau-via-socket-en-c/ 
+https://www.codequoi.com/programmation-reseau-via-socket-en-c/
 
-https://www.figma.com/board/TEviHsREY663xd6BxfD1UQ/ft_irc?node-id=1-2 
+https://www.figma.com/board/TEviHsREY663xd6BxfD1UQ/ft_irc?node-id=1-2
 
-https://www.techbull.com/techbull/guide/internet/irccommande.html 
+https://www.techbull.com/techbull/guide/internet/irccommande.html
 
-https://www.irchelp.org/protocol/rfc/chapter6.html 
+https://www.irchelp.org/protocol/rfc/chapter6.html
 
 https://mathieu-lemoine.developpez.com/tutoriels/irc/protocole/?page=commandes
