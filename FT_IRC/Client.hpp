@@ -1,21 +1,28 @@
 #pragma once
 
 #include <netinet/in.h>
+#include "Client.hpp"
 #include <poll.h>
 #include <string>
 
 class Client
 {
     public:
-        
-    
+
+		Client();
+
+		std::string	getName() const;
+		std::string getData() const;
+		int getMode() const;
+
+		void setName(std::string name);
+		void setData(char *buffer);
+		void setMode(int mode);
+
     private:
 
-        int _fd;
-        int _mode;
-        sockaddr_in _clientAddr;
         std::string _userName;
-
-        struct pollfd _poll;
+		std::string _data;
+		int _mode;
 
 };
