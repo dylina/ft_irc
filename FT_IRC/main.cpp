@@ -28,6 +28,7 @@ int main(int argc, char **argv)
 		std::string port = argv[1];
 
 		// start with 127.0.0.1 == "localhost"
+		
 		Server irc(AF_INET, "127.0.0.1", port);
 
 		irc.on();
