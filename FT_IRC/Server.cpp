@@ -63,7 +63,7 @@ void Server::on()
 			break;
 		}
 
-		for (int i = 0; i < 10; ++i)
+		for (int i = 0; i < this->fds.size(); ++i)
 		{
 			// connexion flags : POLLIN = Il y a des données en attente de lecture.
 			if (fds[i].revents & POLLIN)
