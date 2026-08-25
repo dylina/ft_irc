@@ -1,9 +1,16 @@
 #pragma once
 
 #include <netinet/in.h>
-#include "Client.hpp"
 #include <poll.h>
 #include <string>
+#include <iostream>
+
+#include "colors.hpp"
+#include "Client.hpp"
+
+#ifndef BUFFER_SIZE
+#define BUFFER_SIZE 1024
+#endif
 
 class Client
 {
@@ -16,13 +23,13 @@ class Client
 		int getMode() const;
 
 		void setName(std::string name);
-		void setData(char *buffer);
+		void addData(char *buffer, int clientFd);
 		void setMode(int mode);
 
     private:
 
         std::string _userName;
-		std::string _data;
+		std::string _dataBuffer;
 		int _mode;
 
 };

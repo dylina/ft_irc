@@ -11,10 +11,6 @@
 #include "colors.hpp"
 #include "Client.hpp"
 
-#ifndef BUFFER_SIZE
-#define BUFFER_SIZE 1024
-#endif
-
 
 class Server
 {
@@ -47,11 +43,15 @@ class Server
 
 
 	private:
-
+		//mount a struct pollfd for new client and add in variables server
 		void addNewClient(int clientFd);
+		//catch message from a already connected client
 		void dataReceived(std::vector<struct pollfd> &fds, int i);
 
+
 		Socket _serverSocket;
-		std::map<int,Client> clients;
+		//tableau associatif de pairs, [int Clientfd] -> Client User,  !a delete a la fin!
+		std::map<int,Client *> clients;
+		//tableau dynamique de surveillance de fd pour poll()
 		std::vector<struct pollfd> fds;
 };

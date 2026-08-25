@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client() : _userName(""), _data(""), _mode(1)
+Client::Client() : _userName(""), _dataBuffer(""), _mode(1)
 {}
 
 
@@ -15,9 +15,26 @@ void Client::setName(std::string name)
 	this->_userName = name;
 }
 
-void Client::setData(char *buffer)
+void Client::addData(char *buffer, int clientFd)
 {
-	this->_data = buffer;
+
+	this->_dataBuffer += buffer;
+
+		std::cerr << "new message from client fd [" << clientFd << "] :" << std::endl;
+		std::cerr << "\"" << BOLDWHITE;
+		for (int m = 0; m < BUFFER_SIZE; m++)
+		{
+			if (_dataBuffer[m] == '\n')
+				std::cerr << BOLDYELLOW << "\\n" << BOLDWHITE;
+			else if (_dataBuffer[m] == '\r')
+				std::cerr << BOLDYELLOW << "\\r" << BOLDWHITE;
+			if (!_dataBuffer[m])
+			{
+				std::cerr << RESET << "\"" << std::endl;
+				break;
+			}
+			std::cerr << _dataBuffer[m];
+		}
 }
 
 void Client::setMode(int mode)
@@ -27,7 +44,7 @@ void Client::setMode(int mode)
 
 std::string Client::getData() const
 {
-	return this->_data;
+	return this->_dataBuffer;
 }
 
 int Client::getMode() const
