@@ -19,7 +19,7 @@ class Client
 		std::string getData() const;
 
 		void setNickName(std::string name);
-		void setUserkName(std::string name);
+		void setUserName(std::string name);
 		void setData(char *buffer);
 		void setMode(int mode);
 

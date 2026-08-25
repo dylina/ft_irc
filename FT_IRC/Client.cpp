@@ -5,14 +5,24 @@ Client::Client() : _userName(""), _data(""), _mode(1)
 
 
 
-std::string	Client::getName() const
+std::string	Client::getUserName() const
 {
 	return this->_userName;
 }
 
-void Client::setName(std::string name)
+std::string	Client::getNickName() const
+{
+	return this->_nickName;
+}
+
+void Client::setUserName(std::string name)
 {
 	this->_userName = name;
+}
+
+void Client::setNickName(std::string name)
+{
+	this->_nickName = name;
 }
 
 void Client::setData(char *buffer)
