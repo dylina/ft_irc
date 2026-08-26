@@ -142,11 +142,13 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 	{
 		std::vector<struct pollfd>::iterator it = fds.begin() + i;
 		std::cerr << "client fd [" << (*it).fd << "] disconnected" << std::endl;
+
+		this->clients.erase((*it).fd);
 		close((*it).fd);
 		this->fds.erase(it);
 	}
 	// error
 	else
-		std::cerr << "Error client received" << std::endl;
+		std::cerr << "Error client received in fd [" << fds[i].fd << "]" << std::endl;
 
 }
