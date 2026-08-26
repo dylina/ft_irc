@@ -31,5 +31,6 @@ class Client
         std::string _userName;
 		std::string _dataBuffer;
 		int _mode;
+		std
 
 };
