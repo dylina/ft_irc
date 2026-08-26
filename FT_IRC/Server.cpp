@@ -135,7 +135,9 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 	if (retRecv > 0)
 	{
 		buffer[retRecv] = 0;
-		this->clients[fds[i].fd]->addData(buffer, fds[i].fd);
+		std::string data(buffer, retRecv);
+		std::cerr << retRecv << " bytes received from " << fds[i].fd << " fd" << std::endl;
+		this->clients[fds[i].fd]->addData(data, fds[i].fd);
 	}
 	//client lost
 	else if (retRecv == 0)
