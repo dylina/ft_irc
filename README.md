@@ -6,7 +6,7 @@
 <!-- Docs for functions use in irc in french -->
 ### 	[For details of functions may be utils clic here](documentations/functions/FunctionREADME.md)
 
-###	[Figma](https://www.figma.com/design/C4HZnHfigGpI6nS6wX3mII/Sans-titre?node-id=0-1&p=f&t=aRpLHCoFwRaahX5C-0)
+###	[Figma](https://www.figma.com/board/jBAdbJe6eh4TZFADuDJrHR/Sans-titre?t=pe1Fjax6EZpvkhMh-0)
 
 # Class of the project:
 
@@ -127,3 +127,5 @@ https://www.irchelp.org/protocol/rfc/chapter6.html
 https://mathieu-lemoine.developpez.com/tutoriels/irc/protocole/?page=commandes
 
 https://datatracker.ietf.org/doc/html/rfc1459
+
+https://modern.ircdocs.horse/ => norme irc

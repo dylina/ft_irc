@@ -4,9 +4,11 @@
 #include <poll.h>
 #include <string>
 #include <iostream>
+#include <vector>
+#include <iterator>
 
 #include "colors.hpp"
-#include "Client.hpp"
+#include "CommandComplete.hpp"
 
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE 1024
@@ -20,17 +22,24 @@ class Client
 
 		std::string	getName() const;
 		std::string getData() const;
+
 		int getMode() const;
+		void addData(std::string buffer, int clientFd);
 
-		void setName(std::string name);
-		void addData(char *buffer, int clientFd);
+
+		private:
+
 		void setMode(int mode);
-
-    private:
+		void setName(std::string name);
+		bool parseCommand();
+		void printBufferEnhance();
 
         std::string _userName;
 		std::string _dataBuffer;
 		int _mode;
-		std
+		CommandComplete _commandsConstruct;
+
+
+
 
 };
