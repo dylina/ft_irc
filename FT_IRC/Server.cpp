@@ -63,7 +63,7 @@ void Server::on()
 			break;
 		}
 
-		for (int i = 0; i < this->fds.size(); ++i)
+		for (size_t i = 0; i < this->fds.size(); ++i)
 		{
 			// connexion flags : POLLIN = Il y a des données en attente de lecture.
 			if (fds[i].revents & POLLIN)
@@ -108,12 +108,19 @@ void Server::addNewClient(int clientFd)
 {
 	if (clientFd < 0)
 		throw AcceptErr();
-	struct pollfd newClient;
+	struct pollfd newClientStruct;
 
-	newClient.fd = clientFd;
-	newClient.events = POLLIN;
-	newClient.revents = 0;
-	this->fds.push_back(newClient);
+	newClientStruct.fd = clientFd;
+	newClientStruct.events = POLLIN;
+	newClientStruct.revents = 0;
+
+	this->fds.push_back(newClientStruct);
+
+	Client *newClientClass = new Client;
+	this->clients[newClientStruct.fd] = newClientClass;
+
+
+
 	std::vector<struct pollfd>::iterator it = fds.end() - 1;
 	std::cerr << GREEN << "New client add, fd: [" << (*it).fd << "], connected" << RESET << std::endl;
 }
@@ -123,30 +130,27 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 	char buffer[BUFFER_SIZE];
 
 	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer), 0);
-	//message by client
+
+	//client data received
 	if (retRecv > 0)
 	{
-		std::cerr << "new message from client fd [" << fds[i].fd << "] :" << std::endl;
-		std::cerr << "\"" << BOLDBLUE;
-		for (int m = 0; m < BUFFER_SIZE && buffer[m]; m++)
-		{
-			std::cerr << buffer[m];
-			if (buffer[m + 1] == '\n' && buffer[m + 2] == 0)
-			{
-				std::cerr << RESET << "\"" << std::endl;
-				break;
-			}
-		}
+		buffer[retRecv] = 0;
+		std::string data(buffer, retRecv);
+		std::cerr << retRecv << " bytes received from " << fds[i].fd << " fd" << std::endl;
+		this->clients[fds[i].fd]->addData(data, fds[i].fd);
 	}
 	//client lost
 	else if (retRecv == 0)
 	{
 		std::vector<struct pollfd>::iterator it = fds.begin() + i;
 		std::cerr << "client fd [" << (*it).fd << "] disconnected" << std::endl;
+
+		this->clients.erase((*it).fd);
 		close((*it).fd);
 		this->fds.erase(it);
 	}
 	// error
 	else
-		std::cerr << "Error client received" << std::endl;
+		std::cerr << "Error client received in fd [" << fds[i].fd << "]" << std::endl;
+
 }
