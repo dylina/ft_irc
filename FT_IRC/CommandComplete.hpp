@@ -10,8 +10,8 @@ class CommandComplete
 		CommandComplete();
 		std::string command;
 		std::vector<std::string> params;
-		
-		bool _isComplete;
+
+		bool _isDone;
 	private:
 		std::string prefix;
 		std::string trailing;
