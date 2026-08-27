@@ -40,7 +40,7 @@ bool Client::hasPass() const
 
 bool Client::isRegistered() const
 {
-	return isRegistered;
+	return this->_hasPass && !this->_nickName.empty() && !this->_userName.empty();;
 }
 
 void Client::setNickName(std::string name)
@@ -50,7 +50,7 @@ void Client::setNickName(std::string name)
 
 void Client::setUserName(std::string name)
 {
-
+	this->_userName = name;
 }
 
 // void Client::setMode(std::string int mode)
@@ -60,7 +60,7 @@ void Client::setUserName(std::string name)
 
 void Client::setPass(bool val)
 {
-
+	this->_hasPass = val;
 }
 
 void Client::addData(std::string buffer, int clientFd)
@@ -95,11 +95,6 @@ void Client::printBufferEnhance()
 void Client::setMode(int mode)
 {
 	this->_mode = mode;
-}
-
-std::string Client::getData() const
-{
-	return this->_dataBuffer;
 }
 
 bool Client::parseCommand()
