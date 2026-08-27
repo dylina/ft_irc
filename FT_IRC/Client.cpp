@@ -53,10 +53,10 @@ void Client::setUserName(std::string name)
 	this->_userName = name;
 }
 
-// void Client::setMode(std::string int mode)
-// {
-
-// }
+void Client::setMode(int mode)
+{
+	this->_mode = mode;
+}
 
 void Client::setPass(bool val)
 {
