@@ -70,6 +70,7 @@ void Client::addData(std::string buffer, int clientFd)
 
 	std::cerr << "new data from client fd [" << this->_fd << "] stored in buffer client:" << std::endl;
 	this->parseCommand();
+	(void)clientFd;
 }
 
 void Client::printBufferEnhance()
