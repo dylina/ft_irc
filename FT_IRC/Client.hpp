@@ -45,11 +45,11 @@ class Client
 	private:
 
 		int 			_fd;
-		int 			_mode;
 		sockaddr_in 	_clientAddr;
 		std::string 	_nickName;
         std::string 	_userName;
 		std::string 	_dataBuffer;
+		int 			_mode;
 		bool 			_hasPass;
 		CommandComplete _commandsConstruct;
 
