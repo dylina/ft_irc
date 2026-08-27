@@ -92,11 +92,6 @@ void Client::printBufferEnhance()
 		std::cerr << RESET << "\"" << std::endl;
 }
 
-void Client::setMode(int mode)
-{
-	this->_mode = mode;
-}
-
 bool Client::parseCommand()
 {
 	if (!this->_commandsConstruct._isComplete)
