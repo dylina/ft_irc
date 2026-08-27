@@ -26,12 +26,18 @@ class Client
 		int getMode() const;
 		void addData(std::string buffer, int clientFd);
 
+		class ErrorCreationClient : public std::exception
+		{
+			public:
+				const char* what() const throw();
+		};
+
 
 		private:
 
 		void setMode(int mode);
 		void setName(std::string name);
-		bool parseCommand();
+		CommandComplete parseCommand();
 		void printBufferEnhance();
 
         std::string _userName;
