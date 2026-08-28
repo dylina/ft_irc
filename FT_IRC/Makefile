@@ -4,7 +4,7 @@ CXX = c++
 
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRC = Socket.cpp Server.cpp main.cpp Client.cpp CommandComplete.cpp
+SRC = Socket.cpp Server.cpp main.cpp Client.cpp 
 
 OBJ = $(SRC:.cpp=.o)
 
