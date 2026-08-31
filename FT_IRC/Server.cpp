@@ -33,7 +33,7 @@ Server::Server(int domain, std::string ip, std::string port) : _serverSocket(dom
 		perror("bind");
 		throw BindErr();
 	}
-	std::cerr << BOLDGREEN << "Server bind() success!" << RESET << std::endl;
+	std::cerr << BOLD BRIGHT_GREEN << "Server bind() success!" << RESET << std::endl;
 
 }
 
@@ -59,7 +59,7 @@ void Server::on()
 		int retPoll = poll(&this->fds[0], this->fds.size(), -1);
 		if (retPoll == -1)
 		{
-			std::cerr << BOLDRED << "Error in poll() loop" << RESET << std::endl;
+			std::cerr << BOLD BRIGHT_RED << "Error in poll() loop" << RESET << std::endl;
 			break;
 		}
 
@@ -78,11 +78,11 @@ void Server::on()
 
 					try
 					{
-						this->addNewClient(clientFd);
+						this->addNewClient(clientFd, clientSocket);
 					}
 					catch(const std::exception& e)
 					{
-						std::cerr << BOLDRED << e.what() << RESET << std::endl;
+						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
 				}
 				else
@@ -93,7 +93,7 @@ void Server::on()
 					}
 					catch(const std::exception& e)
 					{
-						std::cerr << BOLDRED << e.what() << RESET << std::endl;
+						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
 
 				}
@@ -103,8 +103,27 @@ void Server::on()
 
 }
 
+static std::string addRandomColorsForClient(int Clientfd)
+{
+	std::stringstream fd;
+	fd << Clientfd;
 
-void Server::addNewClient(int clientFd)
+	int colors = std::rand() % 256;
+
+	std::stringstream rdmcolor;
+	rdmcolor	<< "\033[38;5;"
+				<< colors
+				<< "m"
+				<< Clientfd
+				<< RESET;
+
+
+
+	return rdmcolor.str();
+}
+
+
+void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
 {
 	if (clientFd < 0)
 		throw AcceptErr();
@@ -116,7 +135,7 @@ void Server::addNewClient(int clientFd)
 
 	this->fds.push_back(newClientStruct);
 
-	Client *newClientClass = new Client;
+	Client *newClientClass = new Client(sockAddrClient);
 	this->clients[newClientStruct.fd] = newClientClass;
 
 
@@ -137,7 +156,10 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		buffer[retRecv] = 0;
 		std::string data(buffer, retRecv);
 		std::cerr << retRecv << " bytes received from " << fds[i].fd << " fd" << std::endl;
-		this->clients[fds[i].fd]->addData(data, fds[i].fd);
+
+
+
+		this->clients[fds[i].fd]->addData(data, addRandomColorsForClient(fds[i].fd));
 	}
 	//client lost
 	else if (retRecv == 0)
@@ -154,3 +176,4 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		std::cerr << "Error client received in fd [" << fds[i].fd << "]" << std::endl;
 
 }
+

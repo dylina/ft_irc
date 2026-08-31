@@ -8,6 +8,8 @@
 #include "colors.hpp"
 #include "Socket.hpp"
 #include "Server.hpp"
+#include <cstdlib>
+#include <ctime>
 
 int main(int argc, char **argv)
 {
@@ -28,15 +30,17 @@ int main(int argc, char **argv)
 		std::string port = argv[1];
 
 		// start with 127.0.0.1 == "localhost"
-		
+
 		Server irc(AF_INET, "127.0.0.1", port);
+
+		std::srand(std::time(NULL));
 
 		irc.on();
 
 	}
 	catch (std::exception &e)
 	{
-		std::cerr << BOLDRED << "!Error :" << e.what() << RESET << std::endl;
+		std::cerr << BRIGHT_RED << "!Error :" << e.what() << RESET << std::endl;
 		return 1;
 	}
 
