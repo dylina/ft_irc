@@ -44,7 +44,7 @@ class Server
 
 	private:
 		//mount a struct pollfd for new client and add in variables server
-		void addNewClient(int clientFd);
+		void addNewClient(int clientFd, sockaddr_in sockAddrClient);
 		//catch message from a already connected client
 		void dataReceived(std::vector<struct pollfd> &fds, int i);
 

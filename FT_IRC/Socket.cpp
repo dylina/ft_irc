@@ -59,7 +59,7 @@ Socket::Socket(int domain, std::string ip, std::string port)
 		throw e.what();
 	}
 
-	std::cerr << BOLDGREEN  << "	Valid Args\n"
+	std::cerr << BOLD BRIGHT_GREEN  << "	Valid Args\n"
 							<< "Domain : "; if(domain == AF_INET){std::cerr << "ipv4\n";}else if (domain == AF_INET6){std::cerr << "ipv6\n";}else if (domain == AF_UNIX){std::cerr << "local\n";}else{std::cerr << domain << '\n';} std::cerr
 							<< "Ip : " << ip << '\n'
 							<< "Port : " << port << '\n' << RESET << std::endl;
@@ -82,7 +82,7 @@ Socket::Socket(int domain, std::string ip, std::string port)
 		perror("socket");
 		throw Socket::ErrorOfSocket();
 	}
-	std::cerr << BOLDGREEN << "socket() success!" << RESET << std::endl;
+	std::cerr << BOLD BRIGHT_GREEN << "socket() success!" << RESET << std::endl;
 
 	this->port = port;
 	this->ip = ip;

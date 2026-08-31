@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <iterator>
+#include <sys/socket.h>
 
 #include "colors.hpp"
 
@@ -17,13 +18,16 @@ class Client
 {
     public:
 
-		Client();
+		Client(sockaddr_in socketClient);
 
 		std::string	getName() const;
 		std::string getData() const;
+		std::string getSocket() const;
+
+		void getAllInfo() const;
 
 		int getMode() const;
-		void addData(std::string buffer, int clientFd);
+		void addData(std::string buffer, std::string clientFd);
 
 		class ErrorCreationClient : public std::exception
 		{
@@ -33,6 +37,8 @@ class Client
 
 
 		private:
+
+		sockaddr_in _socket;
 
 		struct parsedCommand
 		{
@@ -63,13 +69,12 @@ class Client
 			std::string command;
 			std::vector<std::string> parametresMiddle;
 			std::string trailing;
-			bool isComplete;
 		};
 
 
 		void setMode(int mode);
 		void setName(std::string name);
-		void printBufferEnhance();
+		void printBufferEnhance() const;
 
 
         std::string _userName;
@@ -79,7 +84,9 @@ class Client
 		std::vector<parsedCommand> _commands;
 		void clearStructCommand(parsedCommand &newCommand);
 		void parseCommand();
-		void printCommands();
+		void printCommands() const;
+
+		std::string _clientFd;
 
 
 
