@@ -18,7 +18,7 @@ int Client::getFd() const
 	return this->_fd;
 }
 
-sockaddr_in Client::getAddr()
+sockaddr_in Client::getAddr() const
 {
 	return _clientAddr;
 }
@@ -104,3 +104,10 @@ bool Client::parseCommand()
 
 	return true;
 }
+/*_dataBuffer
+     ↓
+găsește \r\n
+     ↓
+extrage mesajul
+     ↓
+identifică NICK / USER / PASS etc.*/

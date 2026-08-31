@@ -22,16 +22,16 @@ class Client
 		Client(int fd, sockaddr_in _clientAddr);
 		~Client();
 
-		int 		getFd() const;//
-		sockaddr_in getAddr();//
-		std::string	getNickName() const;//
-		std::string	getUserName() const;//
-		std::string getData() const;//
-		int 		getMode() const;//
-		bool 		hasPass() const;//
+		int 		getFd() const;
+		sockaddr_in getAddr() const;
+		std::string	getNickName() const;
+		std::string	getUserName() const;
+		std::string getData() const;
+		int 		getMode() const;
+		bool 		hasPass() const;
 		bool        isRegistered() const;
 
-		void setNickName(std::string nick);//
+		void setNickName(std::string nick);
 		void setUserName(std::string name);
 		void setMode(int mode);
 		void setPass(bool val);
