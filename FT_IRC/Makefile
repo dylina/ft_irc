@@ -4,7 +4,7 @@ CXX = c++
 
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRC =	
+SRC = Socket.cpp Server.cpp main.cpp Client.cpp 
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -12,9 +12,6 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 		$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJ)
-
-%.o: %.cpp
-		$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 		rm -f $(OBJ)
