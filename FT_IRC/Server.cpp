@@ -39,11 +39,12 @@ Server::Server(int domain, std::string ip, std::string port) : _serverSocket(dom
 
 void Server::on()
 {
-	if (listen(this->_serverSocket.getFd(), this->fds.size()) == -1)
+	if (listen(this->_serverSocket.getFd(), 128) == -1) //~ pour avoir plusieur client en mm temps
 	{
 		perror("listen");
 		throw ListenErr();
 	}
+	listen(this->_serverSocket.getFd(), this->fds.size());
 	std::cout << "Server listening on " << ntohs(this->_serverSocket.getSocket().sin_port) << " .." << std::endl;
 
 	struct pollfd server;
@@ -148,8 +149,8 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 {
 	char buffer[BUFFER_SIZE];
 
-	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer), 0);
-
+	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer) - 1, 0); //~risk d'overflow
+	buffer[retRecv] = 0;
 	//client data received
 	if (retRecv > 0)
 	{
@@ -167,6 +168,7 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		std::vector<struct pollfd>::iterator it = fds.begin() + i;
 		std::cerr << "client fd [" << (*it).fd << "] disconnected" << std::endl;
 
+    	delete this->clients[(*it).fd]; //memory leaked
 		this->clients.erase((*it).fd);
 		close((*it).fd);
 		this->fds.erase(it);
