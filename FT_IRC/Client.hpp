@@ -19,7 +19,8 @@ class Client
     public:
 
 		Client(sockaddr_in socketClient);
-
+		void sendReply(const std::string& msg);
+		void setFD(int fd);
 		std::string	getName() const;
 		std::string getData() const;
 		std::string getSocket() const;
@@ -86,6 +87,7 @@ class Client
 		void parseCommand();
 		void printCommands() const;
 
+		int _fd;
 		std::string _clientFd;
 
 

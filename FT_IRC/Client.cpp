@@ -9,7 +9,16 @@ const char* Client::ErrorCreationClient::what() const throw()
 Client::Client(sockaddr_in socketClient) : _socket(socketClient), _userName(""), _dataBuffer(""), _mode(1)
 {}
 
+void Client::setFD(int fd)
+{
+	this->_fd = fd;
+}
 
+void Client::sendReply(const std::string& msg)
+{
+	std::string reply = msg + "\r\n";
+	send(this->_fd, reply.c_str(), reply.length(), 0);
+}
 
 std::string	Client::getName() const
 {
@@ -78,7 +87,7 @@ void Client::parseCommand()
 			newCommand.prefix = prefix;
 		}
 
-		//parse command
+		//
 		if (newCommand.command.empty())
 		{
 			size_t pos = _dataBuffer.find(' ');

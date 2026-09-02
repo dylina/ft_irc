@@ -44,7 +44,6 @@ void Server::on()
 		perror("listen");
 		throw ListenErr();
 	}
-	listen(this->_serverSocket.getFd(), this->fds.size());
 	std::cout << "Server listening on " << ntohs(this->_serverSocket.getSocket().sin_port) << " .." << std::endl;
 
 	struct pollfd server;
@@ -137,6 +136,7 @@ void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
 	this->fds.push_back(newClientStruct);
 
 	Client *newClientClass = new Client(sockAddrClient);
+	newClientClass->setFD(clientFd);
 	this->clients[newClientStruct.fd] = newClientClass;
 
 
