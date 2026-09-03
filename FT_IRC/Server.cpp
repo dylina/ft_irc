@@ -127,7 +127,7 @@ void Server::addNewClient(int clientFd)
 
 void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 {
-	char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE + 1];//+1 si le retRecv == 512 et buffer[512] est overflow
 
 	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer), 0);
 
