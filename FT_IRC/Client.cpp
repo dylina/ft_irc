@@ -217,23 +217,29 @@ void Client::printCommands()
 
 }
 
-void Client::printBufferEnhance()
+void Client::printBufferEnhance() const
 {
-	std::cerr << "\"" << BOLDWHITE;
+	if (this->_dataBuffer.empty())
+	{
+		std::cout << "Client "<< this->_clientFd <<" have no data in attempt" << std::endl;
+		return;
+	}
+	std::cerr <<  BRIGHT_CYAN"\"" << RESET  << BOLD BRIGHT_WHITE;
 		for (size_t m = 0; m < this->_dataBuffer.size(); m++)
 		{
 			if (_dataBuffer[m] == '\n')
-				std::cerr << BOLDYELLOW << "\\n" << BOLDWHITE;
+				std::cerr << BOLD BRIGHT_YELLOW << "\\n" << BOLD BRIGHT_WHITE;
 			else if (_dataBuffer[m] == '\r')
-				std::cerr << BOLDYELLOW << "\\r" << BOLDWHITE;
+				std::cerr << BOLD BRIGHT_YELLOW << "\\r" << BOLD BRIGHT_WHITE;
 			else if (!_dataBuffer[m])
 			{
-				std::cerr << RESET << "\"" << std::endl;
+				std::cerr << BRIGHT_CYAN << "\"" << RESET << std::endl;
 				break;
 			}
 			else
 				std::cerr << _dataBuffer[m];
 		}
-		std::cerr << RESET << "\"" << std::endl;
+		std::cerr << BRIGHT_CYAN << "\"" << RESET << std::endl;
 }
+
 

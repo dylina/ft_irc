@@ -46,7 +46,7 @@ class Client
 		void parseCommand();
 
 		// Debug
-		void printBufferEnhance();
+		void printBufferEnhance() const;
 		void printCommands();
 
 		class ErrorCreationClient : public std::exception
@@ -108,6 +108,6 @@ class Client
 
 		// Parsed commands
 		std::vector<parsedCommand> _commands;
-
+		std::string _clientFd;
 
 };
