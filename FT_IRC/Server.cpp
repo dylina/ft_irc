@@ -39,7 +39,7 @@ Server::Server(int domain, std::string ip, std::string port) : _serverSocket(dom
 
 void Server::on()
 {
-	if (listen(this->_serverSocket.getFd(), this->fds.size()) == -1)
+	if (listen(this->_serverSocket.getFd(), SOMAXCONN) == -1) //SOMAXCONN limit. max perm. sinon this->fds.size() = 0 error
 	{
 		perror("listen");
 		throw ListenErr();
