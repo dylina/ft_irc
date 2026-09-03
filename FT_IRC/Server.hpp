@@ -55,8 +55,3 @@ class Server
 		//tableau dynamique de surveillance de fd pour poll()
 		std::vector<struct pollfd> fds;
 };
-
-
-
-
-

@@ -103,7 +103,6 @@ void Server::on()
 
 }
 
-
 void Server::addNewClient(int clientFd)
 {
 	if (clientFd < 0)
