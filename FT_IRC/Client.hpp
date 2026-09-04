@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <iterator>
+#include <set>
 
 #include "colors.hpp"
 
@@ -41,9 +42,20 @@ class Client
 		void setMode(int mode);
 		void setPass(bool val);
 
+			// Canale (join/part)
+		void joinChannel(const std::string &name);
+		void leaveChannel(const std::string &name);
+		bool isInChannel(const std::string &name) const;
+		std::set<std::string> getChannels() const;
+
 			// Data / parsing
 		void addData(std::string buffer, int clientFd);
 		void parseCommand();
+
+			// Envoi (bufferise ici, le send() reel se fait seulement sur POLLOUT dans Server::on())
+		void queueMessage(const std::string &msg);
+		bool hasPendingOutput() const;
+		void flushSendBuffer();
 
 		// Debug
 		void printBufferEnhance() const;
@@ -54,9 +66,6 @@ class Client
 		public:
 			const char* what() const throw();
 		};
-
-
-		private:
 
 		struct parsedCommand
 		{
@@ -90,6 +99,12 @@ class Client
 			bool isComplete;
 		};
 
+			// File d'attente des commandes deja parsees, consommee par Server::executeCommand
+		bool hasPendingCommands() const;
+		Client::parsedCommand popCommand();
+
+		private:
+
 		void clearStructCommand(parsedCommand& newCommand);
 
 		// Client information
@@ -105,6 +120,12 @@ class Client
 
 		// Received data
 		std::string _dataBuffer;
+
+		// Donnees en attente d'envoi (flush uniquement sur POLLOUT)
+		std::string _sendBuffer;
+
+		// Canale la care clientul e conectat in prezent
+		std::set<std::string> _channels;
 
 		// Parsed commands
 		std::vector<parsedCommand> _commands;
