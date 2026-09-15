@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "Client.hpp"
 
 const char* Server::BindErr::what() const throw()
 {
@@ -21,8 +22,8 @@ const char* Server::RecvError::what() const throw()
 }
 
 
-Server::Server(int domain, std::string ip, std::string port) : _serverSocket(domain, ip, port)
-{
+Server::Server(int domain, std::string ip, std::string port, std::string password)
+    : _serverSocket(domain, ip, port), _password(password){
 
 	if (	bind(
 			this->_serverSocket.getFd(),
@@ -178,4 +179,57 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		std::cerr << "Error client received in fd [" << fds[i].fd << "]" << std::endl;
 
 }
+
+oid Server::handlePASS(Client* client, std::vector<std::string>& params)
+{
+    if (params.empty())
+    {
+        client->sendReply(":ircserv 461 * PASS :Not enough parameters");
+        return;
+    }
+    if (params[0] != this->_password)
+    {
+        client->sendReply(":ircserv 464 * :Password incorrect");
+        return;
+    }
+    client->setPassOk(true);
+}
+
+void Server::handleNICK(Client* client, std::vector<std::string>& params)
+{
+    if (params.empty())
+    {
+        client->sendReply(":ircserv 431 * :No nickname given");
+        return;
+    }
+    std::string nick = params[0];
+
+    // Vérifier si le nick est déjà pris
+    std::map<int, Client*>::iterator it = this->clients.begin();
+    for (; it != this->clients.end(); ++it)
+    {
+        if (it->second->getName() == nick)
+        {
+            client->sendReply(":ircserv 433 * " + nick + " :Nickname is already in use");
+            return;
+        }
+    }
+    client->setName(nick);
+    client->setHasNick(true);
+    finalizeRegistration(client);
+}
+
+void Server::handleUSER(Client* client, std::vector<std::string>& params, std::string trailing)
+{
+    if (params.empty())
+    {
+        client->sendReply(":ircserv 461 * USER :Not enough parameters");
+        return;
+    }
+    client->setUsername(params[0]);
+    client->setRealname(trailing);
+    client->setHasUser(true);
+    finalizeRegistration(client);
+}
+
 

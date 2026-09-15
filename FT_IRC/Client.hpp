@@ -18,29 +18,6 @@ class Client
 {
     public:
 
-		Client(sockaddr_in socketClient);
-		void sendReply(const std::string& msg);
-		void setFD(int fd);
-		std::string	getName() const;
-		std::string getData() const;
-		std::string getSocket() const;
-
-		void getAllInfo() const;
-
-		int getMode() const;
-		void addData(std::string buffer, std::string clientFd);
-
-		class ErrorCreationClient : public std::exception
-		{
-			public:
-				const char* what() const throw();
-		};
-
-
-		private:
-
-		sockaddr_in _socket;
-
 		struct parsedCommand
 		{
 			/*
@@ -73,6 +50,43 @@ class Client
 		};
 
 
+		Client(sockaddr_in socketClient);
+		void sendReply(const std::string& msg);
+		void setFD(int fd);
+    	bool hasCommands() const;
+    	parsedCommand popCommand();
+		std::string	getName() const;
+		std::string getData() const;
+		std::string getSocket() const;
+
+		void getAllInfo() const;
+
+		int getMode() const;
+		void addData(std::string buffer, std::string clientFd);
+
+		class ErrorCreationClient : public std::exception
+		{
+			public:
+				const char* what() const throw();
+		};
+
+		//Authentication and registration
+		void setPassOk(bool ok);
+		void setHasNick(bool ok);
+		void setHasUser(bool ok);
+		void setRegistered(bool ok);
+		void setUsername(std::string u);
+		void setRealname(std::string r);
+		bool isPassOk() const;
+		bool hasNick() const;
+		bool hasUser() const;
+		bool isRegistered() const;
+		
+		private:
+		sockaddr_in _socket;
+
+
+
 		void setMode(int mode);
 		void setName(std::string name);
 		void printBufferEnhance() const;
@@ -90,6 +104,12 @@ class Client
 		int _fd;
 		std::string _clientFd;
 
+		bool _passOk;
+		bool _hasNick;
+		bool _hasUser;
+		bool _registered;
+		std::string _username;
+		std::string _realname;
 
 
 

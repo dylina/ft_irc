@@ -154,6 +154,7 @@ void Client::parseCommand()
 		std::cerr << "commande partiel" << std::endl;
 }
 
+
 void Client::printCommands() const
 {
 	for (size_t cmds = 0; cmds < this->_commands.size(); cmds++)
@@ -250,4 +251,15 @@ int Client::getMode() const
 	return this->_mode;
 }
 
+bool Client::hasCommands() const
+{
+    return !this->_commands.empty();
+}
+
+Client::parsedCommand Client::popCommand()
+{
+    parsedCommand cmd = this->_commands.front();
+    this->_commands.erase(this->_commands.begin());
+    return cmd;
+}
 

@@ -16,8 +16,7 @@ class Server
 {
 	public:
 
-		Server(int domain, std::string ip, std::string port);
-
+    Server(int domain, std::string ip, std::string port, std::string password);
 		void on();
 
 		class BindErr : public std::exception
@@ -54,6 +53,8 @@ class Server
 		std::map<int,Client *> clients;
 		//tableau dynamique de surveillance de fd pour poll()
 		std::vector<struct pollfd> fds;
+    	void processCommands(Client* client);
+    	std::string _password;
 };
 
 
