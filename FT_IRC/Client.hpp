@@ -58,7 +58,7 @@ class Client
 		std::string	getName() const;
 		std::string getData() const;
 		std::string getSocket() const;
-
+    	void setName(std::string name);
 		void getAllInfo() const;
 
 		int getMode() const;
@@ -69,7 +69,6 @@ class Client
 			public:
 				const char* what() const throw();
 		};
-
 		//Authentication and registration
 		void setPassOk(bool ok);
 		void setHasNick(bool ok);
@@ -81,6 +80,7 @@ class Client
 		bool hasNick() const;
 		bool hasUser() const;
 		bool isRegistered() const;
+		std::string getUsername() const;
 		
 		private:
 		sockaddr_in _socket;
@@ -88,7 +88,6 @@ class Client
 
 
 		void setMode(int mode);
-		void setName(std::string name);
 		void printBufferEnhance() const;
 
 
@@ -103,7 +102,6 @@ class Client
 
 		int _fd;
 		std::string _clientFd;
-
 		bool _passOk;
 		bool _hasNick;
 		bool _hasUser;

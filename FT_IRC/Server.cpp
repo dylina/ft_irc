@@ -158,10 +158,8 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		buffer[retRecv] = 0;
 		std::string data(buffer, retRecv);
 		std::cerr << retRecv << " bytes received from " << fds[i].fd << " fd" << std::endl;
-
-
-
 		this->clients[fds[i].fd]->addData(data, addRandomColorsForClient(fds[i].fd));
+        this->processCommands(this->clients[fds[i].fd]);
 	}
 	//client lost
 	else if (retRecv == 0)
@@ -180,7 +178,7 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 
 }
 
-oid Server::handlePASS(Client* client, std::vector<std::string>& params)
+void Server::handlePASS(Client* client, std::vector<std::string>& params)
 {
     if (params.empty())
     {
@@ -232,4 +230,31 @@ void Server::handleUSER(Client* client, std::vector<std::string>& params, std::s
     finalizeRegistration(client);
 }
 
+void Server::finalizeRegistration(Client* client)
+{
+    if (client->isPassOk() && client->hasNick() && client->hasUser())
+    {
+        client->setRegistered(true);
+        client->sendReply(":ircserv 001 " + client->getName() + " :Welcome to the IRC network " + client->getName() + "!" + client->getUsername() + "@localhost");
+        client->sendReply(":ircserv 002 " + client->getName() + " :Your host is ircserv, running version 1.0");
+        client->sendReply(":ircserv 003 " + client->getName() + " :This server was created today");
+        client->sendReply(":ircserv 004 " + client->getName() + " ircserv 1.0 o o");
+    }
+}
 
+void Server::processCommands(Client* client)
+{
+    while (client->hasCommands())
+    {
+        Client::parsedCommand cmd = client->popCommand();
+
+        if (cmd.command == "PASS")
+            handlePASS(client, cmd.parametresMiddle);
+        else if (cmd.command == "NICK")
+            handleNICK(client, cmd.parametresMiddle);
+        else if (cmd.command == "USER")
+            handleUSER(client, cmd.parametresMiddle, cmd.trailing);
+        else
+            client->sendReply(":ircserv 421 * " + cmd.command + " :Unknown command");
+    }
+}

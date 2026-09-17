@@ -40,21 +40,21 @@ class Server
 				const char* what() const throw();
 		};
 
+		
 
 	private:
-		//mount a struct pollfd for new client and add in variables server
 		void addNewClient(int clientFd, sockaddr_in sockAddrClient);
-		//catch message from a already connected client
 		void dataReceived(std::vector<struct pollfd> &fds, int i);
-
+		void processCommands(Client* client);
+		void handlePASS(Client* client, std::vector<std::string>& params);
+		void handleNICK(Client* client, std::vector<std::string>& params);
+		void handleUSER(Client* client, std::vector<std::string>& params, std::string trailing);
+		void finalizeRegistration(Client* client);
 
 		Socket _serverSocket;
-		//tableau associatif de pairs, [int Clientfd] -> Client User,  !a delete a la fin!
-		std::map<int,Client *> clients;
-		//tableau dynamique de surveillance de fd pour poll()
+		std::map<int, Client*> clients;
 		std::vector<struct pollfd> fds;
-    	void processCommands(Client* client);
-    	std::string _password;
+		std::string _password;
 };
 
 

@@ -6,7 +6,18 @@ const char* Client::ErrorCreationClient::what() const throw()
 	return "Error creation client";
 }
 
-Client::Client(sockaddr_in socketClient) : _socket(socketClient), _userName(""), _dataBuffer(""), _mode(1)
+Client::Client(sockaddr_in socketClient)
+    : _socket(socketClient),
+      _userName(""),
+      _dataBuffer(""),
+      _mode(1),
+      _fd(-1),
+      _passOk(false),
+      _hasNick(false),
+      _hasUser(false),
+      _registered(false),
+      _username(""),
+      _realname("")
 {}
 
 void Client::setFD(int fd)
@@ -16,8 +27,9 @@ void Client::setFD(int fd)
 
 void Client::sendReply(const std::string& msg)
 {
-	std::string reply = msg + "\r\n";
-	send(this->_fd, reply.c_str(), reply.length(), 0);
+    std::string reply = msg + "\r\n";
+    std::cerr << BOLD BRIGHT_CYAN << "SENDING: " << msg << RESET << std::endl; // ← ajouter
+    send(this->_fd, reply.c_str(), reply.length(), 0);
 }
 
 std::string	Client::getName() const
@@ -263,3 +275,57 @@ Client::parsedCommand Client::popCommand()
     return cmd;
 }
 
+void Client::setPassOk(bool ok)
+{
+    this->_passOk = ok;
+}
+
+void Client::setHasNick(bool ok)
+{
+    this->_hasNick = ok;
+}
+
+void Client::setHasUser(bool ok)
+{
+    this->_hasUser = ok;
+}
+
+void Client::setRegistered(bool ok)
+{
+    this->_registered = ok;
+}
+
+void Client::setUsername(std::string u)
+{
+    this->_username = u;
+}
+
+void Client::setRealname(std::string r)
+{
+    this->_realname = r;
+}
+
+bool Client::isPassOk() const
+{
+    return this->_passOk;
+}
+
+bool Client::hasNick() const
+{
+    return this->_hasNick;
+}
+
+bool Client::hasUser() const
+{
+    return this->_hasUser;
+}
+
+bool Client::isRegistered() const
+{
+    return this->_registered;
+}
+
+std::string Client::getUsername() const
+{
+    return this->_username;
+}
