@@ -21,6 +21,11 @@ const char* Server::RecvError::what() const throw()
 	return "recv() error";
 }
 
+const char* Server::Clean::what() const throw()
+{
+	return "Server have data clen and close normally";
+}
+
 
 Server::Server(int domain, std::string ip, std::string port, std::string password)
     : _serverSocket(domain, ip, port), _password(password){
@@ -55,10 +60,10 @@ void Server::on()
 	this->fds.push_back(server);
 
 	// Loop principale de poll qui check les fds en continue
-	while (true)
+	while (g_running)
 	{
 		int retPoll = poll(&this->fds[0], this->fds.size(), -1);
-		if (retPoll == -1)
+		if (retPoll == -1 && g_running)
 		{
 			std::cerr << BOLD BRIGHT_RED << "Error in poll() loop" << RESET << std::endl;
 			break;
@@ -98,6 +103,10 @@ void Server::on()
 					}
 
 				}
+			}
+			if (!g_running)
+			{
+				this->clean();
 			}
 		}
 	}
@@ -257,4 +266,16 @@ void Server::processCommands(Client* client)
         else
             client->sendReply(":ircserv 421 * " + cmd.command + " :Unknown command");
     }
+}
+
+void Server::clean()
+{
+	while (!this->clients.empty())
+	{
+		std::map<int, Client*>::iterator it = this->clients.begin();
+		std::cout << (*it).second->getName() << std::endl;
+		delete (*it).second;
+		this->clients.erase(it);
+	}
+	throw Clean();
 }

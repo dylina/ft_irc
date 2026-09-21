@@ -163,7 +163,10 @@ void Client::parseCommand()
 
 	}
 	else
+	{
 		std::cerr << "commande partiel" << std::endl;
+		this->getAllInfo();
+	}
 }
 
 
@@ -217,9 +220,6 @@ void Client::addData(std::string buffer, std::string clientFd)
 
 	while (this->_dataBuffer.find("\r\n") != std::string::npos)
 		this->parseCommand();
-
-	this->getAllInfo();
-
 
 }
 

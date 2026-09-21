@@ -10,6 +10,15 @@
 #include "Server.hpp"
 #include <cstdlib>
 #include <ctime>
+#include <csignal>
+
+volatile sig_atomic_t g_running = 1;
+
+void handleSignal(int sig)
+{
+	if (sig == SIGINT || sig == SIGTERM)
+		g_running = 0;
+}
 
 int main(int argc, char **argv)
 {
@@ -23,6 +32,14 @@ int main(int argc, char **argv)
 		std::cout << "Usage : ./ircserv <port> <password>" << std::endl;
 		return 1;
 	}
+
+	struct sigaction sa;
+	sa.sa_handler = handleSignal;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGTERM, &sa, NULL);
 
 
 	try

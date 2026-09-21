@@ -81,7 +81,7 @@ class Client
 		bool hasUser() const;
 		bool isRegistered() const;
 		std::string getUsername() const;
-		
+
 		private:
 		sockaddr_in _socket;
 
@@ -91,7 +91,7 @@ class Client
 		void printBufferEnhance() const;
 
 
-        std::string _userName;
+		std::string _userName;
 		std::string _dataBuffer;
 		int _mode;
 

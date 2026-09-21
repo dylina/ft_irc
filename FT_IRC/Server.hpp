@@ -6,11 +6,13 @@
 #include <sys/socket.h>
 #include <iterator>
 #include <map>
+#include <csignal>
 
 #include "Socket.hpp"
 #include "colors.hpp"
 #include "Client.hpp"
 
+extern volatile sig_atomic_t g_running;
 
 class Server
 {
@@ -39,8 +41,13 @@ class Server
 			public:
 				const char* what() const throw();
 		};
+		class Clean : public std::exception
+		{
+			public:
+				const char* what() const throw();
+		};
 
-		
+
 
 	private:
 		void addNewClient(int clientFd, sockaddr_in sockAddrClient);
@@ -55,6 +62,7 @@ class Server
 		std::map<int, Client*> clients;
 		std::vector<struct pollfd> fds;
 		std::string _password;
+		void clean();
 };
 
 
