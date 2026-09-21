@@ -1,0 +1,33 @@
+==34082== Memcheck, a memory error detector
+==34082== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==34082== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==34082== Command: ./ircserv 1052 10
+==34082== 
+[1m[92m	Valid Args
+Domain : ipv4
+Ip : 127.0.0.1
+Port : 1052
+[0m
+[1m[92msocket() success![0m
+[1m[92mServer bind() success![0m
+No clients connected
+log: connexion of new client ...
+[32mNew client add, fd: [4], connected[0m
+log: connexion of new client ...
+[32mNew client add, fd: [5], connected[0m
+log: connexion of new client ...
+[32mNew client add, fd: [6], connected[0m
+log: connexion of new client ...
+[32mNew client add, fd: [7], connected[0m
+client fd [7] disconnected
+client fd [4] disconnected
+client fd [6] disconnected
+client fd [5] disconnected
+==34082== 
+==34082== HEAP SUMMARY:
+==34082==     in use at exit: 0 bytes in 0 blocks
+==34082==   total heap usage: 14 allocs, 14 frees, 78,136 bytes allocated
+==34082== 
+==34082== All heap blocks were freed -- no leaks are possible
+==34082== 
+==34082== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
