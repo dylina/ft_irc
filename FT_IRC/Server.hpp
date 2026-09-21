@@ -7,12 +7,15 @@
 #include <iterator>
 #include <map>
 #include <csignal>
+#include <cerrno>
 
 #include "Socket.hpp"
 #include "colors.hpp"
 #include "Client.hpp"
 
 extern volatile sig_atomic_t g_running;
+extern volatile sig_atomic_t g_sigusr1;
+
 
 class Server
 {
@@ -62,7 +65,11 @@ class Server
 		std::map<int, Client*> clients;
 		std::vector<struct pollfd> fds;
 		std::string _password;
+
 		void clean();
+
+		// debug functions
+		void printAllClients();
 };
 
 

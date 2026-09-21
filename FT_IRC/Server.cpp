@@ -62,9 +62,17 @@ void Server::on()
 	// Loop principale de poll qui check les fds en continue
 	while (g_running)
 	{
+		if (g_sigusr1) // pour capter sigusr1 et print les clients connecter
+		{
+			this->printAllClients();
+			g_sigusr1 = 0;
+		}
+
 		int retPoll = poll(&this->fds[0], this->fds.size(), -1);
 		if (retPoll == -1 && g_running)
 		{
+			if (errno == EINTR) //ignore SIGUSR1
+				continue;
 			std::cerr << BOLD BRIGHT_RED << "Error in poll() loop" << RESET << std::endl;
 			break;
 		}
@@ -273,9 +281,18 @@ void Server::clean()
 	while (!this->clients.empty())
 	{
 		std::map<int, Client*>::iterator it = this->clients.begin();
-		std::cout << (*it).second->getName() << std::endl;
 		delete (*it).second;
 		this->clients.erase(it);
 	}
-	throw Clean();
+}
+
+void Server::printAllClients()
+{
+	if (this->clients.empty())
+		std::cerr << "No clients connected" << std::endl;
+	for (std::map<int, Client*>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
+	{
+		(*it).second->getAllInfo();
+	}
+
 }

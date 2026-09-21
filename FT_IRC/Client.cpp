@@ -17,7 +17,8 @@ Client::Client(sockaddr_in socketClient)
       _hasUser(false),
       _registered(false),
       _username(""),
-      _realname("")
+      _realname(""),
+	  _lastResponse("")
 {}
 
 void Client::setFD(int fd)
@@ -29,6 +30,7 @@ void Client::sendReply(const std::string& msg)
 {
     std::string reply = msg + "\r\n";
     std::cerr << BOLD BRIGHT_CYAN << "SENDING: " << msg << RESET << std::endl; // ← ajouter
+	this->_lastResponse = BOLD BRIGHT_CYAN + msg + RESET;
     send(this->_fd, reply.c_str(), reply.length(), 0);
 }
 
@@ -70,6 +72,8 @@ void Client::getAllInfo() const
 
 	this->printCommands();
 	printBufferEnhance();
+	if (!this->_lastResponse.empty())
+		std::cout << "last response by server: " << _lastResponse << std::endl;
 }
 
 void Client::clearStructCommand(Client::parsedCommand &newCommand)

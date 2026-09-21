@@ -108,6 +108,7 @@ class Client
 		bool _registered;
 		std::string _username;
 		std::string _realname;
+		std::string _lastResponse;
 
 
 
