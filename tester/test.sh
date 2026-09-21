@@ -178,6 +178,3 @@ echo "Clients    : ../tester/client*.log"
 
 make fclean
 
-# if [$1 = "clean"]; then
-# 	rm -f ../tester/*.log
-# fi
