@@ -153,3 +153,130 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		std::cerr << "Error client received in fd [" << fds[i].fd << "]" << std::endl;
 
 }
+
+void Server::executeCommands(Client &client, Client::parsedCommand &cmd)
+{
+	std::string upper = cmd.command;
+	for (size_t i = 0; i < upper.size(); i++)
+		upper[i] = std::toupper(static_cast<unsigned char>(upper[i]));
+
+	if (upper.empty())
+		return;
+	
+	if (!client.isRegistered() && upper != "PASS" && upper != "NICK" && upper != "USER")
+	{
+		client.queueMessage(":ircserv 451 * :You have not registred\r\n");
+		return;
+	}
+
+	if (upper == "PASS")
+        cmdPass(client, cmd);
+    else if (upper == "NICK")
+        cmdNick(client, cmd);
+    else if (upper == "USER")
+        cmdUser(client, cmd);
+    else if (upper == "JOIN")
+        cmdJoin(client, cmd);
+    else if (upper == "PART")
+        cmdPart(client, cmd);
+    else if (upper == "TOPIC")
+        cmdTopic(client, cmd);
+    else if (upper == "KICK")
+        cmdKick(client, cmd);
+    else if (upper == "INVITE")
+        cmdInvite(client, cmd);
+    else if (upper == "MODE")
+        cmdMode(client, cmd);
+    else if (upper == "PRIVMSG")
+        cmdPrivmsg(client, cmd);
+    else if (upper == "NOTICE")
+        cmdNotice(client, cmd);
+    else if (upper == "PING")
+        cmdPing(client, cmd);
+    else if (upper == "QUIT")
+        cmdQuit(client, cmd);
+	else
+		client.queueMessage(":ircserv 421 " + client.getNickName() + " " + cmd.command + " :Unknown command\r\n");
+}
+
+void Server::cmdJoin(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+    (void)cmd;
+    // TODO
+}
+
+void Server::cmdPart(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdPrivmsg(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdTopic(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdKick(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdInvite(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdQuit(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdPing(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+
+
+void Server::cmdNotice(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdMode(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdPass(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;(void)client;
+	(void)cmd;
+}
+
+void Server::cmdNick(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdUser(Client &client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
