@@ -43,6 +43,7 @@ class Server
 		
 
 	private:
+		bool isvalidNick(const std::string& nick) const;
 		void addNewClient(int clientFd, sockaddr_in sockAddrClient);
 		void dataReceived(std::vector<struct pollfd> &fds, int i);
 		void processCommands(Client* client);

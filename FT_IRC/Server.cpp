@@ -123,6 +123,21 @@ static std::string addRandomColorsForClient(int Clientfd)
 	return rdmcolor.str();
 }
 
+bool Server::isvalidNick(const std::string& nick) const
+{
+	if (nick.empty() || nick.length() > 9)
+		return false;
+	std::string validFirst = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ[]\\`^{}";
+	if (validFirst.find(nick[0]) == std::string::npos)
+		return false;
+	std::string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_[]\\`^{}";
+	for (size_t i = 1; i < nick.length(); ++i)
+	{
+		if (validChars.find(nick[i]) == std::string::npos)
+			return false; 
+	}
+	return true;
+}
 
 void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
 {
@@ -202,6 +217,12 @@ void Server::handleNICK(Client* client, std::vector<std::string>& params)
     }
     std::string nick = params[0];
 
+	if (!isvalidNick(nick))
+    {
+        client->sendReply(":ircserv 432 * " + nick + " :Erroneous nickname");
+        return;
+    }
+
     // Vérifier si le nick est déjà pris
     std::map<int, Client*>::iterator it = this->clients.begin();
     for (; it != this->clients.end(); ++it)
@@ -254,6 +275,8 @@ void Server::processCommands(Client* client)
             handleNICK(client, cmd.parametresMiddle);
         else if (cmd.command == "USER")
             handleUSER(client, cmd.parametresMiddle, cmd.trailing);
+		else if (!client->isRegistered())
+			client->sendReply(":ircserv 451 * :You have not registered");
         else
             client->sendReply(":ircserv 421 * " + cmd.command + " :Unknown command");
     }
