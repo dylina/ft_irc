@@ -7,6 +7,8 @@
 #include <vector>
 #include <iterator>
 #include <sys/socket.h>
+#include <sstream>
+#include <cstdlib>
 
 #include "colors.hpp"
 
@@ -55,10 +57,8 @@ class Client
 		void setFD(int fd);
     	bool hasCommands() const;
     	parsedCommand popCommand();
-		std::string	getName() const;
 		std::string getData() const;
 		std::string getSocket() const;
-    	void setName(std::string name);
 		void getAllInfo() const;
 
 		int getMode() const;
@@ -69,6 +69,7 @@ class Client
 			public:
 				const char* what() const throw();
 		};
+
 		//Authentication and registration
 		void setPassOk(bool ok);
 		void setHasNick(bool ok);
@@ -81,6 +82,8 @@ class Client
 		bool hasUser() const;
 		bool isRegistered() const;
 		std::string getUsername() const;
+		std::string getRealname() const;
+		std::string getFdWithColor() const;
 
 		private:
 		sockaddr_in _socket;
@@ -91,7 +94,6 @@ class Client
 		void printBufferEnhance() const;
 
 
-		std::string _userName;
 		std::string _dataBuffer;
 		int _mode;
 
@@ -109,6 +111,7 @@ class Client
 		std::string _username;
 		std::string _realname;
 		std::string _lastResponse;
+		std::vector<std::string> _responseSend;
 
 
 

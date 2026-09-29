@@ -1,0 +1,13 @@
+29/09/2026:
+
+	~/cursus/irc/FT_IRC (Server-management*) » ./ircserv localhost 1051
+	Error :No port
+	terminate called after throwing an instance of 'char const*'
+	[1]    8843 IOT instruction (core dumped)  ./ircserv localhost 1051
+
+
+
+	~/cursus/irc/FT_IRC (Server-management*) » ./ircserv 45484845484462 8486484545454488445
+	Error :No port
+	terminate called after throwing an instance of 'char const*'
+	[1]    9004 IOT instruction (core dumped)  ./ircserv 45484845484462 8486484545454488445

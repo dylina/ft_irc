@@ -121,25 +121,6 @@ void Server::on()
 
 }
 
-static std::string addRandomColorsForClient(int Clientfd)
-{
-	std::stringstream fd;
-	fd << Clientfd;
-
-	int colors = std::rand() % 256;
-
-	std::stringstream rdmcolor;
-	rdmcolor	<< "\033[38;5;"
-				<< colors
-				<< "m"
-				<< Clientfd
-				<< RESET;
-
-
-
-	return rdmcolor.str();
-}
-
 bool Server::isvalidNick(const std::string& nick) const
 {
 	if (nick.empty() || nick.length() > 9)
@@ -151,7 +132,7 @@ bool Server::isvalidNick(const std::string& nick) const
 	for (size_t i = 1; i < nick.length(); ++i)
 	{
 		if (validChars.find(nick[i]) == std::string::npos)
-			return false; 
+			return false;
 	}
 	return true;
 }
@@ -190,7 +171,7 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		buffer[retRecv] = 0;
 		std::string data(buffer, retRecv);
 		std::cerr << retRecv << " bytes received from " << fds[i].fd << " fd" << std::endl;
-		this->clients[fds[i].fd]->addData(data, addRandomColorsForClient(fds[i].fd));
+		this->clients[fds[i].fd]->addData(data, this->clients[fds[i].fd]->getFdWithColor());
         this->processCommands(this->clients[fds[i].fd]);
 	}
 	//client lost
@@ -223,6 +204,7 @@ void Server::handlePASS(Client* client, std::vector<std::string>& params)
         return;
     }
     client->setPassOk(true);
+	finalizeRegistration(client);
 }
 
 void Server::handleNICK(Client* client, std::vector<std::string>& params)
@@ -244,13 +226,13 @@ void Server::handleNICK(Client* client, std::vector<std::string>& params)
     std::map<int, Client*>::iterator it = this->clients.begin();
     for (; it != this->clients.end(); ++it)
     {
-        if (it->second->getName() == nick)
+        if ((*it).second->getRealname() == nick)
         {
             client->sendReply(":ircserv 433 * " + nick + " :Nickname is already in use");
             return;
         }
     }
-    client->setName(nick);
+    client->setRealname(nick);
     client->setHasNick(true);
     finalizeRegistration(client);
 }
@@ -273,10 +255,10 @@ void Server::finalizeRegistration(Client* client)
     if (client->isPassOk() && client->hasNick() && client->hasUser())
     {
         client->setRegistered(true);
-        client->sendReply(":ircserv 001 " + client->getName() + " :Welcome to the IRC network " + client->getName() + "!" + client->getUsername() + "@localhost");
-        client->sendReply(":ircserv 002 " + client->getName() + " :Your host is ircserv, running version 1.0");
-        client->sendReply(":ircserv 003 " + client->getName() + " :This server was created today");
-        client->sendReply(":ircserv 004 " + client->getName() + " ircserv 1.0 o o");
+        client->sendReply(":ircserv 001 " + client->getRealname() + " :Welcome to the IRC network " + client->getRealname() + "!" + client->getUsername() + "@localhost");
+        client->sendReply(":ircserv 002 " + client->getRealname() + " :Your host is ircserv, running version 1.0");
+        client->sendReply(":ircserv 003 " + client->getRealname() + " :This server was created today");
+        client->sendReply(":ircserv 004 " + client->getRealname() + " ircserv 1.0 o o");
     }
 }
 

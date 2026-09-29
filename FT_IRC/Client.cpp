@@ -8,9 +8,8 @@ const char* Client::ErrorCreationClient::what() const throw()
 
 Client::Client(sockaddr_in socketClient)
     : _socket(socketClient),
-      _userName(""),
       _dataBuffer(""),
-      _mode(1),
+      _mode(-1),
       _fd(-1),
       _passOk(false),
       _hasNick(false),
@@ -18,12 +17,39 @@ Client::Client(sockaddr_in socketClient)
       _registered(false),
       _username(""),
       _realname(""),
-	  _lastResponse("")
+	  _lastResponse(""),
+	  _responseSend()
 {}
+
+std::string Client::getFdWithColor() const
+{
+	return this->_clientFd;
+}
+
+
+static std::string addRandomColorsForClient(int Clientfd)
+{
+	std::stringstream fd;
+	fd << Clientfd;
+
+	int colors = std::rand() % 256;
+
+	std::stringstream rdmcolor;
+	rdmcolor	<< "\033[38;5;"
+				<< colors
+				<< "m"
+				<< Clientfd
+				<< RESET;
+
+
+
+	return rdmcolor.str();
+}
 
 void Client::setFD(int fd)
 {
 	this->_fd = fd;
+	this->_clientFd = addRandomColorsForClient(fd);
 }
 
 void Client::sendReply(const std::string& msg)
@@ -31,17 +57,8 @@ void Client::sendReply(const std::string& msg)
     std::string reply = msg + "\r\n";
     std::cerr << BOLD BRIGHT_CYAN << "SENDING: " << msg << RESET << std::endl; // ← ajouter
 	this->_lastResponse = BOLD BRIGHT_CYAN + msg + RESET;
+	this->_responseSend.push_back(_lastResponse);
     send(this->_fd, reply.c_str(), reply.length(), 0);
-}
-
-std::string	Client::getName() const
-{
-	return this->_userName;
-}
-
-void Client::setName(std::string name)
-{
-	this->_userName = name;
 }
 
 std::string Client::getSocket() const
@@ -56,24 +73,43 @@ std::string Client::getSocket() const
 
 void Client::getAllInfo() const
 {
+	std::cout << "------------new--------------" << std::endl;
+
+	if (this->isRegistered())
+		std::cout << BOLD_GREEN << "This user is Registered" << RESET << std::endl;
+	else
+		std::cout << BOLD_RED << "! This user is Not Registered !" << RESET << std::endl;
 
 	this->getSocket();
+
 	std::cout << "Mode : " << this->getMode() << '\n';
-	std::cout << "Name : ";
-	if (this->_userName.empty())
-		std::cout << BG_BRIGHT_RED BOLD BRIGHT_WHITE << "NAME EMPTY" << RESET <<'\n';
+
+	std::cout << "User Name : ";
+	if (this->_username.empty())
+		std::cout << BG_BRIGHT_RED BOLD BRIGHT_WHITE << "Username EMPTY" << RESET <<'\n';
 	else
-		std::cout << this->getName() << '\n';
-	std::cout << "Buffer : ";
-	if (_dataBuffer.empty())
-		std::cout << BG_BRIGHT_RED BOLD BRIGHT_WHITE << "BUFFER EMPTY" << RESET <<'\n';
+		std::cout << this->getUsername() << '\n';
+
+	std::cout << "Real Name : ";
+	if (this->_realname.empty())
+		std::cout << BG_BRIGHT_RED BOLD BRIGHT_WHITE << "Realname EMPTY" << RESET <<'\n';
 	else
-		printBufferEnhance();
+		std::cout << this->getRealname() << '\n';
+
+
+	printBufferEnhance();
 
 	this->printCommands();
-	printBufferEnhance();
 	if (!this->_lastResponse.empty())
-		std::cout << "last response by server: " << _lastResponse << std::endl;
+	{
+		std::cout << "responses sends :" << std::endl;
+		for (std::vector<std::string>::const_iterator it = _responseSend.begin(); it != this->_responseSend.end(); it++)
+			std::cout << (*it) << std::endl;
+	}
+	else
+		std::cout << "No response from server send" << std::endl;
+
+	std::cout << "------------end--------------" << std::endl;
 }
 
 void Client::clearStructCommand(Client::parsedCommand &newCommand)
@@ -391,4 +427,9 @@ bool Client::isRegistered() const
 std::string Client::getUsername() const
 {
     return this->_username;
+}
+
+std::string Client::getRealname() const
+{
+	return this->_realname;
 }
