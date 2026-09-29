@@ -1,45 +1,42 @@
 #include "Server.hpp"
 
-const char* Server::BindErr::what() const throw()
+const char *Server::BindErr::what() const throw()
 {
 	return "bind() error";
 }
 
-const char* Server::ListenErr::what() const throw()
+const char *Server::ListenErr::what() const throw()
 {
 	return "listen() error";
 }
 
-const char* Server::AcceptErr::what() const throw()
+const char *Server::AcceptErr::what() const throw()
 {
 	return "accept() error";
 }
 
-const char* Server::RecvError::what() const throw()
+const char *Server::RecvError::what() const throw()
 {
 	return "recv() error";
 }
 
-
 Server::Server(int domain, std::string ip, std::string port) : _serverSocket(domain, ip, port)
 {
 
-	if (	bind(
+	if (bind(
 			this->_serverSocket.getFd(),
-			reinterpret_cast<const struct sockaddr*>(&this->_serverSocket.getSocket()),
-			sizeof(this->_serverSocket.getSocket())
-			) == -1 )
+			reinterpret_cast<const struct sockaddr *>(&this->_serverSocket.getSocket()),
+			sizeof(this->_serverSocket.getSocket())) == -1)
 	{
 		perror("bind");
 		throw BindErr();
 	}
 	std::cerr << BOLD BRIGHT_GREEN << "Server bind() success!" << RESET << std::endl;
-
 }
 
 void Server::on()
 {
-	if (listen(this->_serverSocket.getFd(), SOMAXCONN) == -1) //SOMAXCONN limit. max perm. sinon this->fds.size() = 0 error
+	if (listen(this->_serverSocket.getFd(), SOMAXCONN) == -1) // SOMAXCONN limit. max perm. sinon this->fds.size() = 0 error
 	{
 		perror("listen");
 		throw ListenErr();
@@ -80,7 +77,7 @@ void Server::on()
 					{
 						this->addNewClient(clientFd);
 					}
-					catch(const std::exception& e)
+					catch (const std::exception &e)
 					{
 						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
@@ -91,16 +88,14 @@ void Server::on()
 					{
 						this->dataReceived(fds, i);
 					}
-					catch(const std::exception& e)
+					catch (const std::exception &e)
 					{
 						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
-
 				}
 			}
 		}
 	}
-
 }
 
 void Server::addNewClient(int clientFd)
@@ -118,27 +113,33 @@ void Server::addNewClient(int clientFd)
 	Client *newClientClass = new Client;
 	this->clients[newClientStruct.fd] = newClientClass;
 
-
-
 	std::vector<struct pollfd>::iterator it = fds.end() - 1;
 	std::cerr << GREEN << "New client add, fd: [" << (*it).fd << "], connected" << RESET << std::endl;
 }
 
 void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 {
-	char buffer[BUFFER_SIZE + 1];//+1 si le retRecv == 512 et buffer[512] est overflow
+	char buffer[BUFFER_SIZE + 1]; //+1 si le retRecv == 512 et buffer[512] est overflow
 
 	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer), 0);
 
-	//client data received
+	// client data received
 	if (retRecv > 0)
 	{
 		buffer[retRecv] = 0;
 		std::string data(buffer, retRecv);
 		std::cerr << retRecv << " bytes received from " << fds[i].fd << " fd" << std::endl;
-		this->clients[fds[i].fd]->addData(data, fds[i].fd);
+
+		Client *client = this->clients[fds[i].fd]; // prends le *
+		client->addData(data, fds[i].fd);		   // ajoute le data dans buff et parse les lignes
+
+		while (client->hasPendingCommands()) // vide le derniere
+		{
+			Client::parsedCommand cmd = client->popCommand(); // enleve la premiere cmd
+			this->executeCommands(*client, cmd);			  // envoi au bon handler
+		}
 	}
-	//client lost
+	// client lost
 	else if (retRecv == 0)
 	{
 		std::vector<struct pollfd>::iterator it = fds.begin() + i;
@@ -151,7 +152,6 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 	// error
 	else
 		std::cerr << "Error client received in fd [" << fds[i].fd << "]" << std::endl;
-
 }
 
 void Server::executeCommands(Client &client, Client::parsedCommand &cmd)
@@ -162,39 +162,39 @@ void Server::executeCommands(Client &client, Client::parsedCommand &cmd)
 
 	if (upper.empty())
 		return;
-	
+
 	if (!client.isRegistered() && upper != "PASS" && upper != "NICK" && upper != "USER")
 	{
-		client.queueMessage(":ircserv 451 * :You have not registred\r\n");
+		client.queueMessage(":ircserv 451 * :You have not registered\r\n");
 		return;
 	}
 
 	if (upper == "PASS")
-        cmdPass(client, cmd);
-    else if (upper == "NICK")
-        cmdNick(client, cmd);
-    else if (upper == "USER")
-        cmdUser(client, cmd);
-    else if (upper == "JOIN")
-        cmdJoin(client, cmd);
-    else if (upper == "PART")
-        cmdPart(client, cmd);
-    else if (upper == "TOPIC")
-        cmdTopic(client, cmd);
-    else if (upper == "KICK")
-        cmdKick(client, cmd);
-    else if (upper == "INVITE")
-        cmdInvite(client, cmd);
-    else if (upper == "MODE")
-        cmdMode(client, cmd);
-    else if (upper == "PRIVMSG")
-        cmdPrivmsg(client, cmd);
-    else if (upper == "NOTICE")
-        cmdNotice(client, cmd);
-    else if (upper == "PING")
-        cmdPing(client, cmd);
-    else if (upper == "QUIT")
-        cmdQuit(client, cmd);
+		cmdPass(client, cmd);
+	else if (upper == "NICK")
+		cmdNick(client, cmd);
+	else if (upper == "USER")
+		cmdUser(client, cmd);
+	else if (upper == "JOIN")
+		cmdJoin(client, cmd);
+	else if (upper == "PART")
+		cmdPart(client, cmd);
+	else if (upper == "TOPIC")
+		cmdTopic(client, cmd);
+	else if (upper == "KICK")
+		cmdKick(client, cmd);
+	else if (upper == "INVITE")
+		cmdInvite(client, cmd);
+	else if (upper == "MODE")
+		cmdMode(client, cmd);
+	else if (upper == "PRIVMSG")
+		cmdPrivmsg(client, cmd);
+	else if (upper == "NOTICE")
+		cmdNotice(client, cmd);
+	else if (upper == "PING")
+		cmdPing(client, cmd);
+	else if (upper == "QUIT")
+		cmdQuit(client, cmd);
 	else
 		client.queueMessage(":ircserv 421 " + client.getNickName() + " " + cmd.command + " :Unknown command\r\n");
 }
@@ -202,8 +202,8 @@ void Server::executeCommands(Client &client, Client::parsedCommand &cmd)
 void Server::cmdJoin(Client &client, Client::parsedCommand &cmd)
 {
 	(void)client;
-    (void)cmd;
-    // TODO
+	(void)cmd;
+	// TODO
 }
 
 void Server::cmdPart(Client &client, Client::parsedCommand &cmd)
@@ -248,8 +248,6 @@ void Server::cmdPing(Client &client, Client::parsedCommand &cmd)
 	(void)cmd;
 }
 
-
-
 void Server::cmdNotice(Client &client, Client::parsedCommand &cmd)
 {
 	(void)client;
@@ -265,7 +263,6 @@ void Server::cmdMode(Client &client, Client::parsedCommand &cmd)
 void Server::cmdPass(Client &client, Client::parsedCommand &cmd)
 {
 	(void)client;
-	(void)cmd;(void)client;
 	(void)cmd;
 }
 
