@@ -85,92 +85,151 @@ void Client::clearStructCommand(Client::parsedCommand &newCommand)
 		newCommand.command.clear();
 }
 
+// void Client::parseCommand()
+// {
+// 	size_t end = _dataBuffer.find("\r\n");
+
+// 	if (end != std::string::npos)
+// 	{
+// 		struct parsedCommand newCommand;
+// 		clearStructCommand(newCommand);
+
+// 		//parse prefix
+// 		if (newCommand.prefix.empty() && *this->_dataBuffer.begin() == ':')
+// 		{
+// 			std::string::iterator it = _dataBuffer.begin();
+// 			std::string prefix = _dataBuffer.substr(0, (this->_dataBuffer.find(" ")));
+// 			this->_dataBuffer.erase(it, it + _dataBuffer.find_first_of(" ") + 1);
+// 			newCommand.prefix = prefix;
+// 		}
+
+// 		//
+// 		if (newCommand.command.empty())
+// 		{
+// 			size_t pos = _dataBuffer.find(' ');
+// 			if (pos != std::string::npos)
+// 			{
+// 				newCommand.command = _dataBuffer.substr(0, pos);
+// 				_dataBuffer.erase(0, pos + 1);
+// 			}
+// 		}
+
+// 		//parse params without trailing
+// 		if (newCommand.parametresMiddle.empty())
+// 		{
+// 			size_t posSpaceStart = this->_dataBuffer.find_first_of(" ");
+// 			size_t posCommaStart = this->_dataBuffer.find_first_of(",");
+// 			while (posCommaStart != std::string::npos || posSpaceStart != std::string::npos)
+// 			{
+// 				std::string::iterator nit = _dataBuffer.begin();
+
+// 				if ((*nit) == ':')
+// 					break;
+
+// 				size_t posComma = this->_dataBuffer.find_first_of(",");
+// 				size_t posSpace = this->_dataBuffer.find_first_of(" ");
+// 				size_t posEnd = this->_dataBuffer.find_first_of("\r\n");
+
+// 				if (posComma != std::string::npos && posComma < posSpace && posComma < posEnd)
+// 				{
+// 					std::string newParam = _dataBuffer.substr(0, posComma);
+// 					newCommand.parametresMiddle.push_back(newParam);
+// 					this->_dataBuffer.erase(0, posComma);
+// 				}
+// 				else if (posSpace != std::string::npos && posSpace < posEnd && posSpace < posComma)
+// 				{
+// 					std::string newParam = _dataBuffer.substr(0, posSpace);
+// 					newCommand.parametresMiddle.push_back(newParam);
+// 					this->_dataBuffer.erase(0, posSpace + 1);
+// 				}
+// 				else if (posEnd != std::string::npos)
+// 				{
+// 					std::string newParam = _dataBuffer.substr(0, posEnd);
+// 					newCommand.parametresMiddle.push_back(newParam);
+// 					this->_dataBuffer.erase(0, posEnd + 2);
+// 					break;
+// 				}
+// 			}
+// 		}
+
+
+// 		if (*this->_dataBuffer.begin() == ':')
+// 		{
+// 			size_t posEnd = this->_dataBuffer.find_first_of("\r\n");
+// 			if (posEnd != std::string::npos)
+// 			{
+// 				newCommand.trailing = _dataBuffer.substr(0, posEnd);
+// 				this->_dataBuffer.erase(0, posEnd + 2);
+// 			}
+// 		}
+
+// 		this->_commands.push_back(newCommand);
+
+// 	}
+// 	else
+// 		std::cerr << "commande partiel" << std::endl;
+// }
+
 void Client::parseCommand()
 {
-	size_t end = _dataBuffer.find("\r\n");
+	size_t end = this->_dataBuffer.find("\r\n");
+	if (end == std::string::npos)
+		return;
 
-	if (end != std::string::npos)
+	std::string line = this->_dataBuffer.substr(0, end);
+	this->_dataBuffer.erase(0, end + 2);
+
+	if (line.empty())
+		return;
+
+	parsedCommand cmd;
+	size_t pos = 0;
+	size_t sp;
+
+	if (line[0] == ':')
 	{
-		struct parsedCommand newCommand;
-		clearStructCommand(newCommand);
-
-		//parse prefix
-		if (newCommand.prefix.empty() && *this->_dataBuffer.begin() == ':')
-		{
-			std::string::iterator it = _dataBuffer.begin();
-			std::string prefix = _dataBuffer.substr(0, (this->_dataBuffer.find(" ")));
-			this->_dataBuffer.erase(it, it + _dataBuffer.find_first_of(" ") + 1);
-			newCommand.prefix = prefix;
-		}
-
-		//
-		if (newCommand.command.empty())
-		{
-			size_t pos = _dataBuffer.find(' ');
-			if (pos != std::string::npos)
-			{
-				newCommand.command = _dataBuffer.substr(0, pos);
-				_dataBuffer.erase(0, pos + 1);
-			}
-		}
-
-		//parse params without trailing
-		if (newCommand.parametresMiddle.empty())
-		{
-			size_t posSpaceStart = this->_dataBuffer.find_first_of(" ");
-			size_t posCommaStart = this->_dataBuffer.find_first_of(",");
-			while (posCommaStart != std::string::npos || posSpaceStart != std::string::npos)
-			{
-				std::string::iterator nit = _dataBuffer.begin();
-
-				if ((*nit) == ':')
-					break;
-
-				size_t posComma = this->_dataBuffer.find_first_of(",");
-				size_t posSpace = this->_dataBuffer.find_first_of(" ");
-				size_t posEnd = this->_dataBuffer.find_first_of("\r\n");
-
-				if (posComma != std::string::npos && posComma < posSpace && posComma < posEnd)
-				{
-					std::string newParam = _dataBuffer.substr(0, posComma);
-					newCommand.parametresMiddle.push_back(newParam);
-					this->_dataBuffer.erase(0, posComma);
-				}
-				else if (posSpace != std::string::npos && posSpace < posEnd && posSpace < posComma)
-				{
-					std::string newParam = _dataBuffer.substr(0, posSpace);
-					newCommand.parametresMiddle.push_back(newParam);
-					this->_dataBuffer.erase(0, posSpace + 1);
-				}
-				else if (posEnd != std::string::npos)
-				{
-					std::string newParam = _dataBuffer.substr(0, posEnd);
-					newCommand.parametresMiddle.push_back(newParam);
-					this->_dataBuffer.erase(0, posEnd + 2);
-					break;
-				}
-			}
-		}
-
-
-		if (*this->_dataBuffer.begin() == ':')
-		{
-			size_t posEnd = this->_dataBuffer.find_first_of("\r\n");
-			if (posEnd != std::string::npos)
-			{
-				newCommand.trailing = _dataBuffer.substr(0, posEnd);
-				this->_dataBuffer.erase(0, posEnd + 2);
-			}
-		}
-
-		this->_commands.push_back(newCommand);
-
+		sp = line.find(' ');
+		if (sp == std::string::npos)
+			return;
+		cmd.prefix = line.substr(1, sp - 1);
+		pos = sp;
+	}
+	while (pos < line.size() && line[pos] == ' ')
+		pos++;
+	sp = line.find(' ', pos);
+	if (sp == std::string::npos)
+	{
+		cmd.command = line.substr(pos);
+		pos = line.size();
 	}
 	else
 	{
-		std::cerr << "commande partiel" << std::endl;
-		this->getAllInfo();
+		cmd.command = line.substr(pos, sp - pos);
+		pos = sp;
 	}
+	while (pos < line.size())
+	{
+		while (pos < line.size() && line[pos] == ' ')
+			pos++;
+		if (pos >= line.size())
+			break;
+		if (line[pos] == ':')
+		{
+			cmd.trailing = line.substr(pos + 1);
+			break;
+		}
+		sp = line.find(' ', pos);
+		if (sp == std::string::npos)
+		{
+			cmd.parametresMiddle.push_back(line.substr(pos));
+			break;
+		}
+		cmd.parametresMiddle.push_back(line.substr(pos, sp - pos));
+		pos = sp;
+	}
+
+	if (!cmd.command.empty())
+		this->_commands.push_back(cmd);
 }
 
 
