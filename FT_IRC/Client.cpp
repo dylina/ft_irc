@@ -376,13 +376,6 @@ bool Client::hasCommands() const
     return !this->_commands.empty();
 }
 
-Client::parsedCommand Client::popCommand()
-{
-    parsedCommand cmd = this->_commands.front();
-    this->_commands.erase(this->_commands.begin());
-    return cmd;
-}
-
 void Client::setPassOk(bool ok)
 {
     this->_passOk = ok;

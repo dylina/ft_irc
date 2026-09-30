@@ -161,9 +161,9 @@ void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
 
 void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 {
-	char buffer[BUFFER_SIZE + 1];
+	char buffer[BUFFER_SIZE];
 
-	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer), 0);
+	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer) - 1, 0); //~risk d'overflow
 	buffer[retRecv] = 0;
 	//client data received
 	if (retRecv > 0)
@@ -171,23 +171,16 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		buffer[retRecv] = 0;
 		std::string data(buffer, retRecv);
 		std::cerr << retRecv << " bytes received from " << fds[i].fd << " fd" << std::endl;
-
-		Client *client = this->clients[fds[i].fd]; // prends le *
-		client->addData(data, fds[i].fd);		   // ajoute le data dans buff et parse les lignes
-
-		while (client->hasPendingCommands()) // vide le derniere
-		{
-			Client::parsedCommand cmd = client->popCommand(); // enleve la premiere cmd
-			this->processCommands(client);			  // envoi au bon handler
-		}
+		this->clients[fds[i].fd]->addData(data, this->clients[fds[i].fd]->getFdWithColor());
+		this->processCommands(this->clients[fds[i].fd]);
 	}
-	// client lost
+	//client lost
 	else if (retRecv == 0)
 	{
 		std::vector<struct pollfd>::iterator it = fds.begin() + i;
 		std::cerr << "client fd [" << (*it).fd << "] disconnected" << std::endl;
 
-    	// delete this->clients[(*it).fd]; //memory leaked
+    	delete this->clients[(*it).fd]; //memory leaked
 		this->clients.erase((*it).fd);
 		close((*it).fd);
 		this->fds.erase(it);
