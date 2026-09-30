@@ -241,7 +241,7 @@ void Server::handleNICK(Client* client, std::vector<std::string>& params)
 void Server::handleUSER(Client* client, std::vector<std::string>& params, std::string trailing)
 {
 	if (!client->isPassOk())
-	{
+{
 		client->sendReply(":ircserv 464 * :Password required");
 		return;
 	}

@@ -1,4 +1,5 @@
 #include "Client.hpp"
+#include <cctype>
 
 
 const char* Client::ErrorCreationClient::what() const throw()
@@ -223,6 +224,8 @@ void Client::parseCommand()
 		cmd.parametresMiddle.push_back(line.substr(pos, sp - pos));
 		pos = sp;
 	}
+	for (size_t i = 0; i < cmd.command.size(); ++i)
+		cmd.command[i] = std::toupper(static_cast<unsigned char>(cmd.command[i]));
 
 	if (!cmd.command.empty())
 		this->_commands.push_back(cmd);
