@@ -28,7 +28,8 @@ const char* Server::Clean::what() const throw()
 
 
 Server::Server(int domain, std::string ip, std::string port, std::string password)
-    : _serverSocket(domain, ip, port), _password(password){
+    : _serverSocket(domain, ip, port), _password(password)
+{
 
 	if (	bind(
 			this->_serverSocket.getFd(),
@@ -40,12 +41,11 @@ Server::Server(int domain, std::string ip, std::string port, std::string passwor
 		throw BindErr();
 	}
 	std::cerr << BOLD BRIGHT_GREEN << "Server bind() success!" << RESET << std::endl;
-
 }
 
 void Server::on()
 {
-	if (listen(this->_serverSocket.getFd(), 128) == -1) //~ pour avoir plusieur client en mm temps
+	if (listen(this->_serverSocket.getFd(), SOMAXCONN) == -1) // SOMAXCONN limit. max perm. sinon this->fds.size() = 0 error
 	{
 		perror("listen");
 		throw ListenErr();
@@ -161,9 +161,9 @@ void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
 
 void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 {
-	char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE + 1];
 
-	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer) - 1, 0); //~risk d'overflow
+	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer), 0);
 	buffer[retRecv] = 0;
 	//client data received
 	if (retRecv > 0)
@@ -171,16 +171,23 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		buffer[retRecv] = 0;
 		std::string data(buffer, retRecv);
 		std::cerr << retRecv << " bytes received from " << fds[i].fd << " fd" << std::endl;
-		this->clients[fds[i].fd]->addData(data, this->clients[fds[i].fd]->getFdWithColor());
-        this->processCommands(this->clients[fds[i].fd]);
+
+		Client *client = this->clients[fds[i].fd]; // prends le *
+		client->addData(data, fds[i].fd);		   // ajoute le data dans buff et parse les lignes
+
+		while (client->hasPendingCommands()) // vide le derniere
+		{
+			Client::parsedCommand cmd = client->popCommand(); // enleve la premiere cmd
+			this->processCommands(client);			  // envoi au bon handler
+		}
 	}
-	//client lost
+	// client lost
 	else if (retRecv == 0)
 	{
 		std::vector<struct pollfd>::iterator it = fds.begin() + i;
 		std::cerr << "client fd [" << (*it).fd << "] disconnected" << std::endl;
 
-    	delete this->clients[(*it).fd]; //memory leaked
+    	// delete this->clients[(*it).fd]; //memory leaked
 		this->clients.erase((*it).fd);
 		close((*it).fd);
 		this->fds.erase(it);
@@ -276,6 +283,26 @@ void Server::processCommands(Client* client)
             handleUSER(client, cmd.parametresMiddle, cmd.trailing);
 		else if (!client->isRegistered())
 			client->sendReply(":ircserv 451 * :You have not registered");
+		// else if (cmd.command  == "JOIN")
+		// 	cmdJoin(client, cmd);				-> to do
+		// else if (cmd.command  == "PART")
+		// 	cmdPart(client, cmd);				-> to do
+		// else if (cmd.command  == "TOPIC")
+		// 	cmdTopic(client, cmd);				-> to do
+		// else if (cmd.command  == "KICK")
+		// 	cmdKick(client, cmd);				-> to do
+		// else if (cmd.command  == "INVITE")
+		// 	cmdInvite(client, cmd);				-> to do
+		// else if (cmd.command  == "MODE")
+		// 	cmdMode(client, cmd);				-> to do
+		// else if (cmd.command  == "PRIVMSG")
+		// 	cmdPrivmsg(client, cmd);				-> to do
+		// else if (cmd.command  == "NOTICE")
+		// 	cmdNotice(client, cmd);				-> to do
+		// else if (cmd.command  == "PING")
+		// 	cmdPing(client, cmd);				-> to do
+		// else if (cmd.command  == "QUIT")
+		// 	cmdQuit(client, cmd);				-> to do
         else
             client->sendReply(":ircserv 421 * " + cmd.command + " :Unknown command");
     }

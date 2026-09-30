@@ -10,6 +10,7 @@
 #include "Server.hpp"
 #include <cstdlib>
 #include <ctime>
+#include <signal.h>
 #include <csignal>
 
 volatile sig_atomic_t g_running = 1;
