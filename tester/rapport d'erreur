@@ -13,8 +13,3 @@
 	[1]    9004 IOT instruction (core dumped)  ./ircserv 45484845484462 8486484545454488445
 
 
-
-30 septembre (apres le merge)
-
-	USER aled		-> si un nickname a deja ete donne et que ya pas tous les parametre dans la cmd le nickname se detruit
-

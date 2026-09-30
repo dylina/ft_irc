@@ -1,6 +1,8 @@
 #include "Client.hpp"
 #include <iostream>
 #include <sys/socket.h>
+#include <cctype>
+
 
 const char* Client::ErrorCreationClient::what() const throw()
 {
@@ -193,86 +195,66 @@ void Client::clearStructCommand(Client::parsedCommand &newCommand)
 
 void Client::parseCommand()
 {
-	size_t end = _dataBuffer.find("\r\n");
+	size_t end = this->_dataBuffer.find("\r\n");
+	if (end == std::string::npos)
+		return;
 
-	if (end != std::string::npos)
+	std::string line = this->_dataBuffer.substr(0, end);
+	this->_dataBuffer.erase(0, end + 2);
+
+	if (line.empty())
+		return;
+
+	parsedCommand cmd;
+	size_t pos = 0;
+	size_t sp;
+
+	if (line[0] == ':')
 	{
-		struct parsedCommand newCommand;
-		clearStructCommand(newCommand);
-
-		//parse prefix (optionnel, rarement envoye par un client)
-		if (!this->_dataBuffer.empty() && this->_dataBuffer[0] == ':')
-		{
-			size_t posSpace = this->_dataBuffer.find_first_of(" ");
-			if (posSpace != std::string::npos)
-			{
-				newCommand.prefix = _dataBuffer.substr(0, posSpace);
-				this->_dataBuffer.erase(0, posSpace + 1);
-			}
-		}
-
-		//parse command
-		if (newCommand.command.empty())
-		{
-			size_t posSpace = _dataBuffer.find_first_of(" ");
-			size_t posEnd = _dataBuffer.find_first_of("\r\n");
-			if (posSpace != std::string::npos && (posEnd == std::string::npos || posSpace < posEnd))
-			{
-				newCommand.command = _dataBuffer.substr(0, posSpace);
-				_dataBuffer.erase(0, posSpace + 1);
-			}
-			else if (posEnd != std::string::npos)
-			{
-				//commande sans aucun parametre (ex: "QUIT\r\n")
-				newCommand.command = _dataBuffer.substr(0, posEnd);
-				_dataBuffer.erase(0, posEnd + 2);
-			}
-		}
-
-		//parse params : uniquement separes par des espaces au niveau protocole.
-		//les listes "a,b,c" (JOIN/PART/PRIVMSG/KICK) restent un seul parametre brut,
-		//c'est au handler de la commande de les re-splitter sur la virgule.
-		while (!this->_dataBuffer.empty() && this->_dataBuffer[0] != ':')
-		{
-			size_t posSpace = this->_dataBuffer.find_first_of(" ");
-			size_t posEnd = this->_dataBuffer.find_first_of("\r\n");
-
-			if (posSpace != std::string::npos && (posEnd == std::string::npos || posSpace < posEnd))
-			{
-				std::string newParam = _dataBuffer.substr(0, posSpace);
-				if (!newParam.empty())
-					newCommand.parametresMiddle.push_back(newParam);
-				this->_dataBuffer.erase(0, posSpace + 1);
-			}
-			else if (posEnd != std::string::npos)
-			{
-				std::string newParam = _dataBuffer.substr(0, posEnd);
-				if (!newParam.empty())
-					newCommand.parametresMiddle.push_back(newParam);
-				this->_dataBuffer.erase(0, posEnd + 2);
-				break;
-			}
-			else
-				break; //securite : ne devrait pas arriver puisque "\r\n" a deja ete trouve plus haut
-		}
-
-		//parse trailing (":ceci est le dernier parametre, avec espaces")
-		if (!this->_dataBuffer.empty() && this->_dataBuffer[0] == ':')
-		{
-			size_t posEnd = this->_dataBuffer.find_first_of("\r\n");
-			if (posEnd != std::string::npos)
-			{
-				newCommand.trailing = _dataBuffer.substr(1, posEnd - 1);
-				this->_dataBuffer.erase(0, posEnd + 2);
-			}
-		}
-
-		newCommand.isComplete = true;
-		this->_commands.push_back(newCommand);
-
+		sp = line.find(' ');
+		if (sp == std::string::npos)
+			return;
+		cmd.prefix = line.substr(1, sp - 1);
+		pos = sp;
+	}
+	while (pos < line.size() && line[pos] == ' ')
+		pos++;
+	sp = line.find(' ', pos);
+	if (sp == std::string::npos)
+	{
+		cmd.command = line.substr(pos);
+		pos = line.size();
 	}
 	else
-		std::cerr << "commande partiel" << std::endl;
+	{
+		cmd.command = line.substr(pos, sp - pos);
+		pos = sp;
+	}
+	while (pos < line.size())
+	{
+		while (pos < line.size() && line[pos] == ' ')
+			pos++;
+		if (pos >= line.size())
+			break;
+		if (line[pos] == ':')
+		{
+			cmd.trailing = line.substr(pos + 1);
+			break;
+		}
+		sp = line.find(' ', pos);
+		if (sp == std::string::npos)
+		{
+			cmd.parametresMiddle.push_back(line.substr(pos));
+			break;
+		}
+		cmd.parametresMiddle.push_back(line.substr(pos, sp - pos));
+		pos = sp;
+	}
+	for (size_t i = 0; i < cmd.command.size(); ++i)
+		cmd.command[i] = std::toupper(static_cast<unsigned char>(cmd.command[i]));
+
+	if (!cmd.command.empty())
+		this->_commands.push_back(cmd);
 }
 
 

@@ -163,9 +163,8 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 {
 	char buffer[BUFFER_SIZE];
 
-	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer) - 1, 0); //~risk d'overflow
+	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer) - 1, 0);
 	buffer[retRecv] = 0;
-	//client data received
 	if (retRecv > 0)
 	{
 		buffer[retRecv] = 0;
@@ -174,18 +173,16 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		this->clients[fds[i].fd]->addData(data, this->clients[fds[i].fd]->getFdWithColor());
 		this->processCommands(this->clients[fds[i].fd]);
 	}
-	//client lost
 	else if (retRecv == 0)
 	{
 		std::vector<struct pollfd>::iterator it = fds.begin() + i;
 		std::cerr << "client fd [" << (*it).fd << "] disconnected" << std::endl;
 
-    	delete this->clients[(*it).fd]; //memory leaked
+    	delete this->clients[(*it).fd];
 		this->clients.erase((*it).fd);
 		close((*it).fd);
 		this->fds.erase(it);
 	}
-	// error
 	else
 		std::cerr << "Error client received in fd [" << fds[i].fd << "]" << std::endl;
 
@@ -209,6 +206,11 @@ void Server::handlePASS(Client* client, std::vector<std::string>& params)
 
 void Server::handleNICK(Client* client, std::vector<std::string>& params)
 {
+	if (!client->isPassOk())
+	{
+		client->sendReply(":ircserv 464 * :Password required");
+		return;
+	}
     if (params.empty())
     {
         client->sendReply(":ircserv 431 * :No nickname given");
@@ -221,8 +223,6 @@ void Server::handleNICK(Client* client, std::vector<std::string>& params)
         client->sendReply(":ircserv 432 * " + nick + " :Erroneous nickname");
         return;
     }
-
-    // Vérifier si le nick est déjà pris
     std::map<int, Client*>::iterator it = this->clients.begin();
     for (; it != this->clients.end(); ++it)
     {
@@ -239,13 +239,29 @@ void Server::handleNICK(Client* client, std::vector<std::string>& params)
 
 void Server::handleUSER(Client* client, std::vector<std::string>& params, std::string trailing)
 {
-    if (params.empty())
+	if (!client->isPassOk())
+{
+		client->sendReply(":ircserv 464 * :Password required");
+		return;
+	}
+	if (client->isRegistered())
+	{
+		client->sendReply(":ircserv 462 " + client->getRealname() + " :You may not reregister");
+		return;
+	}
+
+	std::string realname = trailing;
+	if (realname.empty() && params.size() >= 4)
+		realname = params[3];
+
+std::cerr << "realname stocké : [" << realname << "]" << std::endl;
+    if (params.size() < 3 || realname.empty())
     {
         client->sendReply(":ircserv 461 * USER :Not enough parameters");
         return;
     }
     client->setUsername(params[0]);
-    client->setRealname(trailing);
+    client->setRealname(realname);
     client->setHasUser(true);
     finalizeRegistration(client);
 }
