@@ -201,9 +201,41 @@ void Server::executeCommands(Client &client, Client::parsedCommand &cmd)
 
 void Server::cmdJoin(Client &client, Client::parsedCommand &cmd)
 {
-	(void)client;
-	(void)cmd;
-	// TODO
+	if (cmd.parametresMiddle.empty())
+	{
+		client.queueMessage(":ircserv 461 " + client.getNickName() + " JOIN :Not enough parameters\r\n");
+		return;
+	}
+
+	// separation du param par virgule
+	std::stringstream ss(cmd.parametresMiddle[0]);
+	std::string chan;
+
+	while (std::getline(ss, chan, ','))
+	{
+		// le nom commence tjr avec #
+		if (chan.empty() || chan[0] != '#')
+		{
+			client.queueMessage(":ircserv 476 " + client.getNickName() + " " + chan + " :Bad Channel Mask\r\n");
+			continue;
+		}
+
+		// client deja dans le canal on l'ignore
+		if (client.isInChannel(chan))
+			continue;
+
+		client.joinChannel(chan);
+
+		// msg de JOIN (IRC: :nick JOIN :#canal)
+		std::string joinMsg = ":" + client.getNickName() + " JOIN :" + chan + "\r\n";
+
+		// envoier a tous meme le new client
+		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
+		{
+			if (it->second->isInChannel(chan))
+				it->second->queueMessage(joinMsg);
+		}
+	}
 }
 
 void Server::cmdPart(Client &client, Client::parsedCommand &cmd)
