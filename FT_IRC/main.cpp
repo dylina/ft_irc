@@ -10,6 +10,19 @@
 #include "Server.hpp"
 #include <cstdlib>
 #include <ctime>
+#include <signal.h>
+#include <csignal>
+
+volatile sig_atomic_t g_running = 1;
+volatile sig_atomic_t g_sigusr1 = 0;
+
+void handleSignal(int sig)
+{
+	if (sig == SIGINT || sig == SIGTERM)
+		g_running = 0;
+	else if (sig == SIGUSR1)
+		g_sigusr1 = 1;
+}
 
 int main(int argc, char **argv)
 {
@@ -24,15 +37,17 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	signal(SIGINT, handleSignal);
+	signal(SIGUSR1, handleSignal);
+
 
 	try
 	{
 		std::string port = argv[1];
-
+    	std::string password = argv[2];  // ← récupérer le password
 		// start with 127.0.0.1 == "localhost"
 
-		Server irc(AF_INET, "127.0.0.1", port);
-
+    	Server irc(AF_INET, "127.0.0.1", port, password);  // ← passer au serveur
 		std::srand(std::time(NULL));
 
 		irc.on();
