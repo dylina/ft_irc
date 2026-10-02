@@ -165,6 +165,7 @@ void Server::executeCommands(Client &client, Client::parsedCommand &cmd)
 
 	if (!client.isRegistered() && upper != "PASS" && upper != "NICK" && upper != "USER")
 	{
+
 		client.queueMessage(":ircserv 451 * :You have not registered\r\n");
 		return;
 	}
@@ -189,10 +190,6 @@ void Server::executeCommands(Client &client, Client::parsedCommand &cmd)
 		cmdMode(client, cmd);
 	else if (upper == "PRIVMSG")
 		cmdPrivmsg(client, cmd);
-	else if (upper == "NOTICE")
-		cmdNotice(client, cmd);
-	else if (upper == "PING")
-		cmdPing(client, cmd);
 	else if (upper == "QUIT")
 		cmdQuit(client, cmd);
 	else
@@ -283,8 +280,38 @@ void Server::cmdPrivmsg(Client &client, Client::parsedCommand &cmd)
 		client.queueMessage(":ircserv 412 " + client.getNickName() + " :No text to send\r\n");
 		return;
 	}
-}
 
+	std::string target = cmd.parametresMiddle[0];
+	std::string msg = ":" + client.getNickName() + " PRIVMSG " + target + " :" + cmd.trailing + "\r\n";
+
+	if (target[0] == '#')
+	{
+		if (!client.isInChannel(target))
+		{
+			client.queueMessage(":ircserv 442 " + client.getNickName() + " " + target + " :You're not on that channel\r\n");
+			return;
+		}
+		// envoi a tous sauf expediteur
+		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
+		{
+			if (it->second != &client && it->second->isInChannel(target))
+				it->second->queueMessage(msg);
+		}
+	}
+	else
+	{
+		// message prive a un nick
+		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
+		{
+			if (it->second->getNickName() == target)
+			{
+				it->second->queueMessage(msg);
+				return;
+			}
+		}
+		client.queueMessage(":ircserv 401 " + client.getNickName() + " " + target + " :No such nick\r\n");
+	}
+}
 void Server::cmdTopic(Client &client, Client::parsedCommand &cmd)
 {
 	(void)client;
@@ -304,18 +331,6 @@ void Server::cmdInvite(Client &client, Client::parsedCommand &cmd)
 }
 
 void Server::cmdQuit(Client &client, Client::parsedCommand &cmd)
-{
-	(void)client;
-	(void)cmd;
-}
-
-void Server::cmdPing(Client &client, Client::parsedCommand &cmd)
-{
-	(void)client;
-	(void)cmd;
-}
-
-void Server::cmdNotice(Client &client, Client::parsedCommand &cmd)
 {
 	(void)client;
 	(void)cmd;
