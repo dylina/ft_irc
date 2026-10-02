@@ -272,8 +272,17 @@ void Server::cmdPart(Client &client, Client::parsedCommand &cmd)
 
 void Server::cmdPrivmsg(Client &client, Client::parsedCommand &cmd)
 {
-	(void)client;
-	(void)cmd;
+	if (cmd.parametresMiddle.empty())
+	{
+		client.queueMessage(":ircserv 411 " + client.getNickName() + " :No recipient given (PRIVMSG)\r\n");
+		return;
+	}
+
+	if (cmd.trailing.empty())
+	{
+		client.queueMessage(":ircserv 412 " + client.getNickName() + " :No text to send\r\n");
+		return;
+	}
 }
 
 void Server::cmdTopic(Client &client, Client::parsedCommand &cmd)
