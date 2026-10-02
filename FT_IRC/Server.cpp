@@ -240,8 +240,34 @@ void Server::cmdJoin(Client &client, Client::parsedCommand &cmd)
 
 void Server::cmdPart(Client &client, Client::parsedCommand &cmd)
 {
-	(void)client;
-	(void)cmd;
+	if (cmd.parametresMiddle.empty())
+	{
+		client.queueMessage(":ircserv 461 " + client.getNickName() + " PART :Not enough parameters\r\n");
+		return;
+	}
+
+	std::stringstream ss(cmd.parametresMiddle[0]);
+	std::string chan;
+
+	while (std::getline(ss, chan, ','))
+	{
+		if (!client.isInChannel(chan))
+		{
+			client.queueMessage(":ircserv 442 " + client.getNickName() + " " + chan + " :You're not on that channel\r\n");
+			continue;
+		}
+
+		// motif pour partir apres les :
+		std::string reason = cmd.trailing.empty() ? "" : (" :" + cmd.trailing);
+		std::string partMsg = ":" + client.getNickName() + " PART " + chan + reason + "\r\n";
+
+		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
+		{
+			if (it->second->isInChannel(chan))
+				it->second->queueMessage(partMsg);
+		}
+		client.leaveChannel(chan);
+	}
 }
 
 void Server::cmdPrivmsg(Client &client, Client::parsedCommand &cmd)
