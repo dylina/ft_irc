@@ -11,65 +11,59 @@
 #include "colors.hpp"
 #include "Client.hpp"
 
-
 class Server
 {
+public:
+	Server(int domain, std::string ip, std::string port);
+
+	void on();
+
+	class BindErr : public std::exception
+	{
 	public:
+		const char *what() const throw();
+	};
+	class ListenErr : public std::exception
+	{
+	public:
+		const char *what() const throw();
+	};
+	class AcceptErr : public std::exception
+	{
+	public:
+		const char *what() const throw();
+	};
+	class RecvError : public std::exception
+	{
+	public:
+		const char *what() const throw();
+	};
 
-		Server(int domain, std::string ip, std::string port);
+private:
+	// mount a struct pollfd for new client and add in variables server
+	void addNewClient(int clientFd);
+	// catch message from a already connected client
+	void dataReceived(std::vector<struct pollfd> &fds, int i);
 
-		void on();
+	void executeCommands(Client &client, Client::parsedCommand &cmd);
 
-		class BindErr : public std::exception
-		{
-			public:
-				const char* what() const throw();
-		};
-		class ListenErr : public std::exception
-		{
-			public:
-				const char* what() const throw();
-		};
-		class AcceptErr : public std::exception
-		{
-			public:
-				const char* what() const throw();
-		};
-		class RecvError : public std::exception
-		{
-			public:
-				const char* what() const throw();
-		};
+	void cmdJoin(Client &client, Client::parsedCommand &cmd);
+	void cmdPart(Client &client, Client::parsedCommand &cmd);
+	void cmdPrivmsg(Client &client, Client::parsedCommand &cmd);
+	void cmdTopic(Client &client, Client::parsedCommand &cmd);
+	void cmdKick(Client &client, Client::parsedCommand &cmd);
+	void cmdInvite(Client &client, Client::parsedCommand &cmd);
+	void cmdQuit(Client &client, Client::parsedCommand &cmd);
 
+	// au cas ou
+	void cmdMode(Client &client, Client::parsedCommand &cmd);
+	void cmdPass(Client &client, Client::parsedCommand &cmd);
+	void cmdNick(Client &client, Client::parsedCommand &cmd);
+	void cmdUser(Client &client, Client::parsedCommand &cmd);
 
-	private:
-		//mount a struct pollfd for new client and add in variables server
-		void addNewClient(int clientFd);
-		//catch message from a already connected client
-		void dataReceived(std::vector<struct pollfd> &fds, int i);
-
-
-		void executeCommands(Client &client, Client::parsedCommand &cmd);
-		
-		void cmdJoin(Client &client, Client::parsedCommand &cmd);
-		void cmdPart(Client &client, Client::parsedCommand &cmd);
-		void cmdPrivmsg(Client &client, Client::parsedCommand &cmd);
-		void cmdTopic(Client &client, Client::parsedCommand &cmd);
-		void cmdKick(Client &client, Client::parsedCommand &cmd);
-		void cmdInvite(Client &client, Client::parsedCommand &cmd);
-		void cmdQuit(Client &client, Client::parsedCommand &cmd);
-		void cmdPing(Client &client, Client::parsedCommand &cmd);
-
-		//au cas ou
-		void cmdNotice(Client &client, Client::parsedCommand &cmd);
-		void cmdMode(Client &client, Client::parsedCommand &cmd);
-		void cmdPass(Client &client, Client::parsedCommand &cmd);
-		void cmdNick(Client &client, Client::parsedCommand &cmd);
-		void cmdUser(Client &client, Client::parsedCommand &cmd);
-
-		Socket _serverSocket;
-		//tableau associatif de pairs, [int Clientfd] -> Client User,  !a delete a la fin!
-		std::map<int,Client *> clients;
-		//tableau dynamique de surveillance de fd pour poll()
-		std::vector<struct pollfd> fds;
+	Socket _serverSocket;
+	// tableau associatif de pairs, [int Clientfd] -> Client User,  !a delete a la fin!
+	std::map<int, Client *> clients;
+	// tableau dynamique de surveillance de fd pour poll()
+	std::vector<struct pollfd> fds;
 };
