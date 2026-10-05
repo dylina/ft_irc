@@ -60,7 +60,8 @@ void Client::sendReply(const std::string& msg)
     std::cerr << BOLD BRIGHT_CYAN << "SENDING: " << msg << RESET << std::endl; // ← ajouter
 	this->_lastResponse = BOLD BRIGHT_CYAN + msg + RESET;
 	this->_responseSend.push_back(_lastResponse);
-    send(this->_fd, reply.c_str(), reply.length(), 0);
+	//on supprime le send ici, et on ajoute au buffer send pour respecter la regle sur poll()
+	this->queueMessage(reply);
 }
 
 void Client::getSocket(std::ostream& out) const

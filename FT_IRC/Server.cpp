@@ -102,12 +102,22 @@ void Server::on()
 					try
 					{
 						this->dataReceived(fds, i);
+
 					}
 					catch (const std::exception &e)
 					{
 						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
 				}
+			}
+			if (fds[i].revents & POLLOUT)
+			{
+				Client *client = this->clients[fds[i].fd];
+
+				client->flushSendBuffer();
+
+				if (!client->hasPendingOutput())
+					fds[i].events &= ~POLLOUT;
 			}
 			if (!g_running)
 			{
@@ -166,6 +176,8 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		std::cerr << retRecv << " bytes received from " << fds[i].fd << " fd" << std::endl;
 		this->clients[fds[i].fd]->addData(data, this->clients[fds[i].fd]->getFdWithColor());
 		this->processCommands(this->clients[fds[i].fd]);
+		for (std::vector<struct pollfd>::iterator it = fds.begin(); it != fds.end(); it++)
+			(*it).revents |= POLLOUT;
 	}
 	else if (retRecv == 0)
 	{
