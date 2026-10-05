@@ -322,10 +322,20 @@ void Server::clean()
 
 void Server::printAllClients()
 {
+	std::ofstream dump("/tmp/ircserv_dump");
+
+	if (!dump.is_open())
+		return;
+
 	if (this->clients.empty())
-		std::cerr << "No clients connected" << std::endl;
-	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
 	{
-		(*it).second->getAllInfo();
+		dump << "No clients connected" << std::endl;
+		return;
+	}
+
+	for (std::map<int, Client *>::iterator it = this->clients.begin();
+		 it != this->clients.end(); ++it)
+	{
+		it->second->getAllInfo(dump);
 	}
 }

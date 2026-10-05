@@ -8,6 +8,8 @@
 #include <map>
 #include <csignal>
 #include <cerrno>
+#include <fstream>
+
 
 #include "Socket.hpp"
 #include "colors.hpp"

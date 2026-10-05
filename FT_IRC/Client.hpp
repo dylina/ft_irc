@@ -10,6 +10,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <set>
+#include <ostream>
 
 #include "colors.hpp"
 
@@ -48,8 +49,9 @@ class Client
 		void flushSendBuffer();
 
 		// Debug
+		void printBufferEnhance(std::ostream& out) const;
 		void printBufferEnhance() const;
-		void printCommands() const;
+		void printCommands(std::ostream& out) const;
 
 		class ErrorCreationClient : public std::exception
 		{
@@ -92,10 +94,10 @@ class Client
 
 		void sendReply(const std::string& msg);
 		void setFD(int fd);
-    	bool hasCommands() const;
-    	parsedCommand popCommand();
-		std::string getSocket() const;
-		void getAllInfo() const;
+		bool hasCommands() const;
+		parsedCommand popCommand();
+		void getSocket(std::ostream& out) const;
+		void getAllInfo(std::ostream& out) const;
 
 		void addData(std::string buffer, std::string clientFd);
 
