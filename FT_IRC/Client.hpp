@@ -6,6 +6,9 @@
 #include <iostream>
 #include <vector>
 #include <iterator>
+#include <sys/socket.h>
+#include <sstream>
+#include <cstdlib>
 #include <set>
 
 #include "colors.hpp"
@@ -16,40 +19,27 @@
 
 class Client
 {
-    public:
+	public:
 
-		Client();
-		Client(int fd, sockaddr_in _clientAddr);
-		~Client();
+		Client(sockaddr_in socketClient);
 
-			// Getters
+		// Getters
 		int			getFd() const;
 		sockaddr_in getAddr() const;
 
-		std::string getName() const;//jsp si on doit garder
-		std::string getNickName() const;
-		std::string getUserName() const;
 		std::string getData() const;
 
 		int			getMode() const;
 		bool		hasPass() const;
 		bool		isRegistered() const;
 
-		// Setters
-		void setName(const std::string& name);
-		void setNickName(const std::string& nick);
-		void setUserName(const std::string& name);
-		void setMode(int mode);
-		void setPass(bool val);
-
-			// Canale (join/part)
+		// Canale (join/part)
 		void joinChannel(const std::string &name);
 		void leaveChannel(const std::string &name);
 		bool isInChannel(const std::string &name) const;
 		std::set<std::string> getChannels() const;
 
-			// Data / parsing
-		void addData(std::string buffer, int clientFd);
+		// Data / parsing
 		void parseCommand();
 
 			// Envoi (bufferise ici, le send() reel se fait seulement sur POLLOUT dans Server::on())
@@ -59,7 +49,7 @@ class Client
 
 		// Debug
 		void printBufferEnhance() const;
-		void printCommands();
+		void printCommands() const;
 
 		class ErrorCreationClient : public std::exception
 		{
@@ -99,27 +89,62 @@ class Client
 			bool isComplete;
 		};
 
-			// File d'attente des commandes deja parsees, consommee par Server::executeCommand
+
+		void sendReply(const std::string& msg);
+		void setFD(int fd);
+    	bool hasCommands() const;
+    	parsedCommand popCommand();
+		std::string getSocket() const;
+		void getAllInfo() const;
+
+		void addData(std::string buffer, std::string clientFd);
+
+		//Authentication and registration
+		void setPassOk(bool ok);
+		void setHasNick(bool ok);
+		void setHasUser(bool ok);
+		void setRegistered(bool ok);
+		void setUsername(std::string u);
+		void setRealname(std::string r);
+		void setMode(int mode);
+		bool isPassOk() const;
+		bool hasNick() const;
+		bool hasUser() const;
+		std::string getUsername() const;
+		std::string getRealname() const;
+		std::string getFdWithColor() const;
+
+		bool isComplete;
+		// File d'attente des commandes deja parsees, consommee par Server::executeCommand
 		bool hasPendingCommands() const;
-		Client::parsedCommand popCommand();
 
 		private:
+		sockaddr_in _socket;
 
-		void clearStructCommand(parsedCommand& newCommand);
+		std::string _dataBuffer;
+		int _mode;
 
-		// Client information
-		int         _fd;
+		std::vector<parsedCommand> _commands;
+		void clearStructCommand(parsedCommand &newCommand);
+
+		int _fd;
+		std::string _clientFd;
+		bool _passOk;
+		bool _hasNick;
+		bool _hasUser;
+		bool _registered;
+		std::string _username;
+		std::string _realname;
+		std::string _lastResponse;
+		std::vector<std::string> _responseSend;
+
 		sockaddr_in _clientAddr;
 
 		std::string _nickName;
 		std::string _userName;
 
 		// Client state
-		int         _mode;
 		bool        _hasPass;
-
-		// Received data
-		std::string _dataBuffer;
 
 		// Donnees en attente d'envoi (flush uniquement sur POLLOUT)
 		std::string _sendBuffer;
@@ -127,8 +152,5 @@ class Client
 		// Canale la care clientul e conectat in prezent
 		std::set<std::string> _channels;
 
-		// Parsed commands
-		std::vector<parsedCommand> _commands;
-		std::string _clientFd;
 
 };

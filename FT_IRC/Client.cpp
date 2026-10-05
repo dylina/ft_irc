@@ -1,36 +1,117 @@
 #include "Client.hpp"
 #include <iostream>
 #include <sys/socket.h>
+#include <cctype>
 
-const char *Client::ErrorCreationClient::what() const throw()
+
+const char* Client::ErrorCreationClient::what() const throw()
 {
 	return "Error creation client";
 }
 
-Client::Client()
-	: _fd(-1),
-	  _clientAddr(),
-	  _nickName(""),
-	  _userName(""),
-	  _mode(1),
-	  _hasPass(false),
-	  _dataBuffer("")
+Client::Client(sockaddr_in socketClient)
+    : _socket(socketClient),
+      _dataBuffer(""),
+      _mode(-1),
+      _fd(-1),
+      _passOk(false),
+      _hasNick(false),
+      _hasUser(false),
+      _registered(false),
+      _username(""),
+      _realname(""),
+	  _lastResponse(""),
+	  _responseSend()
+{}
+
+std::string Client::getFdWithColor() const
 {
+	return this->_clientFd;
 }
 
-Client::Client(int fd, sockaddr_in clientAddr)
-	: _fd(fd),
-	  _clientAddr(clientAddr),
-	  _nickName(""),
-	  _userName(""),
-	  _mode(1),
-	  _hasPass(false),
-	  _dataBuffer("")
+
+static std::string addRandomColorsForClient(int Clientfd)
 {
+	std::stringstream fd;
+	fd << Clientfd;
+
+	int colors = std::rand() % 256;
+
+	std::stringstream rdmcolor;
+	rdmcolor	<< "\033[38;5;"
+				<< colors
+				<< "m"
+				<< Clientfd
+				<< RESET;
+
+
+	return rdmcolor.str();
 }
 
-Client::~Client()
+void Client::setFD(int fd)
 {
+	this->_fd = fd;
+	this->_clientFd = addRandomColorsForClient(fd);
+}
+
+void Client::sendReply(const std::string& msg)
+{
+    std::string reply = msg + "\r\n";
+    std::cerr << BOLD BRIGHT_CYAN << "SENDING: " << msg << RESET << std::endl; // ← ajouter
+	this->_lastResponse = BOLD BRIGHT_CYAN + msg + RESET;
+	this->_responseSend.push_back(_lastResponse);
+    send(this->_fd, reply.c_str(), reply.length(), 0);
+}
+
+std::string Client::getSocket() const
+{
+	std::string ret;
+	std::cout	<< "Address : " << this->_socket.sin_addr.s_addr << '\n'
+				<< "Family : " << this->_socket.sin_family << '\n'
+				<< "Port :" << this->_socket.sin_port << '\n'
+				<< "Sin Zero : " << this->_socket.sin_zero << std::endl;
+	return ret;
+}
+
+void Client::getAllInfo() const
+{
+	std::cout << "------------new--------------" << std::endl;
+
+	if (this->isRegistered())
+		std::cout << BOLD_GREEN << "This user is Registered" << RESET << std::endl;
+	else
+		std::cout << BOLD_RED << "! This user is Not Registered !" << RESET << std::endl;
+
+	this->getSocket();
+
+	std::cout << "Mode : " << this->getMode() << '\n';
+
+	std::cout << "User Name : ";
+	if (this->_username.empty())
+		std::cout << BG_BRIGHT_RED BOLD BRIGHT_WHITE << "Username EMPTY" << RESET <<'\n';
+	else
+		std::cout << this->getUsername() << '\n';
+
+	std::cout << "Real Name : ";
+	if (this->_realname.empty())
+		std::cout << BG_BRIGHT_RED BOLD BRIGHT_WHITE << "Realname EMPTY" << RESET <<'\n';
+	else
+		std::cout << this->getRealname() << '\n';
+
+
+	printBufferEnhance();
+
+	this->printCommands();
+	if (!this->_lastResponse.empty())
+	{
+		std::cout << "responses sends :" << std::endl;
+		for (std::vector<std::string>::const_iterator it = _responseSend.begin(); it != this->_responseSend.end(); it++)
+			std::cout << (*it) << std::endl;
+	}
+	else
+		std::cout << "No response from server send" << std::endl;
+
+	std::cout << "------------end--------------" << std::endl;
 }
 
 int Client::getFd() const
@@ -43,64 +124,9 @@ sockaddr_in Client::getAddr() const
 	return _clientAddr;
 }
 
-std::string Client::getName() const // a voir si on garde
-{
-	return this->_nickName;
-}
-
-std::string Client::getNickName() const
-{
-	return this->_nickName;
-}
-
-std::string Client::getUserName() const
-{
-	return this->_userName;
-}
-
-std::string Client::getData() const
-{
-	return this->_dataBuffer;
-}
-
-int Client::getMode() const
-{
-	return this->_mode;
-}
-
 bool Client::hasPass() const
 {
 	return this->_hasPass;
-}
-
-bool Client::isRegistered() const
-{
-	return this->_hasPass && !this->_nickName.empty() && !this->_userName.empty();
-	;
-}
-
-void Client::setName(const std::string &name)
-{
-	this->_nickName = name;
-}
-void Client::setNickName(const std::string &nick)
-{
-	this->_nickName = nick;
-}
-
-void Client::setUserName(const std::string &name)
-{
-	this->_userName = name;
-}
-
-void Client::setMode(int mode)
-{
-	this->_mode = mode;
-}
-
-void Client::setPass(bool val)
-{
-	this->_hasPass = val;
 }
 
 bool Client::hasPendingCommands() const
@@ -130,10 +156,10 @@ void Client::flushSendBuffer()
 	if (this->_sendBuffer.empty())
 		return;
 
-	// appele uniquement depuis Server::on() en reponse a un POLLOUT : jamais d'appel "libre" a send()
+	//appele uniquement depuis Server::on() en reponse a un POLLOUT : jamais d'appel "libre" a send()
 	ssize_t sent = send(this->_fd, this->_sendBuffer.c_str(), this->_sendBuffer.size(), 0);
 
-	// pas d'inspection d'errno : en cas d'echec on retente simplement au prochain cycle POLLOUT
+	//pas d'inspection d'errno : en cas d'echec on retente simplement au prochain cycle POLLOUT
 	if (sent > 0)
 		this->_sendBuffer.erase(0, static_cast<size_t>(sent));
 }
@@ -160,96 +186,123 @@ std::set<std::string> Client::getChannels() const
 
 void Client::clearStructCommand(Client::parsedCommand &newCommand)
 {
-	newCommand.isComplete = false;
-	newCommand.parametresMiddle.clear();
-	newCommand.prefix.clear();
-	newCommand.trailing.clear();
-	newCommand.command.clear();
+		// newCommand.isComplete = false;
+		newCommand.parametresMiddle.clear();
+		newCommand.prefix.clear();
+		newCommand.trailing.clear();
+		newCommand.command.clear();
 }
 
 void Client::parseCommand()
 {
-	size_t end = _dataBuffer.find("\r\n");
+	size_t end = this->_dataBuffer.find("\r\n");
+	if (end == std::string::npos)
+		return;
 
-	if (end != std::string::npos)
+	std::string line = this->_dataBuffer.substr(0, end);
+	this->_dataBuffer.erase(0, end + 2);
+
+	if (line.empty())
+		return;
+
+	parsedCommand cmd;
+	size_t pos = 0;
+	size_t sp;
+
+	if (line[0] == ':')
 	{
-		struct parsedCommand newCommand;
-		clearStructCommand(newCommand);
-
-		// parse prefix (optionnel, rarement envoye par un client)
-		if (!this->_dataBuffer.empty() && this->_dataBuffer[0] == ':')
-		{
-			size_t posSpace = this->_dataBuffer.find_first_of(" ");
-			if (posSpace != std::string::npos)
-			{
-				newCommand.prefix = _dataBuffer.substr(0, posSpace);
-				this->_dataBuffer.erase(0, posSpace + 1);
-			}
-		}
-
-		// parse command
-		if (newCommand.command.empty())
-		{
-			size_t posSpace = _dataBuffer.find_first_of(" ");
-			size_t posEnd = _dataBuffer.find_first_of("\r\n");
-			if (posSpace != std::string::npos && (posEnd == std::string::npos || posSpace < posEnd))
-			{
-				newCommand.command = _dataBuffer.substr(0, posSpace);
-				_dataBuffer.erase(0, posSpace + 1);
-			}
-			else if (posEnd != std::string::npos)
-			{
-				// commande sans aucun parametre (ex: "QUIT\r\n")
-				newCommand.command = _dataBuffer.substr(0, posEnd);
-				_dataBuffer.erase(0, posEnd + 2);
-			}
-		}
-
-		while (!this->_dataBuffer.empty() && this->_dataBuffer[0] != ':')
-		{
-			size_t posSpace = this->_dataBuffer.find_first_of(" ");
-			size_t posEnd = this->_dataBuffer.find_first_of("\r\n");
-
-			if (posSpace != std::string::npos && (posEnd == std::string::npos || posSpace < posEnd))
-			{
-				std::string newParam = _dataBuffer.substr(0, posSpace);
-				if (!newParam.empty())
-					newCommand.parametresMiddle.push_back(newParam);
-				this->_dataBuffer.erase(0, posSpace + 1);
-			}
-			else if (posEnd != std::string::npos)
-			{
-				std::string newParam = _dataBuffer.substr(0, posEnd);
-				if (!newParam.empty())
-					newCommand.parametresMiddle.push_back(newParam);
-				this->_dataBuffer.erase(0, posEnd + 2);
-				break;
-			}
-			else
-				break; // securite : ne devrait pas arriver puisque "\r\n" a deja ete trouve plus haut
-		}
-
-		// parse trailing (":ceci est le dernier parametre, avec espaces")
-		if (!this->_dataBuffer.empty() && this->_dataBuffer[0] == ':')
-		{
-			size_t posEnd = this->_dataBuffer.find_first_of("\r\n");
-			if (posEnd != std::string::npos)
-			{
-				newCommand.trailing = _dataBuffer.substr(1, posEnd - 1);
-				this->_dataBuffer.erase(0, posEnd + 2);
-			}
-		}
-
-		newCommand.isComplete = true;
-		this->_commands.push_back(newCommand);
+		sp = line.find(' ');
+		if (sp == std::string::npos)
+			return;
+		cmd.prefix = line.substr(1, sp - 1);
+		pos = sp;
+	}
+	while (pos < line.size() && line[pos] == ' ')
+		pos++;
+	sp = line.find(' ', pos);
+	if (sp == std::string::npos)
+	{
+		cmd.command = line.substr(pos);
+		pos = line.size();
 	}
 	else
-		std::cerr << "commande partiel" << std::endl;
+	{
+		cmd.command = line.substr(pos, sp - pos);
+		pos = sp;
+	}
+	while (pos < line.size())
+	{
+		while (pos < line.size() && line[pos] == ' ')
+			pos++;
+		if (pos >= line.size())
+			break;
+		if (line[pos] == ':')
+		{
+			cmd.trailing = line.substr(pos + 1);
+			break;
+		}
+		sp = line.find(' ', pos);
+		if (sp == std::string::npos)
+		{
+			cmd.parametresMiddle.push_back(line.substr(pos));
+			break;
+		}
+		cmd.parametresMiddle.push_back(line.substr(pos, sp - pos));
+		pos = sp;
+	}
+	for (size_t i = 0; i < cmd.command.size(); ++i)
+		cmd.command[i] = std::toupper(static_cast<unsigned char>(cmd.command[i]));
+
+	if (!cmd.command.empty())
+		this->_commands.push_back(cmd);
 }
 
-void Client::addData(std::string buffer, int clientFd)
-{
 
+
+
+void Client::printCommands() const
+{
+	for (size_t cmds = 0; cmds < this->_commands.size(); cmds++)
+	{
+		std::cerr << "\nCommand in waiting list number " << cmds + 1 << "/" << this->_commands.size() << " for fd ["<< _clientFd <<"]" << std::endl;
+
+		std::cerr			<< "Prefix : ";
+
+		if (this->_commands[cmds].prefix.empty())
+			std::cerr << BG_BRIGHT_RED BRIGHT_WHITE << "NO PREFIX" << RESET << '\n';
+		else
+			std::cerr << BOLD BRIGHT_MAGENTA << this->_commands[cmds].prefix << RESET <<'\n';
+
+		std::cerr			<< "Command :" << BOLD BRIGHT_MAGENTA << _commands[cmds].command << RESET <<'\n'
+							<< "Params :";
+
+		if (_commands[cmds].parametresMiddle.empty())
+			std::cerr << BOLD BG_BRIGHT_RED << "NO PARAMS\n" << RESET;
+		else
+		{
+			for (size_t i = 0; i < _commands[cmds].parametresMiddle.size(); i++)
+			{
+				if (i < _commands[cmds].parametresMiddle.size())
+					std::cout << " ";
+				std::cerr << '\"' << BOLD BRIGHT_MAGENTA << _commands[cmds].parametresMiddle[i] << RESET << '\"';
+			}
+			std::cerr << std::endl;
+		}
+
+		std::cerr			<< "Trailing :";
+
+		if (_commands[cmds].trailing.empty())
+			std::cerr << BG_BRIGHT_RED BOLD BRIGHT_WHITE << "NO TRAILING" << RESET << '\n';
+		else
+			std::cerr << BOLD BRIGHT_MAGENTA << _commands[cmds].trailing << RESET << std::endl;
+		std::cerr << std::endl;
+	}
+}
+
+
+void Client::addData(std::string buffer, std::string clientFd)
+{
+	this->_clientFd = clientFd;
 	std::cerr << "new data from client fd [" << clientFd << "] stored in buffer client:" << std::endl;
 	this->_dataBuffer += buffer;
 
@@ -258,36 +311,109 @@ void Client::addData(std::string buffer, int clientFd)
 	while (this->_dataBuffer.find("\r\n") != std::string::npos)
 		this->parseCommand();
 
-	std::cout << "commands received from client " << clientFd << std::endl;
-	this->printCommands();
-}
-
-void Client::printCommands()
-{
 }
 
 void Client::printBufferEnhance() const
 {
 	if (this->_dataBuffer.empty())
 	{
-		std::cout << "Client " << this->_clientFd << " have no data in attempt" << std::endl;
+		std::cout << "Client "<< this->_clientFd <<" have no data in attempt" << std::endl;
 		return;
 	}
-	std::cerr << BRIGHT_CYAN "\"" << RESET << BOLD BRIGHT_WHITE;
-	for (size_t m = 0; m < this->_dataBuffer.size(); m++)
-	{
-		if (_dataBuffer[m] == '\n')
-			std::cerr << BOLD BRIGHT_YELLOW << "\\n"
-					  << BOLD BRIGHT_WHITE;
-		else if (_dataBuffer[m] == '\r')
-			std::cerr << BOLD BRIGHT_YELLOW << "\\r" << BOLD BRIGHT_WHITE;
-		else if (!_dataBuffer[m])
+	std::cerr <<  BRIGHT_CYAN"\"" << RESET  << BOLD BRIGHT_WHITE;
+		for (size_t m = 0; m < this->_dataBuffer.size(); m++)
 		{
-			std::cerr << BRIGHT_CYAN << "\"" << RESET << std::endl;
-			break;
+			if (_dataBuffer[m] == '\n')
+				std::cerr << BOLD BRIGHT_YELLOW << "\\n" << BOLD BRIGHT_WHITE;
+			else if (_dataBuffer[m] == '\r')
+				std::cerr << BOLD BRIGHT_YELLOW << "\\r" << BOLD BRIGHT_WHITE;
+			else if (!_dataBuffer[m])
+			{
+				std::cerr << BRIGHT_CYAN << "\"" << RESET << std::endl;
+				break;
+			}
+			else
+				std::cerr << _dataBuffer[m];
 		}
-		else
-			std::cerr << _dataBuffer[m];
-	}
-	std::cerr << BRIGHT_CYAN << "\"" << RESET << std::endl;
+		std::cerr << BRIGHT_CYAN << "\"" << RESET << std::endl;
+}
+
+void Client::setMode(int mode)
+{
+	this->_mode = mode;
+}
+
+std::string Client::getData() const
+{
+	return this->_dataBuffer;
+}
+
+int Client::getMode() const
+{
+	return this->_mode;
+}
+
+bool Client::hasCommands() const
+{
+    return !this->_commands.empty();
+}
+
+void Client::setPassOk(bool ok)
+{
+    this->_passOk = ok;
+}
+
+void Client::setHasNick(bool ok)
+{
+    this->_hasNick = ok;
+}
+
+void Client::setHasUser(bool ok)
+{
+    this->_hasUser = ok;
+}
+
+void Client::setRegistered(bool ok)
+{
+    this->_registered = ok;
+}
+
+void Client::setUsername(std::string u)
+{
+    this->_username = u;
+}
+
+void Client::setRealname(std::string r)
+{
+    this->_realname = r;
+}
+
+bool Client::isPassOk() const
+{
+    return this->_passOk;
+}
+
+bool Client::hasNick() const
+{
+    return this->_hasNick;
+}
+
+bool Client::hasUser() const
+{
+    return this->_hasUser;
+}
+
+bool Client::isRegistered() const
+{
+    return this->_registered;
+}
+
+std::string Client::getUsername() const
+{
+    return this->_username;
+}
+
+std::string Client::getRealname() const
+{
+	return this->_realname;
 }

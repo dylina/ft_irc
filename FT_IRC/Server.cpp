@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "Client.hpp"
 
 const char *Server::BindErr::what() const throw()
 {
@@ -20,7 +21,13 @@ const char *Server::RecvError::what() const throw()
 	return "recv() error";
 }
 
-Server::Server(int domain, std::string ip, std::string port) : _serverSocket(domain, ip, port)
+const char *Server::Clean::what() const throw()
+{
+	return "Server have data clen and close normally";
+}
+
+Server::Server(int domain, std::string ip, std::string port, std::string password)
+	: _serverSocket(domain, ip, port), _password(password)
 {
 
 	if (bind(
@@ -51,23 +58,19 @@ void Server::on()
 	this->fds.push_back(server);
 
 	// Loop principale de poll qui check les fds en continue
-	while (true)
+	while (g_running)
 	{
-		// avant chaque poll(): on active POLLOUT seulement si le client a des donnees en attente d'envoi
-		for (size_t i = 0; i < this->fds.size(); i++)
+		if (g_sigusr1) // pour capter sigusr1 et print les clients connecter
 		{
-			if (fds[i].fd == this->_serverSocket.getFd())
-				continue; // le socket serv n'envoie jamais rien
-			std::map<int, Client *>::iterator cit = this->clients.find(fds[i].fd);
-			if (cit != this->clients.end() && cit->second->hasPendingOutput())
-				fds[i].events = POLLIN | POLLOUT;
-			else
-				fds[i].events = POLLIN;
+			this->printAllClients();
+			g_sigusr1 = 0;
 		}
 
 		int retPoll = poll(&this->fds[0], this->fds.size(), -1);
-		if (retPoll == -1)
+		if (retPoll == -1 && g_running)
 		{
+			if (errno == EINTR) // ignore SIGUSR1
+				continue;
 			std::cerr << BOLD BRIGHT_RED << "Error in poll() loop" << RESET << std::endl;
 			break;
 		}
@@ -87,13 +90,12 @@ void Server::on()
 
 					try
 					{
-						this->addNewClient(clientFd);
+						this->addNewClient(clientFd, clientSocket);
 					}
 					catch (const std::exception &e)
 					{
 						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
-					continue;
 				}
 				else
 				{
@@ -107,18 +109,31 @@ void Server::on()
 					}
 				}
 			}
-			// POLLOUT : le fd est ptre a recevoir des dones en ecriture
-			if (i < fds.size() && (fds[i].revents & POLLOUT))
+			if (!g_running)
 			{
-				std::map<int, Client *>::iterator cit = this->clients.find(fds[i].fd);
-				if (cit != this->clients.end())
-					cit->second->flushSendBuffer();
+				this->clean();
 			}
 		}
 	}
 }
 
-void Server::addNewClient(int clientFd)
+bool Server::isvalidNick(const std::string &nick) const
+{
+	if (nick.empty() || nick.length() > 9)
+		return false;
+	std::string validFirst = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ[]\\`^{}";
+	if (validFirst.find(nick[0]) == std::string::npos)
+		return false;
+	std::string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_[]\\`^{}";
+	for (size_t i = 1; i < nick.length(); ++i)
+	{
+		if (validChars.find(nick[i]) == std::string::npos)
+			return false;
+	}
+	return true;
+}
+
+void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
 {
 	if (clientFd < 0)
 		throw AcceptErr();
@@ -130,7 +145,8 @@ void Server::addNewClient(int clientFd)
 
 	this->fds.push_back(newClientStruct);
 
-	Client *newClientClass = new Client;
+	Client *newClientClass = new Client(sockAddrClient);
+	newClientClass->setFD(clientFd);
 	this->clients[newClientStruct.fd] = newClientClass;
 
 	std::vector<struct pollfd>::iterator it = fds.end() - 1;
@@ -139,243 +155,177 @@ void Server::addNewClient(int clientFd)
 
 void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 {
-	char buffer[BUFFER_SIZE + 1]; //+1 si le retRecv == 512 et buffer[512] est overflow
+	char buffer[BUFFER_SIZE];
 
-	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer), 0);
-
-	// client data received
+	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer) - 1, 0);
+	buffer[retRecv] = 0;
 	if (retRecv > 0)
 	{
 		buffer[retRecv] = 0;
 		std::string data(buffer, retRecv);
 		std::cerr << retRecv << " bytes received from " << fds[i].fd << " fd" << std::endl;
-
-		Client *client = this->clients[fds[i].fd]; // prends le *
-		client->addData(data, fds[i].fd);		   // ajoute le data dans buff et parse les lignes
-
-		while (client->hasPendingCommands()) // vide le derniere
-		{
-			Client::parsedCommand cmd = client->popCommand(); // enleve la premiere cmd
-			this->executeCommands(*client, cmd);			  // envoi au bon handler
-		}
+		this->clients[fds[i].fd]->addData(data, this->clients[fds[i].fd]->getFdWithColor());
+		this->processCommands(this->clients[fds[i].fd]);
 	}
-	// client lost
 	else if (retRecv == 0)
 	{
 		std::vector<struct pollfd>::iterator it = fds.begin() + i;
 		std::cerr << "client fd [" << (*it).fd << "] disconnected" << std::endl;
 
+		delete this->clients[(*it).fd];
 		this->clients.erase((*it).fd);
 		close((*it).fd);
 		this->fds.erase(it);
 	}
-	// error
 	else
 		std::cerr << "Error client received in fd [" << fds[i].fd << "]" << std::endl;
 }
 
-void Server::executeCommands(Client &client, Client::parsedCommand &cmd)
+void Server::handlePASS(Client *client, std::vector<std::string> &params)
 {
-	std::string upper = cmd.command;
-	for (size_t i = 0; i < upper.size(); i++)
-		upper[i] = std::toupper(static_cast<unsigned char>(upper[i]));
-
-	if (upper.empty())
-		return;
-
-	if (!client.isRegistered() && upper != "PASS" && upper != "NICK" && upper != "USER")
+	if (params.empty())
 	{
-
-		client.queueMessage(":ircserv 451 * :You have not registered\r\n");
+		client->sendReply(":ircserv 461 * PASS :Not enough parameters");
 		return;
 	}
-
-	if (upper == "PASS")
-		cmdPass(client, cmd);
-	else if (upper == "NICK")
-		cmdNick(client, cmd);
-	else if (upper == "USER")
-		cmdUser(client, cmd);
-	else if (upper == "JOIN")
-		cmdJoin(client, cmd);
-	else if (upper == "PART")
-		cmdPart(client, cmd);
-	else if (upper == "TOPIC")
-		cmdTopic(client, cmd);
-	else if (upper == "KICK")
-		cmdKick(client, cmd);
-	else if (upper == "INVITE")
-		cmdInvite(client, cmd);
-	else if (upper == "MODE")
-		cmdMode(client, cmd);
-	else if (upper == "PRIVMSG")
-		cmdPrivmsg(client, cmd);
-	else if (upper == "QUIT")
-		cmdQuit(client, cmd);
-	else
-		client.queueMessage(":ircserv 421 " + client.getNickName() + " " + cmd.command + " :Unknown command\r\n");
+	if (params[0] != this->_password)
+	{
+		client->sendReply(":ircserv 464 * :Password incorrect");
+		return;
+	}
+	client->setPassOk(true);
+	finalizeRegistration(client);
 }
 
-void Server::cmdJoin(Client &client, Client::parsedCommand &cmd)
+void Server::handleNICK(Client *client, std::vector<std::string> &params)
 {
-	if (cmd.parametresMiddle.empty())
+	if (!client->isPassOk())
 	{
-		client.queueMessage(":ircserv 461 " + client.getNickName() + " JOIN :Not enough parameters\r\n");
+		client->sendReply(":ircserv 464 * :Password required");
 		return;
 	}
-
-	// separation du param par virgule
-	std::stringstream ss(cmd.parametresMiddle[0]);
-	std::string chan;
-
-	while (std::getline(ss, chan, ','))
+	if (params.empty())
 	{
-		// le nom commence tjr avec #
-		if (chan.empty() || chan[0] != '#')
-		{
-			client.queueMessage(":ircserv 476 " + client.getNickName() + " " + chan + " :Bad Channel Mask\r\n");
-			continue;
-		}
-
-		// client deja dans le canal on l'ignore
-		if (client.isInChannel(chan))
-			continue;
-
-		client.joinChannel(chan);
-
-		// msg de JOIN (IRC: :nick JOIN :#canal)
-		std::string joinMsg = ":" + client.getNickName() + " JOIN :" + chan + "\r\n";
-
-		// envoier a tous meme le new client
-		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
-		{
-			if (it->second->isInChannel(chan))
-				it->second->queueMessage(joinMsg);
-		}
-	}
-}
-
-void Server::cmdPart(Client &client, Client::parsedCommand &cmd)
-{
-	if (cmd.parametresMiddle.empty())
-	{
-		client.queueMessage(":ircserv 461 " + client.getNickName() + " PART :Not enough parameters\r\n");
+		client->sendReply(":ircserv 431 * :No nickname given");
 		return;
 	}
+	std::string nick = params[0];
 
-	std::stringstream ss(cmd.parametresMiddle[0]);
-	std::string chan;
-
-	while (std::getline(ss, chan, ','))
+	if (!isvalidNick(nick))
 	{
-		if (!client.isInChannel(chan))
-		{
-			client.queueMessage(":ircserv 442 " + client.getNickName() + " " + chan + " :You're not on that channel\r\n");
-			continue;
-		}
-
-		// motif pour partir apres les :
-		std::string reason = cmd.trailing.empty() ? "" : (" :" + cmd.trailing);
-		std::string partMsg = ":" + client.getNickName() + " PART " + chan + reason + "\r\n";
-
-		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
-		{
-			if (it->second->isInChannel(chan))
-				it->second->queueMessage(partMsg);
-		}
-		client.leaveChannel(chan);
-	}
-}
-
-void Server::cmdPrivmsg(Client &client, Client::parsedCommand &cmd)
-{
-	if (cmd.parametresMiddle.empty())
-	{
-		client.queueMessage(":ircserv 411 " + client.getNickName() + " :No recipient given (PRIVMSG)\r\n");
+		client->sendReply(":ircserv 432 * " + nick + " :Erroneous nickname");
 		return;
 	}
-
-	if (cmd.trailing.empty())
+	std::map<int, Client *>::iterator it = this->clients.begin();
+	for (; it != this->clients.end(); ++it)
 	{
-		client.queueMessage(":ircserv 412 " + client.getNickName() + " :No text to send\r\n");
-		return;
-	}
-
-	std::string target = cmd.parametresMiddle[0];
-	std::string msg = ":" + client.getNickName() + " PRIVMSG " + target + " :" + cmd.trailing + "\r\n";
-
-	if (target[0] == '#')
-	{
-		if (!client.isInChannel(target))
+		if ((*it).second->getRealname() == nick)
 		{
-			client.queueMessage(":ircserv 442 " + client.getNickName() + " " + target + " :You're not on that channel\r\n");
+			client->sendReply(":ircserv 433 * " + nick + " :Nickname is already in use");
 			return;
 		}
-		// envoi a tous sauf expediteur
-		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
-		{
-			if (it->second != &client && it->second->isInChannel(target))
-				it->second->queueMessage(msg);
-		}
 	}
-	else
+	client->setRealname(nick);
+	client->setHasNick(true);
+	finalizeRegistration(client);
+}
+
+void Server::handleUSER(Client *client, std::vector<std::string> &params, std::string trailing)
+{
+	if (!client->isPassOk())
 	{
-		// message prive a un nick
-		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
-		{
-			if (it->second->getNickName() == target)
-			{
-				it->second->queueMessage(msg);
-				return;
-			}
-		}
-		client.queueMessage(":ircserv 401 " + client.getNickName() + " " + target + " :No such nick\r\n");
+		client->sendReply(":ircserv 464 * :Password required");
+		return;
+	}
+	if (client->isRegistered())
+	{
+		client->sendReply(":ircserv 462 " + client->getRealname() + " :You may not reregister");
+		return;
+	}
+
+	std::string realname = trailing;
+	if (realname.empty() && params.size() >= 4)
+		realname = params[3];
+
+	std::cerr << "realname stocké : [" << realname << "]" << std::endl;
+	if (params.size() < 3 || realname.empty())
+	{
+		client->sendReply(":ircserv 461 * USER :Not enough parameters");
+		return;
+	}
+	client->setUsername(params[0]);
+	client->setRealname(realname);
+	client->setHasUser(true);
+	finalizeRegistration(client);
+}
+
+void Server::finalizeRegistration(Client *client)
+{
+	if (client->isPassOk() && client->hasNick() && client->hasUser())
+	{
+		client->setRegistered(true);
+		client->sendReply(":ircserv 001 " + client->getRealname() + " :Welcome to the IRC network " + client->getRealname() + "!" + client->getUsername() + "@localhost");
+		client->sendReply(":ircserv 002 " + client->getRealname() + " :Your host is ircserv, running version 1.0");
+		client->sendReply(":ircserv 003 " + client->getRealname() + " :This server was created today");
+		client->sendReply(":ircserv 004 " + client->getRealname() + " ircserv 1.0 o o");
 	}
 }
-void Server::cmdTopic(Client &client, Client::parsedCommand &cmd)
+
+void Server::processCommands(Client *client)
 {
-	(void)client;
-	(void)cmd;
+	while (client->hasCommands())
+	{
+		Client::parsedCommand cmd = client->popCommand();
+
+		if (cmd.command == "PASS")
+			handlePASS(client, cmd.parametresMiddle);
+		else if (cmd.command == "NICK")
+			handleNICK(client, cmd.parametresMiddle);
+		else if (cmd.command == "USER")
+			handleUSER(client, cmd.parametresMiddle, cmd.trailing);
+		else if (!client->isRegistered())
+			client->sendReply(":ircserv 451 * :You have not registered");
+		// else if (cmd.command  == "JOIN")
+		// 	cmdJoin(client, cmd);				-> to do
+		// else if (cmd.command  == "PART")
+		// 	cmdPart(client, cmd);				-> to do
+		// else if (cmd.command  == "TOPIC")
+		// 	cmdTopic(client, cmd);				-> to do
+		// else if (cmd.command  == "KICK")
+		// 	cmdKick(client, cmd);				-> to do
+		// else if (cmd.command  == "INVITE")
+		// 	cmdInvite(client, cmd);				-> to do
+		// else if (cmd.command  == "MODE")
+		// 	cmdMode(client, cmd);				-> to do
+		// else if (cmd.command  == "PRIVMSG")
+		// 	cmdPrivmsg(client, cmd);				-> to do
+		// else if (cmd.command  == "NOTICE")
+		// 	cmdNotice(client, cmd);				-> to do
+		// else if (cmd.command  == "PING")
+		// 	cmdPing(client, cmd);				-> to do
+		// else if (cmd.command  == "QUIT")
+		// 	cmdQuit(client, cmd);				-> to do
+		else
+			client->sendReply(":ircserv 421 * " + cmd.command + " :Unknown command");
+	}
 }
 
-void Server::cmdKick(Client &client, Client::parsedCommand &cmd)
+void Server::clean()
 {
-	(void)client;
-	(void)cmd;
+	while (!this->clients.empty())
+	{
+		std::map<int, Client *>::iterator it = this->clients.begin();
+		delete (*it).second;
+		this->clients.erase(it);
+	}
 }
 
-void Server::cmdInvite(Client &client, Client::parsedCommand &cmd)
+void Server::printAllClients()
 {
-	(void)client;
-	(void)cmd;
-}
-
-void Server::cmdQuit(Client &client, Client::parsedCommand &cmd)
-{
-	(void)client;
-	(void)cmd;
-}
-
-void Server::cmdMode(Client &client, Client::parsedCommand &cmd)
-{
-	(void)client;
-	(void)cmd;
-}
-
-void Server::cmdPass(Client &client, Client::parsedCommand &cmd)
-{
-	(void)client;
-	(void)cmd;
-}
-
-void Server::cmdNick(Client &client, Client::parsedCommand &cmd)
-{
-	(void)client;
-	(void)cmd;
-}
-
-void Server::cmdUser(Client &client, Client::parsedCommand &cmd)
-{
-	(void)client;
-	(void)cmd;
+	if (this->clients.empty())
+		std::cerr << "No clients connected" << std::endl;
+	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
+	{
+		(*it).second->getAllInfo();
+	}
 }

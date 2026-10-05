@@ -56,7 +56,7 @@ Socket::Socket(int domain, std::string ip, std::string port)
 	catch(const std::exception& e)
 	{
 		std::cerr << RED << "Error :" << e.what() << RESET << '\n';
-		throw ;//throw e.what(); = throw const char*; on perd le type orig. de l'exception
+		throw ;
 	}
 
 	std::cerr << BOLD BRIGHT_GREEN  << "	Valid Args\n"
