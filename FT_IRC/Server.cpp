@@ -53,6 +53,18 @@ void Server::on()
 	// Loop principale de poll qui check les fds en continue
 	while (true)
 	{
+		// avant chaque poll(): on active POLLOUT seulement si le client a des donnees en attente d'envoi
+		for (size_t i = 0; i < this->fds.size(); i++)
+		{
+			if (fds[i].fd == this->_serverSocket.getFd())
+				continue; // le socket serv n'envoie jamais rien
+			std::map<int, Client *>::iterator cit = this->clients.find(fds[i].fd);
+			if (cit != this->clients.end() && cit->second->hasPendingOutput())
+				fds[i].events = POLLIN | POLLOUT;
+			else
+				fds[i].events = POLLIN;
+		}
+
 		int retPoll = poll(&this->fds[0], this->fds.size(), -1);
 		if (retPoll == -1)
 		{
@@ -81,6 +93,7 @@ void Server::on()
 					{
 						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
+					continue;
 				}
 				else
 				{
@@ -93,6 +106,13 @@ void Server::on()
 						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
 				}
+			}
+			// POLLOUT : le fd est ptre a recevoir des dones en ecriture
+			if (i < fds.size() && (fds[i].revents & POLLOUT))
+			{
+				std::map<int, Client *>::iterator cit = this->clients.find(fds[i].fd);
+				if (cit != this->clients.end())
+					cit->second->flushSendBuffer();
 			}
 		}
 	}

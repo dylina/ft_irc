@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sys/socket.h>
 
-const char* Client::ErrorCreationClient::what() const throw()
+const char *Client::ErrorCreationClient::what() const throw()
 {
 	return "Error creation client";
 }
@@ -43,22 +43,22 @@ sockaddr_in Client::getAddr() const
 	return _clientAddr;
 }
 
-std::string Client::getName() const//a voir si on garde
+std::string Client::getName() const // a voir si on garde
 {
 	return this->_nickName;
 }
 
-std::string	Client::getNickName() const
+std::string Client::getNickName() const
 {
 	return this->_nickName;
 }
 
-std::string	Client::getUserName() const
+std::string Client::getUserName() const
 {
 	return this->_userName;
 }
 
-std::string	Client::getData() const
+std::string Client::getData() const
 {
 	return this->_dataBuffer;
 }
@@ -75,19 +75,20 @@ bool Client::hasPass() const
 
 bool Client::isRegistered() const
 {
-	return this->_hasPass && !this->_nickName.empty() && !this->_userName.empty();;
+	return this->_hasPass && !this->_nickName.empty() && !this->_userName.empty();
+	;
 }
 
-void Client::setName(const std::string& name)
+void Client::setName(const std::string &name)
 {
 	this->_nickName = name;
 }
-void Client::setNickName(const std::string& nick)
+void Client::setNickName(const std::string &nick)
 {
 	this->_nickName = nick;
 }
 
-void Client::setUserName(const std::string& name)
+void Client::setUserName(const std::string &name)
 {
 	this->_userName = name;
 }
@@ -129,10 +130,10 @@ void Client::flushSendBuffer()
 	if (this->_sendBuffer.empty())
 		return;
 
-	//appele uniquement depuis Server::on() en reponse a un POLLOUT : jamais d'appel "libre" a send()
+	// appele uniquement depuis Server::on() en reponse a un POLLOUT : jamais d'appel "libre" a send()
 	ssize_t sent = send(this->_fd, this->_sendBuffer.c_str(), this->_sendBuffer.size(), 0);
 
-	//pas d'inspection d'errno : en cas d'echec on retente simplement au prochain cycle POLLOUT
+	// pas d'inspection d'errno : en cas d'echec on retente simplement au prochain cycle POLLOUT
 	if (sent > 0)
 		this->_sendBuffer.erase(0, static_cast<size_t>(sent));
 }
@@ -159,11 +160,11 @@ std::set<std::string> Client::getChannels() const
 
 void Client::clearStructCommand(Client::parsedCommand &newCommand)
 {
-		newCommand.isComplete = false;
-		newCommand.parametresMiddle.clear();
-		newCommand.prefix.clear();
-		newCommand.trailing.clear();
-		newCommand.command.clear();
+	newCommand.isComplete = false;
+	newCommand.parametresMiddle.clear();
+	newCommand.prefix.clear();
+	newCommand.trailing.clear();
+	newCommand.command.clear();
 }
 
 void Client::parseCommand()
@@ -175,7 +176,7 @@ void Client::parseCommand()
 		struct parsedCommand newCommand;
 		clearStructCommand(newCommand);
 
-		//parse prefix (optionnel, rarement envoye par un client)
+		// parse prefix (optionnel, rarement envoye par un client)
 		if (!this->_dataBuffer.empty() && this->_dataBuffer[0] == ':')
 		{
 			size_t posSpace = this->_dataBuffer.find_first_of(" ");
@@ -186,7 +187,7 @@ void Client::parseCommand()
 			}
 		}
 
-		//parse command
+		// parse command
 		if (newCommand.command.empty())
 		{
 			size_t posSpace = _dataBuffer.find_first_of(" ");
@@ -198,15 +199,12 @@ void Client::parseCommand()
 			}
 			else if (posEnd != std::string::npos)
 			{
-				//commande sans aucun parametre (ex: "QUIT\r\n")
+				// commande sans aucun parametre (ex: "QUIT\r\n")
 				newCommand.command = _dataBuffer.substr(0, posEnd);
 				_dataBuffer.erase(0, posEnd + 2);
 			}
 		}
 
-		//parse params : uniquement separes par des espaces au niveau protocole.
-		//les listes "a,b,c" (JOIN/PART/PRIVMSG/KICK) restent un seul parametre brut,
-		//c'est au handler de la commande de les re-splitter sur la virgule.
 		while (!this->_dataBuffer.empty() && this->_dataBuffer[0] != ':')
 		{
 			size_t posSpace = this->_dataBuffer.find_first_of(" ");
@@ -228,10 +226,10 @@ void Client::parseCommand()
 				break;
 			}
 			else
-				break; //securite : ne devrait pas arriver puisque "\r\n" a deja ete trouve plus haut
+				break; // securite : ne devrait pas arriver puisque "\r\n" a deja ete trouve plus haut
 		}
 
-		//parse trailing (":ceci est le dernier parametre, avec espaces")
+		// parse trailing (":ceci est le dernier parametre, avec espaces")
 		if (!this->_dataBuffer.empty() && this->_dataBuffer[0] == ':')
 		{
 			size_t posEnd = this->_dataBuffer.find_first_of("\r\n");
@@ -244,7 +242,6 @@ void Client::parseCommand()
 
 		newCommand.isComplete = true;
 		this->_commands.push_back(newCommand);
-
 	}
 	else
 		std::cerr << "commande partiel" << std::endl;
@@ -252,47 +249,45 @@ void Client::parseCommand()
 
 void Client::addData(std::string buffer, int clientFd)
 {
-	
+
 	std::cerr << "new data from client fd [" << clientFd << "] stored in buffer client:" << std::endl;
 	this->_dataBuffer += buffer;
-	
+
 	this->printBufferEnhance();
-	
+
 	while (this->_dataBuffer.find("\r\n") != std::string::npos)
-	this->parseCommand();
-	
+		this->parseCommand();
+
 	std::cout << "commands received from client " << clientFd << std::endl;
 	this->printCommands();
-	
-	
 }
 
 void Client::printCommands()
 {
-
 }
 
 void Client::printBufferEnhance() const
 {
 	if (this->_dataBuffer.empty())
 	{
-		std::cout << "Client "<< this->_clientFd <<" have no data in attempt" << std::endl;
+		std::cout << "Client " << this->_clientFd << " have no data in attempt" << std::endl;
 		return;
 	}
-	std::cerr <<  BRIGHT_CYAN"\"" << RESET  << BOLD BRIGHT_WHITE;
-		for (size_t m = 0; m < this->_dataBuffer.size(); m++)
+	std::cerr << BRIGHT_CYAN "\"" << RESET << BOLD BRIGHT_WHITE;
+	for (size_t m = 0; m < this->_dataBuffer.size(); m++)
+	{
+		if (_dataBuffer[m] == '\n')
+			std::cerr << BOLD BRIGHT_YELLOW << "\\n"
+					  << BOLD BRIGHT_WHITE;
+		else if (_dataBuffer[m] == '\r')
+			std::cerr << BOLD BRIGHT_YELLOW << "\\r" << BOLD BRIGHT_WHITE;
+		else if (!_dataBuffer[m])
 		{
-			if (_dataBuffer[m] == '\n')
-				std::cerr << BOLD BRIGHT_YELLOW << "\\n" << BOLD BRIGHT_WHITE;
-			else if (_dataBuffer[m] == '\r')
-				std::cerr << BOLD BRIGHT_YELLOW << "\\r" << BOLD BRIGHT_WHITE;
-			else if (!_dataBuffer[m])
-			{
-				std::cerr << BRIGHT_CYAN << "\"" << RESET << std::endl;
-				break;
-			}
-			else
-				std::cerr << _dataBuffer[m];
+			std::cerr << BRIGHT_CYAN << "\"" << RESET << std::endl;
+			break;
 		}
-		std::cerr << BRIGHT_CYAN << "\"" << RESET << std::endl;
+		else
+			std::cerr << _dataBuffer[m];
+	}
+	std::cerr << BRIGHT_CYAN << "\"" << RESET << std::endl;
 }
