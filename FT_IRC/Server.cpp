@@ -486,8 +486,20 @@ void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd)
 
 void Server::cmdPing(Client *client, Client::parsedCommand &cmd)
 {
-	(void)client;
-	(void)cmd;
+	// PING doit avoir un param.
+	std::string token;
+
+	if (!cmd.trailing.empty())
+		token = cmd.trailing;
+	else if (!cmd.parametresMiddle.empty())
+		token = cmd.parametresMiddle[0];
+	else
+	{
+		client->sendReply(":ircserv 461 * PING :Not enough parameters");
+		return;
+	}
+	// send le pong et garde le token recu
+	client->sendReply(":ircserv PONG ircserv :" + token);
 }
 
 void Server::cmdQuit(Client *client, Client::parsedCommand &cmd)
