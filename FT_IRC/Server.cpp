@@ -66,6 +66,15 @@ void Server::on()
 			g_sigusr1 = 0;
 		}
 
+		for (size_t i = 1; i < this->fds.size(); ++i) // 0 socket du serveur
+		{
+			std::map<int, Client *>::iterator cit = this->clients.find(fds[i].fd);
+			if (cit != this->clients.end() && cit->second->hasPendingOutput())
+				fds[i].events = POLLIN | POLLOUT;
+			else
+				fds[i].events = POLLIN;
+		}
+
 		int retPoll = poll(&this->fds[0], this->fds.size(), -1);
 		if (retPoll == -1 && g_running)
 		{
@@ -96,6 +105,7 @@ void Server::on()
 					{
 						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
+					continue;
 				}
 				else
 				{
@@ -108,6 +118,12 @@ void Server::on()
 						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
 				}
+			}
+			if (i < fds.size() && (fds[i].revents & POLLOUT))
+			{
+				std::map<int, Client *>::iterator cit = this->clients.find(fds[i].fd);
+				if (cit != this->clients.end())
+					cit->second->flushSendBuffer();
 			}
 			if (!g_running)
 			{
@@ -161,7 +177,6 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 	buffer[retRecv] = 0;
 	if (retRecv > 0)
 	{
-		buffer[retRecv] = 0;
 		std::string data(buffer, retRecv);
 		std::cerr << retRecv << " bytes received from " << fds[i].fd << " fd" << std::endl;
 		this->clients[fds[i].fd]->addData(data, this->clients[fds[i].fd]->getFdWithColor());
@@ -285,26 +300,26 @@ void Server::processCommands(Client *client)
 			handleUSER(client, cmd.parametresMiddle, cmd.trailing);
 		else if (!client->isRegistered())
 			client->sendReply(":ircserv 451 * :You have not registered");
-		// else if (cmd.command  == "JOIN")
-		// 	cmdJoin(client, cmd);				-> to do
-		// else if (cmd.command  == "PART")
-		// 	cmdPart(client, cmd);				-> to do
-		// else if (cmd.command  == "TOPIC")
-		// 	cmdTopic(client, cmd);				-> to do
-		// else if (cmd.command  == "KICK")
-		// 	cmdKick(client, cmd);				-> to do
-		// else if (cmd.command  == "INVITE")
-		// 	cmdInvite(client, cmd);				-> to do
-		// else if (cmd.command  == "MODE")
-		// 	cmdMode(client, cmd);				-> to do
-		// else if (cmd.command  == "PRIVMSG")
-		// 	cmdPrivmsg(client, cmd);				-> to do
-		// else if (cmd.command  == "NOTICE")
-		// 	cmdNotice(client, cmd);				-> to do
-		// else if (cmd.command  == "PING")
-		// 	cmdPing(client, cmd);				-> to do
-		// else if (cmd.command  == "QUIT")
-		// 	cmdQuit(client, cmd);				-> to do
+		else if (cmd.command == "JOIN")
+			cmdJoin(client, cmd);
+		else if (cmd.command == "PART")
+			cmdPart(client, cmd);
+		else if (cmd.command == "TOPIC")
+			cmdTopic(client, cmd);
+		else if (cmd.command == "KICK")
+			cmdKick(client, cmd);
+		else if (cmd.command == "INVITE")
+			cmdInvite(client, cmd);
+		else if (cmd.command == "MODE")
+			cmdMode(client, cmd);
+		else if (cmd.command == "PRIVMSG")
+			cmdPrivmsg(client, cmd);
+		// else if (cmd.command == "NOTICE")
+		// cmdNotice(client, cmd);
+		else if (cmd.command == "PING")
+			cmdPing(client, cmd);
+		else if (cmd.command == "QUIT")
+			cmdQuit(client, cmd);
 		else
 			client->sendReply(":ircserv 421 * " + cmd.command + " :Unknown command");
 	}
@@ -328,4 +343,88 @@ void Server::printAllClients()
 	{
 		(*it).second->getAllInfo();
 	}
+}
+
+void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
+{
+	if (cmd.parametresMiddle.empty())
+	{
+		client->sendReply(":ircerv 461 " + client->getNickName() + " JOIN :Not enough parameters");
+		return;
+	}
+
+	// separation du param par virgule
+	std::stringstream ss(cmd.parametresMiddle[0]);
+	std::string chan;
+	while (std::getline(ss, chan, ','))
+	{
+		// le nom commence tjr avec #
+		if (chan.empty() || chan[0] != '#')
+		{
+			client->sendReply(":ircserv 476 " + client->getNickName() + " " + chan + " :Bad Channel Mask");
+			continue;
+		}
+
+		// client deja dans le canal on l'ignore
+		if (client->isInChannel(chan))
+			continue;
+
+		client->joinChannel(chan);
+
+		// msg de JOIN (IRC: :nick JOIN :#canal)
+		std::string joinMsg = ":" + client->getNickName() + " JOIN :" + chan;
+
+		// envoier a tous meme le new client
+		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
+			if (it->second->isInChannel(chan))
+				it->second->sendReply(joinMsg);
+	}
+}
+
+void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdKick(Client *client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdInvite(Client *client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdPing(Client *client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
+}
+
+void Server::cmdQuit(Client *client, Client::parsedCommand &cmd)
+{
+	(void)client;
+	(void)cmd;
 }
