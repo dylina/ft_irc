@@ -219,13 +219,13 @@ void Server::handleNICK(Client *client, std::vector<std::string> &params)
 	std::map<int, Client *>::iterator it = this->clients.begin();
 	for (; it != this->clients.end(); ++it)
 	{
-		if ((*it).second->getRealname() == nick)
+		if ((*it).second->getNickName() == nick)
 		{
 			client->sendReply(":ircserv 433 * " + nick + " :Nickname is already in use");
 			return;
 		}
 	}
-	client->setRealname(nick);
+	client->setNickName(nick);
 	client->setHasNick(true);
 	finalizeRegistration(client);
 }
