@@ -504,6 +504,33 @@ void Server::cmdPing(Client *client, Client::parsedCommand &cmd)
 
 void Server::cmdQuit(Client *client, Client::parsedCommand &cmd)
 {
-	(void)client;
-	(void)cmd;
+	std::string nick = client->getNickName();
+	std::string reason = cmd.trailing;
+
+	if (reason.empty())
+		reason = "Client Quit";
+
+	std::string quitMsg = ":" + nick + " QUIT :" + reason;
+	std::set<std::string> channels = client->getChannels();
+
+	for (std::map<int, Client *>::iterator it = clients.begin();
+		 it != clients.end(); ++it)
+	{
+		Client *other = it->second;
+
+		if (other == client)
+			continue;
+
+		for (std::set<std::string>::iterator ch = channels.begin();
+			 ch != channels.end(); ++ch)
+		{
+			if (other->isInChannel(*ch))
+			{
+				other->sendReply(quitMsg);
+				break;
+			}
+		}
+	}
+
+	shutdown(client->getFd(), SHUT_RDWR);
 }
