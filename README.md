@@ -6,7 +6,7 @@
 <!-- Docs for functions use in irc in french -->
 ### 	[For details of functions may be utils clic here](documentations/functions/FunctionREADME.md)
 
-###	[Figma](https://www.figma.com/board/jBAdbJe6eh4TZFADuDJrHR/Sans-titre?t=pe1Fjax6EZpvkhMh-0)
+###	[NOUVEAU Figma](https://www.figma.com/board/jWutjlYracMFfxJbPJtTkf/Sans-titre?node-id=0-1&t=Tm83JVG8wJ8Gxavf-1)
 
 # Class of the project:
 
