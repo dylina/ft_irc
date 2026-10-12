@@ -18,23 +18,53 @@
 #define BUFFER_SIZE 512 // limitation doc irc
 #endif
 
+
 class Client
 {
 public:
+
+	struct parsedCommand;
+
 	Client(sockaddr_in socketClient);
 
 	// Getters
+
+		// Authentication and registration
+
+		bool isRegistered() const;
+		std::string getNickName() const;
+		bool hasPass() const;
+		bool isPassOk() const;
+		bool hasNick() const;
+		bool hasUser() const;
+		std::string getUsername() const;
+		std::string getNickname() const;
+
 	int getFd() const;
 	sockaddr_in getAddr() const;
-
 	std::string getData() const;
-
 	int getMode() const;
-	bool hasPass() const;
-	bool isRegistered() const;
-	std::string getNickName() const;
+	std::string getFdWithColor() const;
+	void getSocket(std::ostream& out) const;
+	void getAllInfo(std::ostream& out) const;
+	bool isComplete;
+	bool hasCommands() const;
+
+		// File d'attente des commandes deja parsees, consommee par Server::executeCommand
+		bool hasPendingCommands() const;
+
+	//  setters
 
 	void setNickName(const std::string &nick);
+	void setFD(int fd);
+	void setPassOk(bool ok);
+	void setHasNick(bool ok);
+	void setHasUser(bool ok);
+	void setRegistered(bool ok);
+	void setUsername(std::string u);
+	void setMode(int mode);
+	void addData(std::string buffer, std::string clientFd);
+
 
 	// Canale (join/part)
 	void joinChannel(const std::string &name);
@@ -43,22 +73,27 @@ public:
 	std::set<std::string> getChannels() const;
 
 	// Data / parsing
+
 	void parseCommand();
 
 	// Envoi (bufferise ici, le send() reel se fait seulement sur POLLOUT dans Server::on())
+
 	void queueMessage(const std::string &msg);
 	bool hasPendingOutput() const;
 	void flushSendBuffer();
+	void sendReply(const std::string &msg);
+	parsedCommand popCommand();
 
 	// Debug
+
 	void printBufferEnhance() const;
 	void printBufferEnhance(std::ostream& out) const;
 	void printCommands(std::ostream& out) const;
 
 	class ErrorCreationClient : public std::exception
 	{
-	public:
-		const char *what() const throw();
+		public:
+			const char *what() const throw();
 	};
 
 	struct parsedCommand
@@ -92,34 +127,6 @@ public:
 		bool isComplete;
 	};
 
-	void sendReply(const std::string &msg);
-	void setFD(int fd);
-	bool hasCommands() const;
-	parsedCommand popCommand();
-	void getSocket(std::ostream& out) const;
-	void getAllInfo(std::ostream& out) const;
-
-	void addData(std::string buffer, std::string clientFd);
-
-	// Authentication and registration
-	void setPassOk(bool ok);
-	void setHasNick(bool ok);
-	void setHasUser(bool ok);
-	void setRegistered(bool ok);
-	void setUsername(std::string u);
-	void setRealname(std::string r);
-	void setMode(int mode);
-	bool isPassOk() const;
-	bool hasNick() const;
-	bool hasUser() const;
-	std::string getUsername() const;
-	std::string getRealname() const;
-	std::string getFdWithColor() const;
-
-	bool isComplete;
-	// File d'attente des commandes deja parsees, consommee par Server::executeCommand
-	bool hasPendingCommands() const;
-
 private:
 	sockaddr_in _socket;
 
@@ -135,15 +142,12 @@ private:
 	bool _hasNick;
 	bool _hasUser;
 	bool _registered;
-	std::string _username;
-	std::string _realname;
+	std::string _username; // username
+	std::string _nickname; // nickname
 	std::string _lastResponse;
 	std::vector<std::string> _responseSend;
 
 	sockaddr_in _clientAddr;
-
-	std::string _nickName;
-	std::string _userName;
 
 	// Client state
 	bool _hasPass;

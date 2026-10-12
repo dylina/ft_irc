@@ -11,6 +11,8 @@ if [ -z "$PID" ]; then
 	exit 1
 fi
 
+clear
+
 if [ ! -p "$FIFO" ]; then
 	mkfifo "$FIFO"
 fi

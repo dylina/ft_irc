@@ -55,6 +55,10 @@ private:
 	void addNewClient(int clientFd, sockaddr_in sockAddrClient);
 	void dataReceived(std::vector<struct pollfd> &fds, int i);
 	void processCommands(Client *client);
+	bool isNickIsAlreadyUse(Client *client, std::string &nick);
+
+
+
 	void handlePASS(Client *client, std::vector<std::string> &params);
 	void handleNICK(Client *client, std::vector<std::string> &params);
 	void handleUSER(Client *client, std::vector<std::string> &params, std::string trailing);

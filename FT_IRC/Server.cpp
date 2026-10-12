@@ -215,13 +215,28 @@ void Server::handlePASS(Client *client, std::vector<std::string> &params)
 	finalizeRegistration(client);
 }
 
+//check if nickname is arleady use by another client and return true if is
+bool Server::isNickIsAlreadyUse(Client *client, std::string &nick)
+{
+	std::map<int, Client *>::iterator it = this->clients.begin();
+	for (; it != this->clients.end(); ++it)
+	{
+		if ((*it).second->getNickName() == nick && (*it).first != client->getFd())
+		{
+			client->sendReply(":ircserv 433 * " + nick + " :Nickname is already in use");
+			return true;
+		}
+	}
+	return false;
+}
+
 void Server::handleNICK(Client *client, std::vector<std::string> &params)
 {
-	if (!client->isPassOk())
-	{
-		client->sendReply(":ircserv 464 * :Password required");
-		return;
-	}
+	// if (!client->isPassOk())
+	// {
+	// 	client->sendReply(":ircserv 464 * :Password required");
+	// 	return;
+	// } pas en accord avec la norme hexchat pour le CAP LS ?
 	if (params.empty())
 	{
 		client->sendReply(":ircserv 431 * :No nickname given");
@@ -234,15 +249,9 @@ void Server::handleNICK(Client *client, std::vector<std::string> &params)
 		client->sendReply(":ircserv 432 * " + nick + " :Erroneous nickname");
 		return;
 	}
-	std::map<int, Client *>::iterator it = this->clients.begin();
-	for (; it != this->clients.end(); ++it)
-	{
-		if ((*it).second->getNickName() == nick)
-		{
-			client->sendReply(":ircserv 433 * " + nick + " :Nickname is already in use");
-			return;
-		}
-	}
+
+	if (isNickIsAlreadyUse(client, nick) == true)
+		return;
 	client->setNickName(nick);
 	client->setHasNick(true);
 	finalizeRegistration(client);
@@ -250,29 +259,33 @@ void Server::handleNICK(Client *client, std::vector<std::string> &params)
 
 void Server::handleUSER(Client *client, std::vector<std::string> &params, std::string trailing)
 {
-	if (!client->isPassOk())
-	{
-		client->sendReply(":ircserv 464 * :Password required");
-		return;
-	}
+	// if (!client->isPassOk())
+	// {
+	// 	client->sendReply(":ircserv 464 * :Password required");
+	// 	return;
+	// } pas en accord avec la norme hexchat pour le CAP LS ?
 	if (client->isRegistered())
 	{
-		client->sendReply(":ircserv 462 " + client->getRealname() + " :You may not reregister");
+		client->sendReply(":ircserv 462 " + client->getNickname() + " :You may not reregister");
 		return;
 	}
 
-	std::string realname = trailing;
-	if (realname.empty() && params.size() >= 4)
-		realname = params[3];
+	std::string nickname = trailing;
+	if (nickname.empty() && params.size() >= 4)
+		nickname = params[3];
 
-	std::cerr << "realname stocké : [" << realname << "]" << std::endl;
-	if (params.size() < 3 || realname.empty())
+	std::cerr << "nickname stocké : [" << nickname << "]" << std::endl;
+	if (params.size() < 3 || nickname.empty())
 	{
 		client->sendReply(":ircserv 461 * USER :Not enough parameters");
 		return;
 	}
+
+	if (isNickIsAlreadyUse(client, nickname) == true) //pas oublier de verif sinon conflit
+		return;
+
 	client->setUsername(params[0]);
-	client->setRealname(realname);
+	client->setNickName(nickname);
 	client->setHasUser(true);
 	finalizeRegistration(client);
 }
@@ -282,10 +295,10 @@ void Server::finalizeRegistration(Client *client)
 	if (client->isPassOk() && client->hasNick() && client->hasUser())
 	{
 		client->setRegistered(true);
-		client->sendReply(":ircserv 001 " + client->getRealname() + " :Welcome to the IRC network " + client->getRealname() + "!" + client->getUsername() + "@localhost");
-		client->sendReply(":ircserv 002 " + client->getRealname() + " :Your host is ircserv, running version 1.0");
-		client->sendReply(":ircserv 003 " + client->getRealname() + " :This server was created today");
-		client->sendReply(":ircserv 004 " + client->getRealname() + " ircserv 1.0 o o");
+		client->sendReply(":ircserv 001 " + client->getNickname() + " :Welcome to the IRC network " + client->getNickname() + "!" + client->getUsername() + "@localhost");
+		client->sendReply(":ircserv 002 " + client->getNickname() + " :Your host is ircserv, running version 1.0");
+		client->sendReply(":ircserv 003 " + client->getNickname() + " :This server was created today");
+		client->sendReply(":ircserv 004 " + client->getNickname() + " ircserv 1.0 o o");
 	}
 }
 

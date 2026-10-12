@@ -18,7 +18,7 @@ Client::Client(sockaddr_in socketClient)
 	  _hasUser(false),
 	  _registered(false),
 	  _username(""),
-	  _realname(""),
+	  _nickname(""),
 	  _lastResponse(""),
 	  _responseSend()
 {
@@ -88,11 +88,11 @@ void Client::getAllInfo(std::ostream& out) const
 	else
 		out << this->getUsername() << '\n';
 
-	out << "Real Name : ";
-	if (this->_realname.empty())
-		out << BG_BRIGHT_RED BOLD BRIGHT_WHITE << "Realname EMPTY" << RESET << '\n';
+	out << "Nick Name : ";
+	if (this->_nickname.empty())
+		out << BG_BRIGHT_RED BOLD BRIGHT_WHITE << "Nickname EMPTY" << RESET << '\n';
 	else
-		out << this->getRealname() << '\n';
+		out << this->getNickname() << '\n';
 
 	this->printBufferEnhance(out);
 	this->printCommands(out);
@@ -133,12 +133,12 @@ bool Client::hasPendingCommands() const
 
 std::string Client::getNickName() const
 {
-	return this->_nickName;
+	return this->_nickname;
 }
 
 void Client::setNickName(const std::string &nick)
 {
-	this->_nickName = nick;
+	this->_nickname = nick;
 }
 
 Client::parsedCommand Client::popCommand()
@@ -439,11 +439,6 @@ void Client::setUsername(std::string u)
 	this->_username = u;
 }
 
-void Client::setRealname(std::string r)
-{
-	this->_realname = r;
-}
-
 bool Client::isPassOk() const
 {
 	return this->_passOk;
@@ -469,7 +464,7 @@ std::string Client::getUsername() const
 	return this->_username;
 }
 
-std::string Client::getRealname() const
+std::string Client::getNickname() const
 {
-	return this->_realname;
+	return this->_nickname;
 }
