@@ -174,7 +174,7 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 	char buffer[BUFFER_SIZE];
 
 	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer) - 1, 0);
-	buffer[retRecv] = 0;
+
 	if (retRecv > 0)
 	{
 		std::string data(buffer, retRecv);
@@ -254,7 +254,7 @@ void Server::handleUSER(Client *client, std::vector<std::string> &params, std::s
 	}
 	if (client->isRegistered())
 	{
-		client->sendReply(":ircserv 462 " + client->getRealname() + " :You may not reregister");
+		client->sendReply(":ircserv 462 " + client->getNickName() + " :You may not reregister");
 		return;
 	}
 
@@ -279,10 +279,10 @@ void Server::finalizeRegistration(Client *client)
 	if (client->isPassOk() && client->hasNick() && client->hasUser())
 	{
 		client->setRegistered(true);
-		client->sendReply(":ircserv 001 " + client->getRealname() + " :Welcome to the IRC network " + client->getRealname() + "!" + client->getUsername() + "@localhost");
-		client->sendReply(":ircserv 002 " + client->getRealname() + " :Your host is ircserv, running version 1.0");
-		client->sendReply(":ircserv 003 " + client->getRealname() + " :This server was created today");
-		client->sendReply(":ircserv 004 " + client->getRealname() + " ircserv 1.0 o o");
+		client->sendReply(":ircserv 001 " + client->getNickName() + " :Welcome to the IRC network " + client->getRealname() + "!" + client->getUsername() + "@localhost");
+		client->sendReply(":ircserv 002 " + client->getNickName() + " :Your host is ircserv, running version 1.0");
+		client->sendReply(":ircserv 003 " + client->getNickName() + " :This server was created today");
+		client->sendReply(":ircserv 004 " + client->getNickName() + " ircserv 1.0 o o");
 	}
 }
 
@@ -349,7 +349,7 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 {
 	if (cmd.parametresMiddle.empty())
 	{
-		client->sendReply(":ircerv 461 " + client->getNickName() + " JOIN :Not enough parameters");
+		client->sendReply(":ircserv 461 " + client->getNickName() + " JOIN :Not enough parameters");
 		return;
 	}
 
@@ -407,7 +407,7 @@ void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
 		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
 		{
 			if (it->second->isInChannel(chan))
-				it->second->queueMessage(partMsg);
+				it->second->sendReply(partMsg);
 		}
 		client->leaveChannel(chan);
 	}
@@ -476,7 +476,7 @@ void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd)
 		{
 			if (it->second->getNickName() == target)
 			{
-				it->second->queueMessage(msg);
+				it->second->sendReply(msg);
 				return;
 			}
 		}
