@@ -319,7 +319,10 @@ void Server::processCommands(Client *client)
 		else if (cmd.command == "PING")
 			cmdPing(client, cmd);
 		else if (cmd.command == "QUIT")
+		{
 			cmdQuit(client, cmd);
+			return;
+		}
 		else
 			client->sendReply(":ircserv 421 * " + cmd.command + " :Unknown command");
 	}
@@ -532,5 +535,5 @@ void Server::cmdQuit(Client *client, Client::parsedCommand &cmd)
 		}
 	}
 
-	shutdown(client->getFd(), SHUT_RDWR);
+	shutdown(client->getFd(), SHUT_RDWR); // desactive la reception et l'envoi
 }
