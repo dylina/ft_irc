@@ -8,6 +8,7 @@
 #include <map>
 #include <csignal>
 #include <cerrno>
+#include <string>
 
 #include "Socket.hpp"
 #include "colors.hpp"
@@ -72,6 +73,8 @@ private:
 	std::map<int, Client *> clients;
 	std::vector<struct pollfd> fds;
 	std::string _password;
+
+	std::map<std::string, std::string> _channelTopics;
 
 	void clean();
 
