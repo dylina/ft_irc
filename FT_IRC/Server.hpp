@@ -11,6 +11,7 @@
 #include <fstream>
 #include <string>
 
+#include "Channel.hpp"
 #include "Socket.hpp"
 #include "colors.hpp"
 #include "Client.hpp"
@@ -79,7 +80,9 @@ private:
 	std::vector<struct pollfd> fds;
 	std::string _password;
 
-	std::map<std::string, std::string> _channelTopics;
+	std::map<std::string, std::string> _channelTopics; //?
+
+	std::map<std::string ,Channel *> _channels;
 
 	void clean();
 

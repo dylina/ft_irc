@@ -171,22 +171,26 @@ void Client::flushSendBuffer()
 		this->_sendBuffer.erase(0, static_cast<size_t>(sent));
 }
 
-void Client::joinChannel(const std::string &name)
-{
-	this->_channels.insert(name);
-}
 
-void Client::leaveChannel(const std::string &name)
-{
-	this->_channels.erase(name);
-}
+// je deplace sa dans Channel.cpp
+// les clients ne geres pas les channels -----------
 
-bool Client::isInChannel(const std::string &name) const
-{
-	return this->_channels.find(name) != this->_channels.end();
-}
+// void Client::joinChannel(const std::string &name)
+// {
+// 	this->_channels.insert(name);
+// }
 
-std::set<std::string> Client::getChannels() const
+// void Client::leaveChannel(const std::string &name)
+// {
+// 	this->_channels.erase(name);
+// }
+
+// bool Client::isInChannel(const std::string &name) const
+// {
+// 	return this->_channels.find(name) != this->_channels.end();
+// }---------------------------------------------
+
+std::vector<std::string> Client::getChannels() const
 {
 	return this->_channels;
 }
@@ -467,4 +471,17 @@ std::string Client::getUsername() const
 std::string Client::getNickname() const
 {
 	return this->_nickname;
+}
+
+void Client::leave(std::string &name)
+{
+	for (std::vector<std::string>::iterator it = this->_channels.begin(); it != _channels.end(); it++)
+	{
+		if (name == (*it))
+			this->_channels.erase(it);
+	}
+}
+void Client::join(std::string &name)
+{
+	this->_channels.push_back(name);
 }

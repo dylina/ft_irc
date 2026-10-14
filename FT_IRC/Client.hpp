@@ -66,11 +66,13 @@ public:
 	void addData(std::string buffer, std::string clientFd);
 
 
-	// Canale (join/part)
-	void joinChannel(const std::string &name);
-	void leaveChannel(const std::string &name);
-	bool isInChannel(const std::string &name) const;
-	std::set<std::string> getChannels() const;
+		// Canale (join/part) ---> deplacer dans channel.hpp pour eviter que ce soit les clients qui controle les channels
+		// void joinChannel(const std::string &name);
+		// void leaveChannel(const std::string &name);
+		// bool isInChannel(const std::string &name) const;
+		std::vector<std::string> getChannels() const;
+		void leave(std::string &name);
+		void join(std::string &name);
 
 	// Data / parsing
 
@@ -156,5 +158,5 @@ private:
 	std::string _sendBuffer;
 
 	// Canale la care clientul e conectat in prezent
-	std::set<std::string> _channels;
+	std::vector<std::string> _channels;
 };
