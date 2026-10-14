@@ -175,7 +175,7 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 	char buffer[BUFFER_SIZE];
 
 	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer) - 1, 0);
-	buffer[retRecv] = 0;
+
 	if (retRecv > 0)
 	{
 		std::string data(buffer, retRecv);
@@ -266,7 +266,7 @@ void Server::handleUSER(Client *client, std::vector<std::string> &params, std::s
 	// } pas en accord avec la norme hexchat pour le CAP LS ?
 	if (client->isRegistered())
 	{
-		client->sendReply(":ircserv 462 " + client->getNickname() + " :You may not reregister");
+		client->sendReply(":ircserv 462 " + client->getNickName() + " :You may not reregister");
 		return;
 	}
 
@@ -335,7 +335,10 @@ void Server::processCommands(Client *client)
 		else if (cmd.command == "PING")
 			cmdPing(client, cmd);
 		else if (cmd.command == "QUIT")
+		{
 			cmdQuit(client, cmd);
+			return;
+		}
 		else
 			client->sendReply(":ircserv 421 * " + cmd.command + " :Unknown command");
 	}
@@ -375,7 +378,7 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 {
 	if (cmd.parametresMiddle.empty())
 	{
-		client->sendReply(":ircerv 461 " + client->getNickName() + " JOIN :Not enough parameters");
+		client->sendReply(":ircserv 461 " + client->getNickName() + " JOIN :Not enough parameters");
 		return;
 	}
 
@@ -433,7 +436,7 @@ void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
 		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
 		{
 			if (it->second->isInChannel(chan))
-				it->second->queueMessage(partMsg);
+				it->second->sendReply(partMsg);
 		}
 		client->leaveChannel(chan);
 	}
@@ -472,7 +475,15 @@ void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd)
 		return;
 	}
 
-	if (cmd.trailing.empty())
+	std::cerr << "debug :" << cmd.command <<
+
+							"\n nbr of parameter :" << cmd.parametresMiddle.size() <<
+							std::endl;
+	for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++)
+		std::cerr << (*it).c_str() << std::endl;
+
+
+	if (cmd.parametresMiddle.begin() == cmd.parametresMiddle.end())
 	{
 		client->sendReply(":ircserv 412 " + client->getNickName() + " :No text to send");
 		return;
@@ -502,7 +513,7 @@ void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd)
 		{
 			if (it->second->getNickName() == target)
 			{
-				it->second->queueMessage(msg);
+				it->second->sendReply(msg);
 				return;
 			}
 		}
@@ -530,6 +541,33 @@ void Server::cmdPing(Client *client, Client::parsedCommand &cmd)
 
 void Server::cmdQuit(Client *client, Client::parsedCommand &cmd)
 {
-	(void)client;
-	(void)cmd;
+	std::string nick = client->getNickName();
+	std::string reason = cmd.trailing;
+
+	if (reason.empty())
+		reason = "Client Quit";
+
+	std::string quitMsg = ":" + nick + " QUIT :" + reason;
+	std::set<std::string> channels = client->getChannels();
+
+	for (std::map<int, Client *>::iterator it = clients.begin();
+		 it != clients.end(); ++it)
+	{
+		Client *other = it->second;
+
+		if (other == client)
+			continue;
+
+		for (std::set<std::string>::iterator ch = channels.begin();
+			 ch != channels.end(); ++ch)
+		{
+			if (other->isInChannel(*ch))
+			{
+				other->sendReply(quitMsg);
+				break;
+			}
+		}
+	}
+
+	shutdown(client->getFd(), SHUT_RDWR); // desactive la reception et l'envoi
 }
