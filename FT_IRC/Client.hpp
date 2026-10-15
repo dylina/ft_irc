@@ -71,7 +71,7 @@ public:
 		// void joinChannel(const std::string &name);
 		// void leaveChannel(const std::string &name);
 		// bool isInChannel(const std::string &name) const;
-		std::vector<std::string> getChannels() const;
+		std::vector<std::string> &getChannels();
 		void leave(std::string &name);
 		void join(std::string &name);
 

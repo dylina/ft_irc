@@ -79,10 +79,11 @@ private:
 	std::map<int, Client *> clients;
 	std::vector<struct pollfd> fds;
 	std::string _password;
-
-	std::map<std::string, std::string> _channelTopics; //?
-
 	std::map<std::string ,Channel *> _channels;
+
+	// QUIT
+	void broadcastQuit(Client *client, std::string reason);
+	void removeClient(int index); // suprime le client en clients et en fds
 
 	void clean();
 

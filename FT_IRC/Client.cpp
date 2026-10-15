@@ -190,7 +190,7 @@ void Client::flushSendBuffer()
 // 	return this->_channels.find(name) != this->_channels.end();
 // }---------------------------------------------
 
-std::vector<std::string> Client::getChannels() const
+std::vector<std::string> &Client::getChannels()
 {
 	return this->_channels;
 }

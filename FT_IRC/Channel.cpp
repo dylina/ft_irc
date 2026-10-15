@@ -1,7 +1,11 @@
 #include "Channel.hpp"
 
-Channel::Channel(Client *creator, std::string &topic, std::string &name) : _name(name), _topic(topic), _nbrOfUsersConnected(1)
+Channel::Channel(Client *creator, std::string &topic, std::string &name) : _name(name), _nbrOfUsersConnected(1)
 {
+	if (topic.empty())
+		this->_topic.clear();
+	else
+		this->_topic = topic;
 	this->_users.push_back(creator);
 }
 
@@ -67,4 +71,19 @@ void Channel::sendToAll(std::string &msg)
 {
 	for (std::vector<Client *>::iterator it = this->_users.begin(); it != this->_users.end(); ++it)
 		(*it)->sendReply(msg);
+}
+
+bool Channel::haveTopic()
+{
+	if (this->_topic.empty())
+		return false;
+	return true;
+}
+
+void Channel::setTopic(std::string &topic, Client *user)
+{
+	// verif si les modes sont bon a faire
+	(void)user;
+	// le reste de la demarche
+	this->_topic = topic;
 }
