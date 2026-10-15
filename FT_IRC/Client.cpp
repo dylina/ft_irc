@@ -475,11 +475,14 @@ std::string Client::getNickname() const
 
 void Client::leave(std::string &name)
 {
-	for (std::vector<std::string>::iterator it = this->_channels.begin(); it != _channels.end(); it++)
-	{
-		if (name == (*it))
-			this->_channels.erase(it);
-	}
+	std::vector<std::string>::iterator it = std::find(this->_channels.begin(), this->_channels.end(), name);
+	if (it != this->_channels.end())
+		this->_channels.erase(it);
+	// for (std::vector<std::string>::iterator it = this->_channels.begin(); it != _channels.end(); it++)
+	// {
+	// 	if (name == (*it))
+	// 		this->_channels.erase(it);
+	// }
 }
 void Client::join(std::string &name)
 {

@@ -438,14 +438,7 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 		std::string joinMsg = ":" + client->getNickName() + " JOIN :" + chan;
 
 		// envoier a tous meme le new client
-		std::vector<int> usersConnected = this->_channels[chan]->getAllUsers();
-		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
-		{
-			for (std::vector<int>::iterator itOfFdConnected = usersConnected.begin(); itOfFdConnected != usersConnected.end(); itOfFdConnected++)
-				if ((*it).second->getFd() == (*itOfFdConnected))
-					it->second->sendReply(joinMsg);
-		}
-
+		this->_channels[chan]->sendToAll(joinMsg);
 	}
 }
 
@@ -463,61 +456,39 @@ void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
 
 	while (std::getline(ss, chan, ','))
 	{
-		std::cerr << "debug :" << chan << std::endl;
-		for (std::map<std::string, Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+		if (chan.empty())
+			continue;
+
+		// Vérifier que le channel existe
+		std::map<std::string, Channel *>::iterator it = this->_channels.find(chan);
+		
+		if (it == this->_channels.end())
 		{
-			if ((*it).second->getName() == chan)
-			{
-				if (!(*it).second->isInChannel(client))
-				{
-					client->sendReply(":ircserv 442 " + client->getNickName() + " " + chan + " :You're not on that channel");
-					continue;
-				}
-			}
+			client->sendReply(":ircserv 403 " + client->getNickName()
+				+ " " + chan + " :No such channel");
+			continue;
+		}
+
+		Channel *channel = it->second;
+
+		if (!channel->isInChannel(client))
+		{
+			client->sendReply(":ircserv 442 " + client->getNickName()
+				+ " " + chan + " :You're not on that channel");
+			continue;
 		}
 
 		// motif pour partir apres les :
 		std::string reason = cmd.trailing.empty() ? "" : (" :" + cmd.trailing);
 		std::string partMsg = ":" + client->getNickName() + " PART " + chan + reason;
 
-		try
-		{
-			_channels[chan];
-		}
-		catch(...)
-		{
-			continue;
-		}
+		this->_channels[chan]->sendToAll(partMsg);
+		_channels[chan]->leaveChannel(client);
 
-		std::vector<int> usersConnectedInChannel = _channels[chan]->getAllUsers();
-		if (_channels[chan]->getNbrConnected() == 1)
+		if (_channels[chan]->getNbrConnected() == 0)
 		{
-			client->sendReply(partMsg);
-			_channels[chan]->leaveChannel(client);
-
-			if (_channels[chan]->getNbrConnected() == 0)
-			{
-				delete _channels[chan];
-				this->_channels.erase(chan);
-			}
-			continue;
-		}
-		else
-		{
-			for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
-			{
-				for (std::vector<int>::iterator itOfFdConnected = usersConnectedInChannel.begin(); itOfFdConnected != usersConnectedInChannel.end(); itOfFdConnected++)
-				{
-					if ((*it).second->getFd() == (*itOfFdConnected))
-						it->second->sendReply(partMsg);
-				}
-			}
-			_channels[chan]->leaveChannel(client);
-			if (_channels[chan]->getNbrConnected() == 0)
-			{
-				delete _channels[chan];
-				this->_channels.erase(chan);
-			}
+			delete _channels.at(chan);
+			this->_channels.erase(it);
 		}
 	}
 }

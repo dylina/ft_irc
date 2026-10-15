@@ -16,7 +16,7 @@ void Channel::joinChannel(Client *user)
 std::vector<int> Channel::getAllUsers()
 {
 	std::vector<int> usersFd;
-	for (std::vector<const Client*>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
+	for (std::vector<Client*>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
 	{
 		usersFd.push_back((*it)->getFd());
 	}
@@ -25,26 +25,22 @@ std::vector<int> Channel::getAllUsers()
 
 void Channel::leaveChannel(Client *user)
 {
-	std::vector<const Client*>::iterator itToErase;
-	for (std::vector<const Client*>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
+	for (std::vector<Client*>::iterator it = this->_users.begin();
+		it != this->_users.end(); ++it)
 	{
-		if (user->getNickName() == (*it)->getNickName())
+		if (*it == user)
 		{
-			itToErase = it;
-			break ;
+			user->leave(this->_name);
+			this->_users.erase(it);
+			this->_nbrOfUsersConnected--;
+			return;
 		}
-
-		if (it == this->_users.end())
-			return ;
 	}
-	this->_nbrOfUsersConnected--;
-	user->leave(this->_name);
-	this->_users.erase(itToErase);
 }
 
-bool Channel::isInChannel(const Client *user) const
+bool Channel::isInChannel(Client *user) const
 {
-	for (std::vector<const Client*>::const_iterator it = this->_users.begin(); it != this->_users.end(); it++)
+	for (std::vector<Client*>::const_iterator it = this->_users.begin(); it != this->_users.end(); it++)
 	{
 		if (user->getNickName() == (*it)->getNickName())
 			return true;
@@ -67,3 +63,8 @@ int Channel::getNbrConnected() const
 	return this->_nbrOfUsersConnected;
 }
 
+void Channel::sendToAll(std::string &msg)
+{
+	for (std::vector<Client *>::iterator it = this->_users.begin(); it != this->_users.end(); ++it)
+		(*it)->sendReply(msg);
+}

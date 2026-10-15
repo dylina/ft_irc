@@ -20,13 +20,14 @@ class Channel{
 
 		void joinChannel(Client *user);
 		void leaveChannel(Client *user);
-		bool isInChannel(const Client *user) const;
+		bool isInChannel(Client *user) const;
+		void sendToAll(std::string &msg);
 
 	private:
 
 		std::string &_name;
 		std::string &_topic;
-		std::vector<const Client *> _users;
+		std::vector<Client *> _users;
 		std::vector<std::string> _historique;
 		int _nbrOfUsersConnected;
 };

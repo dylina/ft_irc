@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <set>
 #include <ostream>
+#include <algorithm>
 
 #include "colors.hpp"
 
