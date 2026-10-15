@@ -74,7 +74,10 @@ private:
 	std::vector<struct pollfd> fds;
 	std::string _password;
 
+	// QUIT
 	std::map<std::string, std::string> _channelTopics;
+	void broadcastQuit(Client *client, const std::string &reason);
+	void removeClient(int index); // suprime le client en clients et en fds
 
 	void clean();
 

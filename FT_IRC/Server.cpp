@@ -43,7 +43,7 @@ Server::Server(int domain, std::string ip, std::string port, std::string passwor
 
 void Server::on()
 {
-	if (listen(this->_serverSocket.getFd(), SOMAXCONN) == -1) // SOMAXCONN limit. max perm. sinon this->fds.size() = 0 error
+	if (listen(this->_serverSocket.getFd(), SOMAXCONN) == -1)
 	{
 		perror("listen");
 		throw ListenErr();
@@ -54,19 +54,17 @@ void Server::on()
 	server.fd = this->_serverSocket.getFd();
 	server.events = POLLIN;
 	server.revents = 0;
-
 	this->fds.push_back(server);
 
-	// Loop principale de poll qui check les fds en continue
 	while (g_running)
 	{
-		if (g_sigusr1) // pour capter sigusr1 et print les clients connecter
+		if (g_sigusr1)
 		{
 			this->printAllClients();
 			g_sigusr1 = 0;
 		}
 
-		for (size_t i = 1; i < this->fds.size(); ++i) // 0 socket du serveur
+		for (size_t i = 1; i < this->fds.size(); ++i)
 		{
 			std::map<int, Client *>::iterator cit = this->clients.find(fds[i].fd);
 			if (cit != this->clients.end() && cit->second->hasPendingOutput())
@@ -76,27 +74,26 @@ void Server::on()
 		}
 
 		int retPoll = poll(&this->fds[0], this->fds.size(), -1);
-		if (retPoll == -1 && g_running)
+		if (retPoll == -1)
 		{
-			if (errno == EINTR) // ignore SIGUSR1
+			if (!g_running)
+				break;
+			if (errno == EINTR)
 				continue;
 			std::cerr << BOLD BRIGHT_RED << "Error in poll() loop" << RESET << std::endl;
 			break;
 		}
 
-		for (size_t i = 0; i < this->fds.size(); ++i)
+		for (int i = static_cast<int>(this->fds.size()) - 1; i >= 0; --i)
 		{
-			// connexion flags : POLLIN = Il y a des données en attente de lecture.
-			if (fds[i].revents & POLLIN)
+			if (fds[i].fd == this->_serverSocket.getFd())
 			{
-				if (fds[i].fd == this->_serverSocket.getFd())
+				if (fds[i].revents & POLLIN)
 				{
 					sockaddr_in clientSocket;
 					socklen_t clientLen = sizeof(clientSocket);
-
 					std::cerr << "log: connexion of new client ..." << std::endl;
 					int clientFd = accept(fds[i].fd, reinterpret_cast<struct sockaddr *>(&clientSocket), &clientLen);
-
 					try
 					{
 						this->addNewClient(clientFd, clientSocket);
@@ -105,32 +102,35 @@ void Server::on()
 					{
 						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
-					continue;
 				}
-				else
-				{
-					try
-					{
-						this->dataReceived(fds, i);
-					}
-					catch (const std::exception &e)
-					{
-						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
-					}
-				}
+				continue;
 			}
-			if (i < fds.size() && (fds[i].revents & POLLOUT))
+
+			if ((fds[i].revents & (POLLERR | POLLHUP | POLLNVAL)) && !(fds[i].revents & POLLIN))
+			{
+				int fd = fds[i].fd;
+				std::map<int, Client *>::iterator cit = this->clients.find(fd);
+				if (cit != this->clients.end())
+					this->broadcastQuit(cit->second, "Connection closed");
+				this->removeClient(fd);
+				continue;
+			}
+
+			if (fds[i].revents & POLLIN)
+			{
+				this->dataReceived(fds, i); // poate sterge fds[i]
+				continue;
+			}
+
+			if (fds[i].revents & POLLOUT)
 			{
 				std::map<int, Client *>::iterator cit = this->clients.find(fds[i].fd);
 				if (cit != this->clients.end())
 					cit->second->flushSendBuffer();
 			}
-			if (!g_running)
-			{
-				this->clean();
-			}
 		}
 	}
+	this->clean();
 }
 
 bool Server::isvalidNick(const std::string &nick) const
@@ -172,28 +172,29 @@ void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
 void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 {
 	char buffer[BUFFER_SIZE];
+	int fd = fds[i].fd;
 
-	int retRecv = recv(fds[i].fd, buffer, sizeof(buffer) - 1, 0);
+	std::map<int, Client *>::iterator it = this->clients.find(fd);
+	if (it == this->clients.end())
+	{
+		this->removeClient(fd);
+		return;
+	}
+	Client *client = it->second;
 
+	int retRecv = recv(fd, buffer, sizeof(buffer) - 1, 0);
 	if (retRecv > 0)
 	{
 		std::string data(buffer, retRecv);
-		std::cerr << retRecv << " bytes received from " << fds[i].fd << " fd" << std::endl;
-		this->clients[fds[i].fd]->addData(data, this->clients[fds[i].fd]->getFdWithColor());
-		this->processCommands(this->clients[fds[i].fd]);
-	}
-	else if (retRecv == 0)
-	{
-		std::vector<struct pollfd>::iterator it = fds.begin() + i;
-		std::cerr << "client fd [" << (*it).fd << "] disconnected" << std::endl;
-
-		delete this->clients[(*it).fd];
-		this->clients.erase((*it).fd);
-		close((*it).fd);
-		this->fds.erase(it);
+		std::cerr << retRecv << " bytes received from " << fd << " fd" << std::endl;
+		client->addData(data, client->getFdWithColor());
+		this->processCommands(client); // apres quit client invalid
 	}
 	else
-		std::cerr << "Error client received in fd [" << fds[i].fd << "]" << std::endl;
+	{
+		this->broadcastQuit(client, "Connection closed");
+		this->removeClient(fd);
+	}
 }
 
 void Server::handlePASS(Client *client, std::vector<std::string> &params)
@@ -292,7 +293,9 @@ void Server::processCommands(Client *client)
 	{
 		Client::parsedCommand cmd = client->popCommand();
 
-		if (cmd.command == "PASS")
+		if (cmd.command == "CAP" || cmd.command == "PONG")
+			continue;
+		else if (cmd.command == "PASS")
 			handlePASS(client, cmd.parametresMiddle);
 		else if (cmd.command == "NICK")
 			handleNICK(client, cmd.parametresMiddle);
@@ -333,9 +336,11 @@ void Server::clean()
 	while (!this->clients.empty())
 	{
 		std::map<int, Client *>::iterator it = this->clients.begin();
-		delete (*it).second;
+		close(it->first);
+		delete it->second;
 		this->clients.erase(it);
 	}
+	this->fds.clear();
 }
 
 void Server::printAllClients()
@@ -418,8 +423,46 @@ void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
 
 void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
 {
-	(void)client;
-	(void)cmd;
+	if (cmd.parametresMiddle.empty())
+	{
+		client->sendReply(":ircserv 461 " + client->getNickName() + " TOPIC :Not enough parameters");
+		return;
+	}
+
+	std::string channel = cmd.parametresMiddle[0];
+
+	if (!client->isInChannel(channel))
+	{
+		client->sendReply(":ircserv 442 " + client->getNickName() + " " + channel + " :You're not on that channel");
+		return;
+	}
+
+	if (cmd.trailing.empty())
+	{
+		std::map<std::string, std::string>::iterator it =
+			_channelTopics.find(channel);
+
+		if (it == _channelTopics.end() || it->second.empty())
+		{
+			client->sendReply(":ircserv 331 " + client->getNickName() + " " + channel + " :No topic is set");
+		}
+		else
+		{
+			client->sendReply(":ircserv 332 " + client->getNickName() + " " + channel + " :" + it->second);
+		}
+		return;
+	}
+
+	_channelTopics[channel] = cmd.trailing;
+
+	std::string topicMsg = ":" + client->getNickName() + " TOPIC " + channel + " :" + cmd.trailing;
+
+	for (std::map<int, Client *>::iterator it = clients.begin();
+		 it != clients.end(); ++it)
+	{
+		if (it->second->isInChannel(channel))
+			it->second->sendReply(topicMsg);
+	}
 }
 
 void Server::cmdKick(Client *client, Client::parsedCommand &cmd)
@@ -505,27 +548,17 @@ void Server::cmdPing(Client *client, Client::parsedCommand &cmd)
 	client->sendReply(":ircserv PONG ircserv :" + token);
 }
 
-void Server::cmdQuit(Client *client, Client::parsedCommand &cmd)
+void Server::broadcastQuit(Client *client, const std::string &reason)
 {
-	std::string nick = client->getNickName();
-	std::string reason = cmd.trailing;
-
-	if (reason.empty())
-		reason = "Client Quit";
-
-	std::string quitMsg = ":" + nick + " QUIT :" + reason;
+	std::string quitMsg = ":" + client->getNickName() + " QUIT :" + reason;
 	std::set<std::string> channels = client->getChannels();
 
-	for (std::map<int, Client *>::iterator it = clients.begin();
-		 it != clients.end(); ++it)
+	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
 	{
 		Client *other = it->second;
-
 		if (other == client)
 			continue;
-
-		for (std::set<std::string>::iterator ch = channels.begin();
-			 ch != channels.end(); ++ch)
+		for (std::set<std::string>::iterator ch = channels.begin(); ch != channels.end(); ++ch)
 		{
 			if (other->isInChannel(*ch))
 			{
@@ -534,6 +567,31 @@ void Server::cmdQuit(Client *client, Client::parsedCommand &cmd)
 			}
 		}
 	}
+}
 
-	shutdown(client->getFd(), SHUT_RDWR); // desactive la reception et l'envoi
+void Server::removeClient(int fd)
+{
+	std::map<int, Client *>::iterator it = this->clients.find(fd);
+	if (it != this->clients.end())
+	{
+		delete it->second;
+		this->clients.erase(it);
+	}
+	for (std::vector<struct pollfd>::iterator p = this->fds.begin(); p != this->fds.end(); ++p)
+	{
+		if (p->fd == fd)
+		{
+			this->fds.erase(p);
+			break;
+		}
+	}
+	close(fd);
+	std::cerr << "client fd [" << fd << "] disconnected" << std::endl;
+}
+
+void Server::cmdQuit(Client *client, Client::parsedCommand &cmd)
+{
+	std::string reason = cmd.trailing.empty() ? "Client Quit" : cmd.trailing;
+	this->broadcastQuit(client, reason);
+	this->removeClient(client->getFd()); // apres ca le `client` est invalide
 }
