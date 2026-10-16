@@ -73,6 +73,15 @@ void Channel::sendToAll(std::string &msg)
 		(*it)->sendReply(msg);
 }
 
+void Channel::sendToAllOtherClient(std::string &msg, Client *user)
+{
+	for (std::vector<Client *>::iterator it = this->_users.begin(); it != this->_users.end(); ++it)
+	{
+		if ((*it)->getNickName() != user->getNickName())
+			(*it)->sendReply(msg);
+	}
+}
+
 bool Channel::haveTopic()
 {
 	if (this->_topic.empty())
@@ -83,7 +92,7 @@ bool Channel::haveTopic()
 void Channel::setTopic(std::string &topic, Client *user)
 {
 	// verif si les modes sont bon a faire
-	(void)user;
+	user->getAddr();
 	// le reste de la demarche
 	this->_topic = topic;
 }

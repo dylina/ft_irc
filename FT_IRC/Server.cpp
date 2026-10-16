@@ -319,16 +319,16 @@ void Server::processCommands(Client *client)
 			cmdJoin(client, cmd);
 		else if (cmd.command == "PART")
 			cmdPart(client, cmd);
-		// else if (cmd.command == "TOPIC")
-		// 	cmdTopic(client, cmd);
+		else if (cmd.command == "TOPIC")
+			cmdTopic(client, cmd);
 		// else if (cmd.command == "KICK")
 		// 	cmdKick(client, cmd);
 		// else if (cmd.command == "INVITE")
 		// 	cmdInvite(client, cmd);
 		// else if (cmd.command == "MODE")
 		// 	cmdMode(client, cmd);
-		// else if (cmd.command == "PRIVMSG")
-		// 	cmdPrivmsg(client, cmd);
+		else if (cmd.command == "PRIVMSG")
+			cmdPrivmsg(client, cmd);
 		// else if (cmd.command == "NOTICE")
 		// cmdNotice(client, cmd);
 		// else if (cmd.command == "PING")
@@ -519,7 +519,7 @@ void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
 	{
 		std::map<std::string, Channel *>::iterator it = this->_channels.find(channel);
 
-		if ((*it).second->haveTopic())
+		if (!(*it).second->haveTopic())
 		{
 			client->sendReply(":ircserv 331 " + client->getNickName() + " " + channel + " :No topic is set");
 		}
@@ -554,66 +554,61 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 	(void)client;
 	(void)cmd;
 }
-void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd)
+
+
+void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd) //courage ptdr
 {
-	(void)client;
-	(void)cmd;
+
+	if (cmd.parametresMiddle.empty())
+	{
+		client->sendReply(":ircserv 411 " + client->getNickName() + " :No recipient given (PRIVMSG)");
+		return;
+	}
+
+	std::cerr << "debug :" << cmd.command << "\n nbr of parameter :" << cmd.parametresMiddle.size() << std::endl;
+	for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++)
+		std::cerr << (*it).c_str() << std::endl;
+
+
+	if (cmd.parametresMiddle.begin() == cmd.parametresMiddle.end())
+	{
+		client->sendReply(":ircserv 412 " + client->getNickName() + " :No text to send");
+		return;
+	}
+
+	std::string target = cmd.parametresMiddle[0];
+	std::string msg = ":" + client->getNickName() + " PRIVMSG " + target + " :" + cmd.trailing;
+
+	if (target[0] == '#')
+	{
+		std::map<std::string, Channel *>::iterator it = this->_channels.find(target);
+		if (it == this->_channels.end()) // pas trouver le channels
+		{
+			client->sendReply(":ircserv 403 " + client->getNickName() + " " + target + " :No such channel");
+			return;
+		}
+		if (!(*it).second->isInChannel(client))
+		{
+			client->sendReply(":ircserv 442 " + client->getNickName() + " " + target + " :You're not on that channel");
+			return;
+		}
+		// envoi a tous sauf expediteur
+		(*it).second->sendToAllOtherClient(msg, client);
+	}
+	else
+	{
+		// message prive a un nick
+		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
+		{
+			if (it->second->getNickName() == target)
+			{
+				it->second->sendReply(msg);
+				return;
+			}
+		}
+		client->sendReply(":ircserv 401 " + client->getNickName() + " " + target + " :No such nick");
+	}
 }
-
-// void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd)
-// {
-
-// 	if (cmd.parametresMiddle.empty())
-// 	{
-// 		client->sendReply(":ircserv 411 " + client->getNickName() + " :No recipient given (PRIVMSG)");
-// 		return;
-// 	}
-
-// 	std::cerr << "debug :" << cmd.command <<
-
-// 							"\n nbr of parameter :" << cmd.parametresMiddle.size() <<
-// 							std::endl;
-// 	for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++)
-// 		std::cerr << (*it).c_str() << std::endl;
-
-
-// 	if (cmd.parametresMiddle.begin() == cmd.parametresMiddle.end())
-// 	{
-// 		client->sendReply(":ircserv 412 " + client->getNickName() + " :No text to send");
-// 		return;
-// 	}
-
-// 	std::string target = cmd.parametresMiddle[0];
-// 	std::string msg = ":" + client->getNickName() + " PRIVMSG " + target + " :" + cmd.trailing;
-
-// 	if (target[0] == '#')
-// 	{
-// 		if (!client->isInChannel(target))
-// 		{
-// 			client->sendReply(":ircserv 442 " + client->getNickName() + " " + target + " :You're not on that channel");
-// 			return;
-// 		}
-// 		// envoi a tous sauf expediteur
-// 		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
-// 		{
-// 			if (it->second != client && it->second->isInChannel(target))
-// 				it->second->sendReply(msg);
-// 		}
-// 	}
-// 	else
-// 	{
-// 		// message prive a un nick
-// 		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
-// 		{
-// 			if (it->second->getNickName() == target)
-// 			{
-// 				it->second->sendReply(msg);
-// 				return;
-// 			}
-// 		}
-// 		client->sendReply(":ircserv 401 " + client->getNickName() + " " + target + " :No such nick");
-// 	}
-// }
 
 void Server::cmdPing(Client *client, Client::parsedCommand &cmd) // a verif je crois qu'il manques des trucs
 {

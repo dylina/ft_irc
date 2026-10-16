@@ -31,6 +31,7 @@ class Channel{
 		void joinChannel(Client *user);
 		void leaveChannel(Client *user);
 		void sendToAll(std::string &msg);
+		void sendToAllOtherClient(std::string &msg, Client *user);
 
 
 	private:
