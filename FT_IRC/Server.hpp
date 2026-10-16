@@ -10,11 +10,13 @@
 #include <cerrno>
 #include <fstream>
 #include <string>
+#include <iomanip>
 
 #include "Channel.hpp"
 #include "Socket.hpp"
 #include "colors.hpp"
 #include "Client.hpp"
+#include "IrcErrors.hpp"
 
 extern volatile sig_atomic_t g_running;
 extern volatile sig_atomic_t g_sigusr1;
@@ -74,6 +76,8 @@ private:
 	void cmdInvite(Client *client, Client::parsedCommand &cmd);
 	void cmdMode(Client *client, Client::parsedCommand &cmd);
 	void cmdQuit(Client *client, Client::parsedCommand &cmd);
+
+	bool isModeIsHandle(char &mode);
 
 	Socket _serverSocket;
 	std::map<int, Client *> clients;

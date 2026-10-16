@@ -132,6 +132,25 @@ void Server::on()
 	}
 }
 
+static std::string formatMessage(
+    int error,
+    std::string msg,
+    Client *client,
+    std::string channelTarget = "")
+{
+    std::ostringstream oss;
+    oss << ":ircserv "
+        << std::setfill('0') << std::setw(3) << error
+        << " " << client->getNickName();
+
+    if (!channelTarget.empty())
+        oss << " " << channelTarget;
+
+    oss << " " << msg;
+
+    return oss.str();
+}
+
 bool Server::isvalidNick(const std::string &nick) const
 {
 	if (nick.empty() || nick.length() > 9)
@@ -200,12 +219,12 @@ void Server::handlePASS(Client *client, std::vector<std::string> &params)
 {
 	if (params.empty())
 	{
-		client->sendReply(":ircserv 461 * PASS :Not enough parameters");
+		client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, ""));
 		return;
 	}
 	if (params[0] != this->_password)
 	{
-		client->sendReply(":ircserv 464 * :Password incorrect");
+		client->sendReply(formatMessage(ERR_PASSWDMISMATCH, MSG_PASSWDMISMATCH, client, ""));
 		return;
 	}
 	client->setPassOk(true);
@@ -220,7 +239,7 @@ bool Server::isNickIsAlreadyUse(Client *client, std::string &nick)
 	{
 		if ((*it).second->getNickName() == nick && (*it).first != client->getFd())
 		{
-			client->sendReply(":ircserv 433 * " + nick + " :Nickname is already in use");
+			client->sendReply(formatMessage(ERR_NICKNAMEINUSE, MSG_NICKNAMEINUSE, client, ""));
 			return true;
 		}
 	}
@@ -236,7 +255,7 @@ void Server::handleNICK(Client *client, std::vector<std::string> &params)
 	// } pas en accord avec la norme hexchat pour le CAP LS ?
 	if (params.empty())
 	{
-		client->sendReply(":ircserv 431 * :No nickname given");
+		client->sendReply(formatMessage(ERR_NONICKNAMEGIVEN, MSG_NONICKNAMEGIVEN, client, ""));
 		return;
 	}
 	std::string nick = params[0];
@@ -325,8 +344,8 @@ void Server::processCommands(Client *client)
 		// 	cmdKick(client, cmd);
 		// else if (cmd.command == "INVITE")
 		// 	cmdInvite(client, cmd);
-		// else if (cmd.command == "MODE")
-		// 	cmdMode(client, cmd);
+		else if (cmd.command == "MODE")
+			cmdMode(client, cmd);
 		else if (cmd.command == "PRIVMSG")
 			cmdPrivmsg(client, cmd);
 		// else if (cmd.command == "NOTICE")
@@ -555,24 +574,117 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 	(void)cmd;
 }
 
+// void Server::cmdMode(Client *client, Client::parsedCommand &cmd) wip
+// {
+// 	(void)client;
+// 	std::cerr << "debug cmdmode" << std::endl;
+// 	std::cerr << "command: " << cmd.command.c_str() << std::endl;
+// 	for ( std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++)
+// 	{
+// 		std::cerr << "Params: " << (*it).c_str() << std::endl;
+// 	}
+// 	std::cerr << "trailing :" << cmd.trailing << std::endl;
+// 	std::cerr << "fin debug" << std::endl;
 
-void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd) //courage ptdr
+// 	int countNbrChann = 0;
+// 	std::vector<std::string> modeWant;
+// 	Channel *channelTarget;
+
+// 	for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++)
+// 	{
+// 		if ((*it)[0] == '#' && countNbrChann == 0) //si le premier argument est un channel
+// 		{
+// 			countNbrChann++;
+
+// 			std::map<std::string, Channel *>::iterator chIt = this->_channels.find((*it));
+
+// 			if (chIt == this->_channels.end()) // pas de channels correspondant
+// 			{
+// 				client->sendReply(formatMessage(ERR_NOSUCHCHANNEL, MSG_NOSUCHCHANNEL, client, (*it)));
+// 				return;
+// 			}
+// 			channelTarget = (*chIt).second;
+// 		}
+// 		else if (((*it)[0] == '+' || (*it)[0] == '-') && countNbrChann == 1) // si le deuxieme arg est bien un mode avec + ou -
+// 		{
+// 			countNbrChann++;
+
+// 			for (size_t i = 0; i < (*it).size(); i++) //parse les modes voulues
+// 			{
+// 				if ((*it)[i] && ((*it)[i] == '+' || (*it)[i] == '-'))
+// 				{
+// 					if ((*it)[i + 1] && isModeIsHandle((*it)[i + 1]))
+// 					{
+// 						char del = (*it)[i];
+// 						char mode = (*it)[i + 1];
+
+// 						std::string modeAndDel;
+// 						modeAndDel += del;
+// 						modeAndDel += mode;
+// 						modeWant.push_back(modeAndDel);
+// 						it ++;
+// 					}
+// 					else if ((*it)[i + 1] && !isModeIsHandle((*it)[i + 1]))
+// 					{
+// 						client->sendReply(formatMessage(ERR_UNKNOWNMODE, MSG_UNKNOWNMODE, client, ""));
+// 						return ;
+// 					}
+// 				}
+// 				else
+// 				{
+// 					client->sendReply(formatMessage(ERR_UNKNOWNMODE, MSG_UNKNOWNMODE, client, ""));
+// 					return ;
+// 				}
+// 			}
+// 		}
+// 		else if ((*it)[0] != '#' && countNbrChann == 0) //si le premier argument est un channel sans la bonne syntaxe
+// 		{
+// 			client->sendReply(formatMessage(ERR_NOSUCHCHANNEL, MSG_NOSUCHCHANNEL, client, (*it)));
+// 			return ;
+// 		}
+// 	}
+// 	// wip
+// 	// for (size_t i = 0; i < modeWant.size(); i++)
+// 	// {
+
+// 	// }
+
+// }
+
+bool Server::isModeIsHandle(char &mode)
+{
+	std::vector<char> handleMode;
+
+	handleMode.push_back('i');
+	handleMode.push_back('t');
+	handleMode.push_back('k');
+	handleMode.push_back('o');
+	handleMode.push_back('l');
+	for (std::vector<char>::iterator it = handleMode.begin(); it != handleMode.end(); it++)
+	{
+		if (mode == (*it))
+			return true;
+	}
+	return false;
+}
+
+void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd)
 {
 
 	if (cmd.parametresMiddle.empty())
 	{
-		client->sendReply(":ircserv 411 " + client->getNickName() + " :No recipient given (PRIVMSG)");
+		client->sendReply(formatMessage(ERR_NORECIPIENT, MSG_NORECIPIENT, client, ""));
 		return;
 	}
 
-	std::cerr << "debug :" << cmd.command << "\n nbr of parameter :" << cmd.parametresMiddle.size() << std::endl;
-	for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++)
-		std::cerr << (*it).c_str() << std::endl;
+	// std::cerr << "debug :" << cmd.command << "\n nbr of parameter :" << cmd.parametresMiddle.size() << std::endl;
+	// for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++)
+	// 	std::cerr << (*it).c_str() << std::endl;
 
 
 	if (cmd.parametresMiddle.begin() == cmd.parametresMiddle.end())
 	{
-		client->sendReply(":ircserv 412 " + client->getNickName() + " :No text to send");
+		client->sendReply(formatMessage(ERR_NOTEXTTOSEND, MSG_NOTEXTTOSEND, client, ""));
 		return;
 	}
 
@@ -584,12 +696,12 @@ void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd) //courage pt
 		std::map<std::string, Channel *>::iterator it = this->_channels.find(target);
 		if (it == this->_channels.end()) // pas trouver le channels
 		{
-			client->sendReply(":ircserv 403 " + client->getNickName() + " " + target + " :No such channel");
+			client->sendReply(formatMessage(ERR_NOSUCHCHANNEL, MSG_NOSUCHCHANNEL, client, target));
 			return;
 		}
 		if (!(*it).second->isInChannel(client))
 		{
-			client->sendReply(":ircserv 442 " + client->getNickName() + " " + target + " :You're not on that channel");
+			client->sendReply(formatMessage(ERR_NOTONCHANNEL, MSG_NOTONCHANNEL, client, target));
 			return;
 		}
 		// envoi a tous sauf expediteur
@@ -606,7 +718,7 @@ void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd) //courage pt
 				return;
 			}
 		}
-		client->sendReply(":ircserv 401 " + client->getNickName() + " " + target + " :No such nick");
+		client->sendReply(formatMessage(ERR_NOSUCHNICK, MSG_NOSUCHNICK, client, target));
 	}
 }
 

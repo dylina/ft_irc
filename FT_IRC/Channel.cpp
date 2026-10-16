@@ -7,6 +7,7 @@ Channel::Channel(Client *creator, std::string &topic, std::string &name) : _name
 	else
 		this->_topic = topic;
 	this->_users.push_back(creator);
+	this->mode.setMode("o", creator, NULL, NULL);
 }
 
 
@@ -95,4 +96,103 @@ void Channel::setTopic(std::string &topic, Client *user)
 	user->getAddr();
 	// le reste de la demarche
 	this->_topic = topic;
+}
+
+Channel::Mode::Mode() : _i(false), _t(false), _k(false), _o(), _l(false)
+{}
+
+const char* Channel::Mode::NoModeFind::what() const throw()
+{
+	return "No mode match";
+}
+
+const char* Channel::Mode::ModeAlreadySet::what() const throw()
+{
+	return "Mode already set";
+}
+
+const char* Channel::Mode::ModeDontHaveParams::what() const throw()
+{
+	return "Mode missing params";
+}
+
+bool Channel::Mode::getMode(std::string mode)
+{
+	if (mode == "t")
+		return _t;
+	else if (mode == "i")
+		return _i;
+	else if (mode == "k")
+		return _k;
+	else if (mode == "l")
+		return _l;
+	else if (mode == "o")
+	{
+		if (_o.empty())
+			return false;
+		else
+			return true;
+	}
+
+	throw NoModeFind();
+	return false;
+}
+
+bool Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, std::string pass)
+{
+	if (userTarget == NULL && mode == "o")
+	{
+		this->_o.push_back(user);
+		return true;
+	}
+
+	std::vector<Client *>::iterator isOp = std::find(this->_o.begin(), this->_o.end(), user);
+	if (isOp == this->_o.end())
+		return false;
+
+	if (mode == "t")
+	{
+		if (_t)
+			throw ModeAlreadySet();
+		else
+			this->_t = true;
+		return _t;
+	}
+	else if (mode == "i")
+	{
+		if (_i)
+			throw ModeAlreadySet();
+		else
+			this->_i = true;
+		return _i;
+	}
+	else if (mode == "k")
+	{
+		if (_k)
+			throw ModeAlreadySet();
+
+		if (pass.empty())
+			throw ModeDontHaveParams();
+
+		_password = pass;
+		this->_k = true;
+		return _k;
+	}
+	else if (mode == "l")
+	{
+		if (_l)
+			throw ModeAlreadySet();
+		else
+			this->_l = true;
+		return _l;
+	}
+	else if (mode == "o")
+	{
+		std::vector<Client *>::iterator it = std::find(this->_o.begin(), this->_o.end(), userTarget);
+		if (it == this->_o.end())
+			this->_o.push_back(userTarget);
+		else
+			throw ModeAlreadySet();
+	}
+	return true;
 }
