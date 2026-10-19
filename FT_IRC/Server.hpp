@@ -17,6 +17,7 @@
 #include "colors.hpp"
 #include "Client.hpp"
 #include "IrcErrors.hpp"
+#include "RplIrc.hpp"
 
 extern volatile sig_atomic_t g_running;
 extern volatile sig_atomic_t g_sigusr1;

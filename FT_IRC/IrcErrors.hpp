@@ -16,6 +16,7 @@
 #define ERR_NOTEXTTOSEND        412 // Texte du message manquant
 #define ERR_UNKNOWNCOMMAND      421 // Commande inconnue
 #define ERR_NOMOTD              422 // Message MOTD indisponible
+#define ERR_NOTOPIC				331 // Elle indique que le canal auquel vous tentez d'accéder ou d'interroger n'a aucun sujet (topic) défini pour le moment.
 
 // ============================================
 // NICK
@@ -47,6 +48,7 @@
 #define ERR_BADCHANNELKEY       475 // Clé incorrecte (+k)
 #define ERR_BADCHANMASK         476 // Masque de channel invalide
 #define ERR_CHANOPRIVSNEEDED    482 // Opérateur requis
+#define ERR_INVALIDMODEPARAM	696 // mauvaise limit pour le mode l
 
 // ============================================
 // PRIVILEGES / COMMANDES

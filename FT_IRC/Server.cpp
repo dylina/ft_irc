@@ -441,8 +441,10 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 					continue;
 			}
 			catch (...)
-			{}
+			{
+			}
 		}
+
 
 		try
 		{
@@ -450,8 +452,13 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 		}
 		catch (...) // si on catch une erreur c'est que le salon n'existe pas encore, alor on le creer
 		{
-			Channel *newChannel = new Channel(client, chan, chan);
-			this->_channels[chan] = newChannel;
+			try
+			{
+				Channel *newChannel = new Channel(client, chan, chan);
+				this->_channels[chan] = newChannel;
+			}
+			catch (...)
+			{}
 		}
 
 		// msg de JOIN (IRC: :nick JOIN :#canal)
@@ -484,8 +491,7 @@ void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
 
 		if (it == this->_channels.end())
 		{
-			client->sendReply(":ircserv 403 " + client->getNickName()
-				+ " " + chan + " :No such channel");
+			client->sendReply(":ircserv 403 " + client->getNickName() + " " + chan + " :No such channel");
 			continue;
 		}
 
@@ -493,8 +499,7 @@ void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
 
 		if (!channel->isInChannel(client))
 		{
-			client->sendReply(":ircserv 442 " + client->getNickName()
-				+ " " + chan + " :You're not on that channel");
+			client->sendReply(":ircserv 442 " + client->getNickName() + " " + chan + " :You're not on that channel");
 			continue;
 		}
 
@@ -517,7 +522,7 @@ void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
 {
 	if (cmd.parametresMiddle.empty())
 	{
-		client->sendReply(":ircserv 461 " + client->getNickName() + " TOPIC :Not enough parameters");
+		client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, ""));
 		return;
 	}
 
@@ -525,12 +530,12 @@ void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
 	std::map<std::string, Channel *>::iterator it = this->_channels.find(channel);
 	if (it == this->_channels.end())
 	{
-		client->sendReply(":ircserv 403 #" + channel + " :No such channel");
+		client->sendReply(formatMessage(ERR_NOSUCHCHANNEL, MSG_NOSUCHCHANNEL, client, ""));
 		return;
 	}
 	if (!this->_channels[channel]->isInChannel(client))
 	{
-		client->sendReply(":ircserv 442 " + client->getNickName() + " " + channel + " :You're not on that channel");
+		client->sendReply(formatMessage(ERR_NOTONCHANNEL, MSG_NOTONCHANNEL, client, channel));
 		return;
 	}
 
@@ -540,11 +545,11 @@ void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
 
 		if (!(*it).second->haveTopic())
 		{
-			client->sendReply(":ircserv 331 " + client->getNickName() + " " + channel + " :No topic is set");
+			client->sendReply(formatMessage(ERR_NOTOPIC, MSG_NOTOPIC, client, channel));
 		}
 		else
 		{
-			client->sendReply(":ircserv 332 " + client->getNickName() + " " + channel + " :" + it->second->getTopic());
+			client->sendReply(formatMessage(RPL_TOPIC, it->second->getTopic(), client, channel));
 		}
 		return;
 	}
@@ -568,88 +573,148 @@ void Server::cmdInvite(Client *client, Client::parsedCommand &cmd)
 	(void)cmd;
 }
 
-void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
-{
-	(void)client;
-	(void)cmd;
-}
-
-// void Server::cmdMode(Client *client, Client::parsedCommand &cmd) wip
+// void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 // {
 // 	(void)client;
-// 	std::cerr << "debug cmdmode" << std::endl;
-// 	std::cerr << "command: " << cmd.command.c_str() << std::endl;
-// 	for ( std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++)
-// 	{
-// 		std::cerr << "Params: " << (*it).c_str() << std::endl;
-// 	}
-// 	std::cerr << "trailing :" << cmd.trailing << std::endl;
-// 	std::cerr << "fin debug" << std::endl;
-
-// 	int countNbrChann = 0;
-// 	std::vector<std::string> modeWant;
-// 	Channel *channelTarget;
-
-// 	for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++)
-// 	{
-// 		if ((*it)[0] == '#' && countNbrChann == 0) //si le premier argument est un channel
-// 		{
-// 			countNbrChann++;
-
-// 			std::map<std::string, Channel *>::iterator chIt = this->_channels.find((*it));
-
-// 			if (chIt == this->_channels.end()) // pas de channels correspondant
-// 			{
-// 				client->sendReply(formatMessage(ERR_NOSUCHCHANNEL, MSG_NOSUCHCHANNEL, client, (*it)));
-// 				return;
-// 			}
-// 			channelTarget = (*chIt).second;
-// 		}
-// 		else if (((*it)[0] == '+' || (*it)[0] == '-') && countNbrChann == 1) // si le deuxieme arg est bien un mode avec + ou -
-// 		{
-// 			countNbrChann++;
-
-// 			for (size_t i = 0; i < (*it).size(); i++) //parse les modes voulues
-// 			{
-// 				if ((*it)[i] && ((*it)[i] == '+' || (*it)[i] == '-'))
-// 				{
-// 					if ((*it)[i + 1] && isModeIsHandle((*it)[i + 1]))
-// 					{
-// 						char del = (*it)[i];
-// 						char mode = (*it)[i + 1];
-
-// 						std::string modeAndDel;
-// 						modeAndDel += del;
-// 						modeAndDel += mode;
-// 						modeWant.push_back(modeAndDel);
-// 						it ++;
-// 					}
-// 					else if ((*it)[i + 1] && !isModeIsHandle((*it)[i + 1]))
-// 					{
-// 						client->sendReply(formatMessage(ERR_UNKNOWNMODE, MSG_UNKNOWNMODE, client, ""));
-// 						return ;
-// 					}
-// 				}
-// 				else
-// 				{
-// 					client->sendReply(formatMessage(ERR_UNKNOWNMODE, MSG_UNKNOWNMODE, client, ""));
-// 					return ;
-// 				}
-// 			}
-// 		}
-// 		else if ((*it)[0] != '#' && countNbrChann == 0) //si le premier argument est un channel sans la bonne syntaxe
-// 		{
-// 			client->sendReply(formatMessage(ERR_NOSUCHCHANNEL, MSG_NOSUCHCHANNEL, client, (*it)));
-// 			return ;
-// 		}
-// 	}
-// 	// wip
-// 	// for (size_t i = 0; i < modeWant.size(); i++)
-// 	// {
-
-// 	// }
-
+// 	(void)cmd;
 // }
+
+void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
+{
+
+	int countNbrChann = 0;
+	std::vector<std::string> modeWant;
+	Channel *channelTarget = NULL;
+
+	for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++) // boucle pour verif si tout les args sont bons
+	{
+		if ((*it)[0] == '#' && countNbrChann == 0) //si le premier argument est un channel
+		{
+			countNbrChann++;
+
+			std::map<std::string, Channel *>::iterator chIt = this->_channels.find((*it));
+
+			if (chIt == this->_channels.end()) // pas de channels correspondant
+			{
+				client->sendReply(formatMessage(ERR_NOSUCHCHANNEL, MSG_NOSUCHCHANNEL, client, (*it)));
+				return;
+			}
+			std::cerr << (*chIt).second->getName() << std::endl; //debug
+			channelTarget = (*chIt).second;
+		}
+		else if (countNbrChann == 1) // si il existe un deuxieme args
+		{
+			countNbrChann++;
+
+			for (size_t i = 0; i < (*it).size(); i++) //parse les modes voulues
+			{
+				if ((*it)[i] && ((*it)[i] == '+' || (*it)[i] == '-'))
+				{
+					if ((*it).size() > i + 1 && isModeIsHandle((*it)[i + 1]))
+					{
+						char del = (*it)[i];
+						char mode = (*it)[i + 1];
+
+						std::string modeAndDel;
+						modeAndDel += del;
+						modeAndDel += mode;
+						modeWant.push_back(modeAndDel);
+
+						i ++;
+						continue;
+					}
+					else if ((*it).size() > i + 1 && !isModeIsHandle((*it)[i + 1]))
+					{
+						client->sendReply(formatMessage(ERR_UNKNOWNMODE, MSG_UNKNOWNMODE, client, ""));
+						return ;
+					}
+				}
+				else if (isModeIsHandle((*it)[i])) // si pas de + ou de - on suppose que c'est un +
+				{
+					char mode = (*it)[i];
+					std::string modeAndDel = "+";
+
+					modeAndDel += mode;
+					modeWant.push_back(modeAndDel);
+				}
+				else
+				{
+					client->sendReply(formatMessage(ERR_UNKNOWNMODE, MSG_UNKNOWNMODE, client, ""));
+					return ;
+				}
+			}
+		}
+		else if ((*it)[0] != '#' && countNbrChann == 0) //si le premier argument est un channel sans la bonne syntaxe
+		{
+			client->sendReply(formatMessage(ERR_NOSUCHCHANNEL, MSG_NOSUCHCHANNEL, client, (*it)));
+			return ;
+		}
+	}
+
+	if (countNbrChann == 1 && modeWant.empty()) // si aucun argument n'est donne en plus du canal on renvoi les modes actif sur le channel
+	{
+		client->sendReply(formatMessage(RPL_CHANNELMODEIS, channelTarget->mode.getModeActive(), client, channelTarget->getName()));
+		return ;
+	}
+
+	countNbrChann = 1;
+	for (std::vector<std::string>::iterator it = modeWant.begin(); it != modeWant.end(); it++) // dernier check des modes si il y en a avec des attributs on check si il existe genre mdp et limites
+	{
+		if ((*it)[0] == '+')
+		{
+			std::cerr << "debug: add mode" << std::endl; //debug
+
+			if ((*it)[1] == 'k' || (*it)[1] == 'l') // on verifie les params de k et de l (mdp et limite de nbr)
+			{
+				size_t isExist = countNbrChann + 1;
+				if (isExist >= cmd.parametresMiddle.size())
+					client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
+				if ((*it)[1] == 'l') // on verifie le param de l si c'est bien que 1 nombre positif
+				{
+					for (size_t i = 0; cmd.parametresMiddle[isExist].size() > i; i++)
+					{
+						if (!std::isdigit(cmd.parametresMiddle[isExist][i]))
+						{
+							client->sendReply(formatMessage(ERR_INVALIDMODEPARAM, MSG_INVALIDMODEPARAM, client, channelTarget->getName()));
+							return ;
+						}
+					}
+				}
+				countNbrChann++;
+			}
+		}
+		else
+		{
+			std::cerr << "debug: supp mode" << std::endl; //debug
+
+			if ((*it)[1] == 'k') // on verifie les params de k
+			{
+				size_t isExist = countNbrChann + 1;
+				if (isExist >= cmd.parametresMiddle.size()) // pas de params on pleures
+					client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
+				countNbrChann++;
+			}
+		}
+	}
+
+	size_t paramsNbr = countNbrChann + 1;
+	if (paramsNbr != cmd.parametresMiddle.size()) // si il y a trop de parametres dans le mode, on pleures encore
+	{
+		client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
+		return ;
+	}
+
+	// wip -------------------------------------------------
+	// wip gestion des modes une fois que tout est bien valide (normalement le parsing au dessu est bon (inch'))
+
+
+	// for (size_t i = 0; i < modeWant.size(); i++)
+	// {
+	// 	channelTarget->mode.setMode(,);
+	// }
+	// 	---------------------------------------------------
+
+}
 
 bool Server::isModeIsHandle(char &mode)
 {

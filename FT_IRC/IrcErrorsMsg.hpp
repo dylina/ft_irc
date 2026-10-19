@@ -15,6 +15,7 @@
 #define MSG_NOTEXTTOSEND        ":No text to send"
 #define MSG_UNKNOWNCOMMAND      ":Unknown command"
 #define MSG_NOMOTD              ":MOTD File is missing"
+#define	MSG_NOTOPIC				"No topic is set"
 
 // ============================================
 // NICK
@@ -46,6 +47,7 @@
 #define MSG_BADCHANNELKEY       ":Cannot join channel (+k)"
 #define MSG_BADCHANMASK         ":Bad Channel Mask"
 #define MSG_CHANOPRIVSNEEDED    ":You're not channel operator"
+#define MSG_INVALIDMODEPARAM	":Invalid limit parameter"
 
 // ============================================
 // PRIVILEGES / COMMANDES

@@ -1,13 +1,13 @@
 #include "Channel.hpp"
 
-Channel::Channel(Client *creator, std::string &topic, std::string &name) : _name(name), _nbrOfUsersConnected(1)
+Channel::Channel(Client *creator, std::string &topic, std::string name) : _name(name), _nbrOfUsersConnected(1)
 {
 	if (topic.empty())
 		this->_topic.clear();
 	else
 		this->_topic = topic;
 	this->_users.push_back(creator);
-	this->mode.setMode("o", creator, NULL, NULL);
+	this->mode.setMode("o", creator, NULL, "");
 }
 
 
@@ -98,8 +98,10 @@ void Channel::setTopic(std::string &topic, Client *user)
 	this->_topic = topic;
 }
 
-Channel::Mode::Mode() : _i(false), _t(false), _k(false), _o(), _l(false)
-{}
+Channel::Mode::Mode() : _i(false), _t(false), _k(false), _o(), _l(false), _limitNbr(-1)
+{
+	this->_password = "";
+}
 
 const char* Channel::Mode::NoModeFind::what() const throw()
 {
@@ -138,7 +140,7 @@ bool Channel::Mode::getMode(std::string mode)
 	return false;
 }
 
-bool Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, std::string pass)
+bool Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, std::string param) // a utiliser que si +
 {
 	if (userTarget == NULL && mode == "o")
 	{
@@ -171,10 +173,10 @@ bool Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, 
 		if (_k)
 			throw ModeAlreadySet();
 
-		if (pass.empty())
+		if (param.empty())
 			throw ModeDontHaveParams();
 
-		_password = pass;
+		_password = param;
 		this->_k = true;
 		return _k;
 	}
@@ -182,8 +184,10 @@ bool Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, 
 	{
 		if (_l)
 			throw ModeAlreadySet();
-		else
-			this->_l = true;
+
+
+		this->_l = true;
+		this->_limitNbr = std::atoi(param.c_str());
 		return _l;
 	}
 	else if (mode == "o")
@@ -195,4 +199,27 @@ bool Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, 
 			throw ModeAlreadySet();
 	}
 	return true;
+}
+
+// void Channel::Mode::suppMode(std::string mode, Client *user, Client *userTarget, std::string param) // a utiliser pour -
+// {
+// 	// wip
+// }
+
+std::string Channel::Mode::getModeActive()
+{
+	std::string modeActiv;
+
+	modeActiv += "+";
+
+	if (this->getMode("t"))
+		modeActiv += "t";
+	if (this->getMode("i"))
+		modeActiv += "i";
+	if (this->getMode("k"))
+		modeActiv += "k";
+	if (this->getMode("l"))
+		modeActiv += "l";
+
+	return modeActiv;
 }

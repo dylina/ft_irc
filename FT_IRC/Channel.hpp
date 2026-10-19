@@ -11,7 +11,7 @@ class Channel{
 
 
 	public :
-		Channel(Client *creator, std::string &topic, std::string &name);
+		Channel(Client *creator, std::string &topic, std::string name);
 
 		// getters
 
@@ -55,24 +55,27 @@ class Channel{
 
 				// setters
 
-				bool setMode(std::string mode, Client *user, Client *userTarget, std::string pass);
+				bool setMode(std::string mode, Client *user, Client *userTarget, std::string param);
+				// void suppMode(std::string mode, Client *user, Client *userTarget, std::string param); wip
 
 				//getters
 
 				bool getMode(std::string mode);
+				std::string getModeActive();
 			private:
-				int _i; //invitation mode
-				int _t; // operators reserved
-				int _k; // set a pass
+				bool _i; //invitation mode
+				bool _t; // operators reserved
+				bool _k; // set a pass
 				std::vector<Client *> _o; // set operator mode to a user
-				int _l;	//limit nbr of members
+				bool _l;	//limit nbr of members
 				std::string _password;
+				int _limitNbr;
 		};
 		Mode mode;
 
 	private:
 
-		std::string &_name;
+		std::string _name;
 		std::vector<Client *> _users;
 		std::vector<std::string> _historique;
 		int _nbrOfUsersConnected;
