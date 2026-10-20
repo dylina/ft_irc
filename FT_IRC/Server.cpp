@@ -74,7 +74,7 @@ void Server::on()
 		}
 
 		int retPoll = poll(&this->fds[0], this->fds.size(), -1);
-		if (retPoll == -1  && g_running)
+		if (retPoll == -1 && g_running)
 		{
 			if (!g_running)
 				break;
@@ -108,7 +108,6 @@ void Server::on()
 					try
 					{
 						this->dataReceived(fds, i);
-
 					}
 					catch (const std::exception &e)
 					{
@@ -133,22 +132,22 @@ void Server::on()
 }
 
 static std::string formatMessage(
-    int error,
-    std::string msg,
-    Client *client,
-    std::string channelTarget = "")
+	int error,
+	std::string msg,
+	Client *client,
+	std::string channelTarget = "")
 {
-    std::ostringstream oss;
-    oss << ":ircserv "
-        << std::setfill('0') << std::setw(3) << error
-        << " " << client->getNickName();
+	std::ostringstream oss;
+	oss << ":ircserv "
+		<< std::setfill('0') << std::setw(3) << error
+		<< " " << client->getNickName();
 
-    if (!channelTarget.empty())
-        oss << " " << channelTarget;
+	if (!channelTarget.empty())
+		oss << " " << channelTarget;
 
-    oss << " " << msg;
+	oss << " " << msg;
 
-    return oss.str();
+	return oss.str();
 }
 
 bool Server::isvalidNick(const std::string &nick) const
@@ -231,7 +230,7 @@ void Server::handlePASS(Client *client, std::vector<std::string> &params)
 	finalizeRegistration(client);
 }
 
-//check if nickname is arleady use by another client and return true if is
+// check if nickname is arleady use by another client and return true if is
 bool Server::isNickIsAlreadyUse(Client *client, std::string &nick)
 {
 	std::map<int, Client *>::iterator it = this->clients.begin();
@@ -286,23 +285,19 @@ void Server::handleUSER(Client *client, std::vector<std::string> &params, std::s
 		return;
 	}
 
-	std::string nickname = trailing;
-	if (nickname.empty() && params.size() >= 4)
-		nickname = params[3];
+	std::string realname = trailing;
+	if (realname.empty() && params.size() >= 4)
+		realname = params[3];
 
-	std::cerr << "nickname stocké : [" << nickname << "]" << std::endl;
-	if (params.size() < 3 || nickname.empty())
+	if (params.size() < 3 || realname.empty())
 	{
 		client->sendReply(":ircserv 461 * USER :Not enough parameters");
 		return;
 	}
 
-	if (isNickIsAlreadyUse(client, nickname) == true) //pas oublier de verif sinon conflit
-		return;
-
 	client->setUsername(params[0]);
-	client->setNickName(nickname);
 	client->setHasUser(true);
+
 	finalizeRegistration(client);
 }
 
@@ -445,7 +440,6 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 			}
 		}
 
-
 		try
 		{
 			this->_channels.at(chan)->joinChannel(client);
@@ -458,7 +452,8 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 				this->_channels[chan] = newChannel;
 			}
 			catch (...)
-			{}
+			{
+			}
 		}
 
 		// msg de JOIN (IRC: :nick JOIN :#canal)
@@ -468,7 +463,6 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 		this->_channels[chan]->sendToAll(joinMsg);
 	}
 }
-
 
 void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
 {
@@ -558,7 +552,6 @@ void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
 
 	std::string topicMsg = ":" + client->getNickName() + " TOPIC " + channel + " :" + cmd.trailing;
 	this->_channels[channel]->sendToAll(topicMsg);
-
 }
 
 void Server::cmdKick(Client *client, Client::parsedCommand &cmd)
@@ -588,7 +581,7 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 
 	for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++) // boucle pour verif si tout les args sont bons
 	{
-		if ((*it)[0] == '#' && countNbrChann == 0) //si le premier argument est un channel
+		if ((*it)[0] == '#' && countNbrChann == 0) // si le premier argument est un channel
 		{
 			countNbrChann++;
 
@@ -599,14 +592,14 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 				client->sendReply(formatMessage(ERR_NOSUCHCHANNEL, MSG_NOSUCHCHANNEL, client, (*it)));
 				return;
 			}
-			std::cerr << (*chIt).second->getName() << std::endl; //debug
+			std::cerr << (*chIt).second->getName() << std::endl; // debug
 			channelTarget = (*chIt).second;
 		}
 		else if (countNbrChann == 1) // si il existe un deuxieme args
 		{
 			countNbrChann++;
 
-			for (size_t i = 0; i < (*it).size(); i++) //parse les modes voulues
+			for (size_t i = 0; i < (*it).size(); i++) // parse les modes voulues
 			{
 				if ((*it)[i] && ((*it)[i] == '+' || (*it)[i] == '-'))
 				{
@@ -620,13 +613,13 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 						modeAndDel += mode;
 						modeWant.push_back(modeAndDel);
 
-						i ++;
+						i++;
 						continue;
 					}
 					else if ((*it).size() > i + 1 && !isModeIsHandle((*it)[i + 1]))
 					{
 						client->sendReply(formatMessage(ERR_UNKNOWNMODE, MSG_UNKNOWNMODE, client, ""));
-						return ;
+						return;
 					}
 				}
 				else if (isModeIsHandle((*it)[i])) // si pas de + ou de - on suppose que c'est un +
@@ -640,21 +633,21 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 				else
 				{
 					client->sendReply(formatMessage(ERR_UNKNOWNMODE, MSG_UNKNOWNMODE, client, ""));
-					return ;
+					return;
 				}
 			}
 		}
-		else if ((*it)[0] != '#' && countNbrChann == 0) //si le premier argument est un channel sans la bonne syntaxe
+		else if ((*it)[0] != '#' && countNbrChann == 0) // si le premier argument est un channel sans la bonne syntaxe
 		{
 			client->sendReply(formatMessage(ERR_NOSUCHCHANNEL, MSG_NOSUCHCHANNEL, client, (*it)));
-			return ;
+			return;
 		}
 	}
 
 	if (countNbrChann == 1 && modeWant.empty()) // si aucun argument n'est donne en plus du canal on renvoi les modes actif sur le channel
 	{
 		client->sendReply(formatMessage(RPL_CHANNELMODEIS, channelTarget->mode.getModeActive(), client, channelTarget->getName()));
-		return ;
+		return;
 	}
 
 	countNbrChann = 1;
@@ -662,7 +655,7 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 	{
 		if ((*it)[0] == '+')
 		{
-			std::cerr << "debug: add mode" << std::endl; //debug
+			std::cerr << "debug: add mode" << std::endl; // debug
 
 			if ((*it)[1] == 'k' || (*it)[1] == 'l') // on verifie les params de k et de l (mdp et limite de nbr)
 			{
@@ -676,7 +669,7 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 						if (!std::isdigit(cmd.parametresMiddle[isExist][i]))
 						{
 							client->sendReply(formatMessage(ERR_INVALIDMODEPARAM, MSG_INVALIDMODEPARAM, client, channelTarget->getName()));
-							return ;
+							return;
 						}
 					}
 				}
@@ -685,7 +678,7 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 		}
 		else
 		{
-			std::cerr << "debug: supp mode" << std::endl; //debug
+			std::cerr << "debug: supp mode" << std::endl; // debug
 
 			if ((*it)[1] == 'k') // on verifie les params de k
 			{
@@ -701,19 +694,17 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 	if (paramsNbr != cmd.parametresMiddle.size()) // si il y a trop de parametres dans le mode, on pleures encore
 	{
 		client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
-		return ;
+		return;
 	}
 
 	// wip -------------------------------------------------
 	// wip gestion des modes une fois que tout est bien valide (normalement le parsing au dessu est bon (inch'))
-
 
 	// for (size_t i = 0; i < modeWant.size(); i++)
 	// {
 	// 	channelTarget->mode.setMode(,);
 	// }
 	// 	---------------------------------------------------
-
 }
 
 bool Server::isModeIsHandle(char &mode)
@@ -745,7 +736,6 @@ void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd)
 	// std::cerr << "debug :" << cmd.command << "\n nbr of parameter :" << cmd.parametresMiddle.size() << std::endl;
 	// for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++)
 	// 	std::cerr << (*it).c_str() << std::endl;
-
 
 	if (cmd.parametresMiddle.begin() == cmd.parametresMiddle.end())
 	{
@@ -832,7 +822,7 @@ void Server::broadcastQuit(Client *client, std::string reason)
 			if (!this->_channels.empty())
 				it = this->_channels.begin();
 			else
-				return ;
+				return;
 		}
 	}
 }
