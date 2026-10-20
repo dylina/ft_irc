@@ -814,17 +814,16 @@ void Server::broadcastQuit(Client *client, std::string reason)
 		}
 	}
 
-	for (std::map<std::string, Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+	std::map<std::string, Channel *>::iterator it = this->_channels.begin();
+	while (it != this->_channels.end())
 	{
 		if ((*it).second->getNbrConnected() == 0)
 		{
-			delete _channels.at((*it).first);
-			this->_channels.erase(it);
-			if (!this->_channels.empty())
-				it = this->_channels.begin();
-			else
-				return;
+			delete (*it).second;
+			this->_channels.erase(it++);
 		}
+		else
+			++it;
 	}
 }
 
