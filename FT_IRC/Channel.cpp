@@ -10,7 +10,6 @@ Channel::Channel(Client *creator, std::string &topic, std::string name) : _name(
 	this->mode.setMode("o", creator, NULL, "");
 }
 
-
 void Channel::joinChannel(Client *user)
 {
 	this->_users.push_back(user);
@@ -21,7 +20,7 @@ void Channel::joinChannel(Client *user)
 std::vector<int> Channel::getAllUsers()
 {
 	std::vector<int> usersFd;
-	for (std::vector<Client*>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
+	for (std::vector<Client *>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
 	{
 		usersFd.push_back((*it)->getFd());
 	}
@@ -30,11 +29,12 @@ std::vector<int> Channel::getAllUsers()
 
 void Channel::leaveChannel(Client *user)
 {
-	for (std::vector<Client*>::iterator it = this->_users.begin();
-		it != this->_users.end(); ++it)
+	for (std::vector<Client *>::iterator it = this->_users.begin();
+		 it != this->_users.end(); ++it)
 	{
 		if (*it == user)
 		{
+			this->mode.removeOperator(user);
 			user->leave(this->_name);
 			this->_users.erase(it);
 			this->_nbrOfUsersConnected--;
@@ -45,7 +45,7 @@ void Channel::leaveChannel(Client *user)
 
 bool Channel::isInChannel(Client *user) const
 {
-	for (std::vector<Client*>::const_iterator it = this->_users.begin(); it != this->_users.end(); it++)
+	for (std::vector<Client *>::const_iterator it = this->_users.begin(); it != this->_users.end(); it++)
 	{
 		if (user->getNickName() == (*it)->getNickName())
 			return true;
@@ -58,7 +58,7 @@ std::string Channel::getName() const
 	return this->_name;
 }
 
-std::string & Channel::getTopic()
+std::string &Channel::getTopic()
 {
 	return this->_topic;
 }
@@ -103,17 +103,17 @@ Channel::Mode::Mode() : _i(false), _t(false), _k(false), _o(), _l(false), _limit
 	this->_password = "";
 }
 
-const char* Channel::Mode::NoModeFind::what() const throw()
+const char *Channel::Mode::NoModeFind::what() const throw()
 {
 	return "No mode match";
 }
 
-const char* Channel::Mode::ModeAlreadySet::what() const throw()
+const char *Channel::Mode::ModeAlreadySet::what() const throw()
 {
 	return "Mode already set";
 }
 
-const char* Channel::Mode::ModeDontHaveParams::what() const throw()
+const char *Channel::Mode::ModeDontHaveParams::what() const throw()
 {
 	return "Mode missing params";
 }
@@ -185,7 +185,6 @@ bool Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, 
 		if (_l)
 			throw ModeAlreadySet();
 
-
 		this->_l = true;
 		this->_limitNbr = std::atoi(param.c_str());
 		return _l;
@@ -205,6 +204,13 @@ bool Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, 
 // {
 // 	// wip
 // }
+
+void Channel::Mode::removeOperator(Client *user)
+{
+	std::vector<Client *>::iterator it = std::find(this->_o.begin(), this->_o.end(), user);
+	if (it != this->_o.end())
+		this->_o.erase(it);
+}
 
 std::string Channel::Mode::getModeActive()
 {

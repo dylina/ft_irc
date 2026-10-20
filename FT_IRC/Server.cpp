@@ -450,6 +450,7 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 			{
 				std::string noTopic;
 				Channel *newChannel = new Channel(client, noTopic, chan);
+				this->_channels[chan] = newChannel;
 			}
 			catch (...)
 			{
