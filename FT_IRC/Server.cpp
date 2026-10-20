@@ -543,7 +543,7 @@ void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
 		}
 		else
 		{
-			client->sendReply(formatMessage(RPL_TOPIC, it->second->getTopic(), client, channel));
+			client->sendReply(formatMessage(RPL_TOPIC, ":" + it->second->getTopic(), client, channel));
 		}
 		return;
 	}
