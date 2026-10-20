@@ -448,8 +448,8 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 		{
 			try
 			{
-				Channel *newChannel = new Channel(client, chan, chan);
-				this->_channels[chan] = newChannel;
+				std::string noTopic;
+				Channel *newChannel = new Channel(client, noTopic, chan);
 			}
 			catch (...)
 			{
