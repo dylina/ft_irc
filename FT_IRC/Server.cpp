@@ -662,7 +662,10 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 			{
 				size_t isExist = countNbrChann + 1;
 				if (isExist >= cmd.parametresMiddle.size())
+				{
 					client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
+					return;
+				}
 				if ((*it)[1] == 'l') // on verifie le param de l si c'est bien que 1 nombre positif
 				{
 					for (size_t i = 0; cmd.parametresMiddle[isExist].size() > i; i++)
