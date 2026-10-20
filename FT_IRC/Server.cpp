@@ -738,7 +738,7 @@ void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd)
 	// for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++)
 	// 	std::cerr << (*it).c_str() << std::endl;
 
-	if (cmd.parametresMiddle.begin() == cmd.parametresMiddle.end())
+	if (cmd.trailing.empty())
 	{
 		client->sendReply(formatMessage(ERR_NOTEXTTOSEND, MSG_NOTEXTTOSEND, client, ""));
 		return;
