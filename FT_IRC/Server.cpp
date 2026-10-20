@@ -688,7 +688,10 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 			{
 				size_t isExist = countNbrChann + 1;
 				if (isExist >= cmd.parametresMiddle.size()) // pas de params on pleures
+				{
 					client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
+					return;
+				}
 				countNbrChann++;
 			}
 		}
