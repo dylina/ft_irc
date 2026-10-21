@@ -12,6 +12,9 @@ Channel::Channel(Client *creator, std::string &topic, std::string name) : _name(
 
 void Channel::joinChannel(Client *user)
 {
+	if (user == NULL || this->isInChannel(user))
+        return;
+		
 	this->_users.push_back(user);
 	user->join(this->_name);
 	this->_nbrOfUsersConnected++;
