@@ -502,12 +502,12 @@ void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
 		std::string reason = cmd.trailing.empty() ? "" : (" :" + cmd.trailing);
 		std::string partMsg = ":" + client->getNickName() + " PART " + chan + reason;
 
-		this->_channels[chan]->sendToAll(partMsg);
-		_channels[chan]->leaveChannel(client);
+		channel->sendToAll(partMsg);
+		channel->leaveChannel(client);
 
-		if (_channels[chan]->getNbrConnected() == 0)
+		if (channel->getNbrConnected() == 0)
 		{
-			delete _channels.at(chan);
+			delete channel;
 			this->_channels.erase(it);
 		}
 	}
@@ -566,12 +566,6 @@ void Server::cmdInvite(Client *client, Client::parsedCommand &cmd)
 	(void)client;
 	(void)cmd;
 }
-
-// void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
-// {
-// 	(void)client;
-// 	(void)cmd;
-// }
 
 void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 {
