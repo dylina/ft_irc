@@ -335,10 +335,10 @@ void Server::processCommands(Client *client)
 			cmdPart(client, cmd);
 		else if (cmd.command == "TOPIC")
 			cmdTopic(client, cmd);
-		// else if (cmd.command == "KICK")
-		// 	cmdKick(client, cmd);
-		// else if (cmd.command == "INVITE")
-		// 	cmdInvite(client, cmd);
+		else if (cmd.command == "KICK")
+			cmdKick(client, cmd);
+		else if (cmd.command == "INVITE")
+			cmdInvite(client, cmd);
 		else if (cmd.command == "MODE")
 			cmdMode(client, cmd);
 		else if (cmd.command == "PRIVMSG")
@@ -566,8 +566,74 @@ void Server::cmdKick(Client *client, Client::parsedCommand &cmd)
 
 void Server::cmdInvite(Client *client, Client::parsedCommand &cmd)
 {
-	(void)client;
-	(void)cmd;
+	if (cmd.parametresMiddle.size() < 2)
+    {
+        client->sendReply(":ircserv 461 " + client->getNickName()
+            + " INVITE :Not enough parameters");
+        return;
+    }
+
+    std::string nick = cmd.parametresMiddle[0];
+    std::string channel = cmd.parametresMiddle[1];
+
+    Client *target = NULL;
+
+    for (std::map<int, Client *>::iterator it = this->clients.begin();
+        it != this->clients.end(); ++it)
+    {
+        if (it->second->getNickName() == nick)
+        {
+            target = it->second;
+            break;
+        }
+    }
+
+    if (target == NULL)
+    {
+        client->sendReply(":ircserv 401 " + client->getNickName()
+            + " " + nick + " :No such nick");
+        return;
+    }
+
+	if (!target->isRegistered())
+	{
+    	client->sendReply(":ircserv 401 " + client->getNickName()
+       	 	+ " " + nick + " :No such nick");
+    	return;
+	}
+	
+    std::map<std::string, Channel *>::iterator it =
+        this->_channels.find(channel);
+
+    if (it == this->_channels.end())
+    {
+        client->sendReply(":ircserv 403 " + client->getNickName()
+            + " " + channel + " :No such channel");
+        return;
+    }
+
+    Channel *chan = it->second;
+
+    if (!chan->isInChannel(client))
+    {
+        client->sendReply(":ircserv 442 " + client->getNickName()
+            + " " + channel + " :You're not on that channel");
+        return;
+    }
+
+    if (chan->isInChannel(target))
+    {
+        client->sendReply(":ircserv 443 " + client->getNickName()
+            + " " + nick + " " + channel
+            + " :is already on channel");
+        return;
+    }
+
+    target->sendReply(":" + client->getNickName()
+        + " INVITE " + nick + " :" + channel);
+
+    client->sendReply(":ircserv 341 " + client->getNickName()
+        + " " + nick + " " + channel);
 }
 
 void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
