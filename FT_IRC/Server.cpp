@@ -499,7 +499,10 @@ void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
 		}
 
 		// motif pour partir apres les :
-		std::string reason = cmd.trailing.empty() ? "" : (" :" + cmd.trailing);
+		std::string reason;
+		if (!cmd.trailing.empty())
+            reason = " :" + cmd.trailing;
+			
 		std::string partMsg = ":" + client->getNickName() + " PART " + chan + reason;
 
 		channel->sendToAll(partMsg);
