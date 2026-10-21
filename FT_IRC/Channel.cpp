@@ -14,7 +14,7 @@ void Channel::joinChannel(Client *user)
 {
 	if (user == NULL || this->isInChannel(user))
         return;
-		
+
 	this->_users.push_back(user);
 	user->join(this->_name);
 	this->_nbrOfUsersConnected++;
@@ -48,10 +48,13 @@ void Channel::leaveChannel(Client *user)
 
 bool Channel::isInChannel(Client *user) const
 {
+	if (user == NULL)
+        return false;
+
 	for (std::vector<Client *>::const_iterator it = this->_users.begin(); it != this->_users.end(); it++)
 	{
-		if (user->getNickName() == (*it)->getNickName())
-			return true;
+		if (*it == user)
+            return true;
 	}
 	return false;
 }
