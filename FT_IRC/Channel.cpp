@@ -235,3 +235,23 @@ std::string Channel::Mode::getModeActive()
 
 	return modeActiv;
 }
+
+bool Channel::Mode::isInviteOnly()
+{
+    return _i;
+}
+
+bool Channel::Mode::hasKey()
+{
+    return _k;
+}
+
+bool Channel::Mode::isFull(int currentUsers)
+{
+    return _l && currentUsers >= _limitNbr;
+}
+
+bool Channel::Mode::checkKey(const std::string &key)
+{
+    return !_k || key == _password;
+}

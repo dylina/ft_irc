@@ -65,6 +65,11 @@ public:
 		bool getMode(std::string mode);
 		std::string getModeActive();
 
+		bool isInviteOnly();
+		bool hasKey();
+		bool isFull(int currentUsers);
+		bool checkKey(const std::string &key);
+
 	private:
 		bool _i;				  // invitation mode
 		bool _t;				  // operators reserved
