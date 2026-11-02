@@ -502,7 +502,7 @@ void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
 		std::string reason;
 		if (!cmd.trailing.empty())
             reason = " :" + cmd.trailing;
-			
+
 		std::string partMsg = ":" + client->getNickName() + " PART " + chan + reason;
 
 		channel->sendToAll(partMsg);
@@ -601,7 +601,7 @@ void Server::cmdInvite(Client *client, Client::parsedCommand &cmd)
        	 	+ " " + nick + " :No such nick");
     	return;
 	}
-	
+
     std::map<std::string, Channel *>::iterator it =
         this->_channels.find(channel);
 
