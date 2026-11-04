@@ -30,6 +30,15 @@ void Channel::joinChannel(Client *user)
 	}
 	// -----
 
+	if (this->mode.getMode("l")) // si le serv est en +l on check si il est full ou non
+	{
+		if (this->mode.isFull(this->_nbrOfUsersConnected))
+		{
+			user->sendReply(":ircserv 471 " + user->getNickName() + " " + this->getName() + MSG_CHANNELISFULL);
+			return ;
+		}
+	}
+
 	this->_users.push_back(user);
 	user->join(this->_name);
 	this->_nbrOfUsersConnected++;
