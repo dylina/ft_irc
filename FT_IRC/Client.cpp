@@ -488,3 +488,8 @@ void Client::join(std::string &name)
 {
 	this->_channels.push_back(name);
 }
+
+std::string Client::getMask()
+{
+	return ":" + this->getNickName() + "!" + this->getUsername() + "@" + "localhost";
+}

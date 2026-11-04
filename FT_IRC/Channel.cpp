@@ -1,4 +1,5 @@
 #include "Channel.hpp"
+#include "Client.hpp"
 
 Channel::Channel(Client *creator, std::string &topic, std::string name) : _name(name), _nbrOfUsersConnected(1)
 {
@@ -7,7 +8,8 @@ Channel::Channel(Client *creator, std::string &topic, std::string name) : _name(
 	else
 		this->_topic = topic;
 	this->_users.push_back(creator);
-	this->mode.setMode("o", creator, NULL, "");
+	this->mode.setOwner(creator);
+	this->mode.setMode("o", creator, creator, creator->getNickName());
 }
 
 void Channel::joinChannel(Client *user)
@@ -37,7 +39,13 @@ void Channel::leaveChannel(Client *user)
 	{
 		if (*it == user)
 		{
+			// removeoperator cherche dans tous les op et si le user en est un le supprime de sa db
 			this->mode.removeOperator(user);
+
+			// on check si le channel a un createur et si c'est bien lui on le supprime aussi ce qui rend le channel orphelin si il n'y a pas d'autre op
+			if (this->mode.hasOwner() && this->mode.isOwner(user))
+				this->mode.deleteOwner();
+
 			user->leave(this->_name);
 			this->_users.erase(it);
 			this->_nbrOfUsersConnected--;
@@ -56,6 +64,30 @@ bool Channel::isInChannel(Client *user) const
 		if (*it == user)
             return true;
 	}
+	return false;
+}
+
+bool Channel::isInChannel(std::string &nickname) const
+{
+	for (std::vector<Client *>::const_iterator it = this->_users.begin(); it != this->_users.end(); it++)
+	{
+		if ((*it)->getNickName() == nickname)
+            return true;
+	}
+	return false;
+}
+
+bool Channel::isOperator(Client *user) const
+{
+	if (this->mode.isOp(user))
+		return true;
+	return false;
+}
+
+bool Channel::isOwner(Client *user) const
+{
+	if (this->mode.isOwner(user))
+		return true;
 	return false;
 }
 
@@ -96,11 +128,8 @@ bool Channel::haveTopic()
 	return true;
 }
 
-void Channel::setTopic(std::string &topic, Client *user)
+void Channel::setTopic(std::string &topic)
 {
-	// verif si les modes sont bon a faire
-	user->getAddr();
-	// le reste de la demarche
 	this->_topic = topic;
 }
 
@@ -146,50 +175,49 @@ bool Channel::Mode::getMode(std::string mode)
 	return false;
 }
 
-bool Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, std::string param) // a utiliser que si +
+int Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, std::string param, Channel *chann) // a utiliser que si +
 {
-	if (userTarget == NULL && mode == "o")
+	if (this->isOwner(user) && mode == "o" && user->getNickName() == param)
 	{
 		this->_o.push_back(user);
-		return true;
+		return 1;
 	}
 
-	std::vector<Client *>::iterator isOp = std::find(this->_o.begin(), this->_o.end(), user);
-	if (isOp == this->_o.end())
-		return false;
+	if (!this->isOp(user)) //verif si user est un operateur
+		return ERR_CHANOPRIVSNEEDED;
 
 	if (mode == "t")
 	{
-		if (_t)
-			throw ModeAlreadySet();
-		else
+		// if (_t)
+		// 	throw ModeAlreadySet();
+		// else
 			this->_t = true;
-		return _t;
+		return 1;
 	}
 	else if (mode == "i")
 	{
-		if (_i)
-			throw ModeAlreadySet();
-		else
+		// if (_i)
+		// 	throw ModeAlreadySet();
+		// else
 			this->_i = true;
-		return _i;
+		return 1;
 	}
 	else if (mode == "k")
 	{
-		if (_k)
-			throw ModeAlreadySet();
+		// if (_k)
+		// 	throw ModeAlreadySet();
 
-		if (param.empty())
-			throw ModeDontHaveParams();
+		// if (param.empty())
+		// 	throw ModeDontHaveParams();
 
 		_password = param;
 		this->_k = true;
-		return _k;
+		return 1;
 	}
 	else if (mode == "l")
 	{
-		if (_l)
-			throw ModeAlreadySet();
+		// if (_l)
+		// 	throw ModeAlreadySet();
 
 		this->_l = true;
 		this->_limitNbr = std::atoi(param.c_str());
@@ -197,13 +225,15 @@ bool Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, 
 	}
 	else if (mode == "o")
 	{
-		std::vector<Client *>::iterator it = std::find(this->_o.begin(), this->_o.end(), userTarget);
-		if (it == this->_o.end())
+		if (!chann->isInChannel(param)) // si la target n'est pas enregsitrer dans le chann
+			return ERR_USERNOTINCHANNEL;
+
+		if (chann->isInChannel(param))
 			this->_o.push_back(userTarget);
-		else
-			throw ModeAlreadySet();
+		// else
+		// 	throw ModeAlreadySet();
 	}
-	return true;
+	return 1;
 }
 
 // void Channel::Mode::suppMode(std::string mode, Client *user, Client *userTarget, std::string param) // a utiliser pour -
@@ -222,7 +252,7 @@ std::string Channel::Mode::getModeActive()
 {
 	std::string modeActiv;
 
-	modeActiv += "+";
+	modeActiv += "+"; //on renvoie un simple + sir aucun mode n'est actif par defaut (cf:norme irc)
 
 	if (this->getMode("t"))
 		modeActiv += "t";
@@ -254,4 +284,38 @@ bool Channel::Mode::isFull(int currentUsers)
 bool Channel::Mode::checkKey(const std::string &key)
 {
     return !_k || key == _password;
+}
+
+bool Channel::Mode::hasOwner() const
+{
+	if (this->_owner != NULL)
+		return true;
+	return false;
+}
+
+void Channel::Mode::setOwner(Client *creator)
+{
+	this->_owner = creator;
+}
+
+void Channel::Mode::deleteOwner()
+{
+	this->_owner = NULL;
+}
+
+bool Channel::Mode::isOwner(Client *user) const
+{
+	if (this->_owner == user)
+		return true;
+	return false;
+}
+
+bool Channel::Mode::isOp(Client* user) const
+{
+	for (std::vector<Client*>::const_iterator it = this->_o.begin(); it != this->_o.end(); it++)
+	{
+		if (user == (*it))
+			return true;
+	}
+	return false;
 }

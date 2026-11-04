@@ -296,6 +296,8 @@ void Server::handleUSER(Client *client, std::vector<std::string> &params, std::s
 	}
 
 	client->setUsername(params[0]);
+	client->setNickName(realname);
+	client->setHasNick(true);
 	client->setHasUser(true);
 
 	finalizeRegistration(client);
@@ -303,6 +305,8 @@ void Server::handleUSER(Client *client, std::vector<std::string> &params, std::s
 
 void Server::finalizeRegistration(Client *client)
 {
+	if (client->isRegistered())
+		return ;
 	if (client->isPassOk() && client->hasNick() && client->hasUser())
 	{
 		client->setRegistered(true);
@@ -502,8 +506,9 @@ void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
 		std::string reason;
 		if (!cmd.trailing.empty())
             reason = " :" + cmd.trailing;
-
-		std::string partMsg = ":" + client->getNickName() + " PART " + chan + reason;
+//
+		std::string partMsg;
+		partMsg = client->getMask() + " PART " + chan + reason;
 
 		channel->sendToAll(partMsg);
 		channel->leaveChannel(client);
@@ -551,10 +556,21 @@ void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
 		}
 		return;
 	}
+	if (this->_channels[channel]->mode.getMode("t"))	// verif si le chann est en +t
+	{
+		if (!this->_channels[channel]->mode.isOp(client))
+		{
+			client->sendReply(formatMessage(ERR_CHANOPRIVSNEEDED, MSG_CHANOPRIVSNEEDED, client, channel)); // a verif
+			return ;
+		}
+	}
 
-	this->_channels[channel]->setTopic(cmd.trailing, client);
+	this->_channels[channel]->setTopic(cmd.trailing);
 
-	std::string topicMsg = ":" + client->getNickName() + " TOPIC " + channel + " :" + cmd.trailing;
+
+	std::string topicMsg;
+	topicMsg = client->getMask() + " TOPIC " + channel + " :" + cmd.trailing;
+
 	this->_channels[channel]->sendToAll(topicMsg);
 }
 
@@ -636,12 +652,31 @@ void Server::cmdInvite(Client *client, Client::parsedCommand &cmd)
         + " " + nick + " " + channel);
 }
 
+struct _pair{
+		bool del; // true = + et false = -
+		bool haveParameter; // false = nn, true = oui -_-
+		std::string mode;
+		std::string parameter;
+		Client *targetUser;
+
+		_pair() : del(false), haveParameter(false), targetUser(NULL) {}
+};
+
 void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 {
 
 	int countNbrChann = 0;
+
 	std::vector<std::string> modeWant;
+	std::vector<_pair> _modeWantPair;
 	Channel *channelTarget = NULL;
+
+	if (cmd.parametresMiddle.empty()) //mode vide
+	{
+		client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, ""));
+		return ;
+	}
+
 
 	for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++) // boucle pour verif si tout les args sont bons
 	{
@@ -672,10 +707,35 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 						char del = (*it)[i];
 						char mode = (*it)[i + 1];
 
-						std::string modeAndDel;
-						modeAndDel += del;
-						modeAndDel += mode;
-						modeWant.push_back(modeAndDel);
+						// std::string modeAndDel;
+						// modeAndDel += del;
+						// modeAndDel += mode;
+						// modeWant.push_back(modeAndDel);
+
+
+						_pair request;
+						if (del == '+')
+							request.del = true;
+						else
+						{
+							request.del = false;
+							if (mode == 'k')
+								request.haveParameter = true;
+							else
+								request.haveParameter = false;
+						}
+
+						request.mode = mode;
+
+						if (request.del) // si c'est un +
+						{
+							if (mode == 'k' || mode == 'o' || mode == 'l')
+								request.haveParameter = true;
+							else
+								request.haveParameter = false;
+						}
+
+						_modeWantPair.push_back(request);
 
 						i++;
 						continue;
@@ -689,10 +749,22 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 				else if (isModeIsHandle((*it)[i])) // si pas de + ou de - on suppose que c'est un +
 				{
 					char mode = (*it)[i];
-					std::string modeAndDel = "+";
 
-					modeAndDel += mode;
-					modeWant.push_back(modeAndDel);
+
+					// std::string modeAndDel = "+";
+
+					// modeAndDel += mode;
+					// modeWant.push_back(modeAndDel);
+
+
+					_pair request;
+					request.del = true;
+					request.mode = mode;
+					if (mode == 'k' || mode == 'o' || mode == 'l')
+						request.haveParameter = true;
+					else
+						request.haveParameter = false;
+					_modeWantPair.push_back(request);
 				}
 				else
 				{
@@ -708,20 +780,20 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 		}
 	}
 
-	if (countNbrChann == 1 && modeWant.empty()) // si aucun argument n'est donne en plus du canal on renvoi les modes actif sur le channel
+	if (countNbrChann == 1 && _modeWantPair.empty()) // si aucun argument n'est donne en plus du canal on renvoi les modes actif sur le channel
 	{
 		client->sendReply(formatMessage(RPL_CHANNELMODEIS, channelTarget->mode.getModeActive(), client, channelTarget->getName()));
 		return;
 	}
 
 	countNbrChann = 1;
-	for (std::vector<std::string>::iterator it = modeWant.begin(); it != modeWant.end(); it++) // dernier check des modes si il y en a avec des attributs on check si il existe genre mdp et limites
+	for (std::vector<_pair>::iterator it = _modeWantPair.begin(); it != _modeWantPair.end(); it++) // dernier check des modes si il y en a avec des attributs on check si il existe genre mdp et limites
 	{
-		if ((*it)[0] == '+')
+		if ((*it).del) // si c'est un +
 		{
 			std::cerr << "debug: add mode" << std::endl; // debug
 
-			if ((*it)[1] == 'k' || (*it)[1] == 'l') // on verifie les params de k et de l (mdp et limite de nbr)
+			if ((*it).mode == "k" || (*it).mode == "l" || (*it).mode == "o") // on verifie les params de k et de l (mdp et limite de nbr)
 			{
 				size_t isExist = countNbrChann + 1;
 				if (isExist >= cmd.parametresMiddle.size())
@@ -729,7 +801,7 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 					client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
 					return;
 				}
-				if ((*it)[1] == 'l') // on verifie le param de l si c'est bien que 1 nombre positif
+				if ((*it).mode == "l") // on verifie le param de l si c'est bien que 1 nombre positif
 				{
 					for (size_t i = 0; cmd.parametresMiddle[isExist].size() > i; i++)
 					{
@@ -740,14 +812,30 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 						}
 					}
 				}
+
+				if ((*it).mode == "o") // on verifie les args de 0 (si l'utilisateur rechercher est good)
+				{
+					for (std::map<int, Client*>::iterator ite = this->clients.begin(); ite != this->clients.end(); ite++)
+					{
+						if (cmd.parametresMiddle[isExist] == (*ite).second->getNickname())
+						{
+							(*it).parameter = cmd.parametresMiddle[isExist];
+							(*it).targetUser = (*ite).second;
+							break;
+						}
+					}
+				}
+
+				if ((*it).haveParameter && (*it).parameter.empty())
+					(*it).parameter = cmd.parametresMiddle[isExist]; // on rajoute le param du mode si c'est k ou l
 				countNbrChann++;
 			}
 		}
-		else
+		else // si c'est un -
 		{
 			std::cerr << "debug: supp mode" << std::endl; // debug
 
-			if ((*it)[1] == 'k') // on verifie les params de k
+			if ((*it).mode == "k") // on verifie les params de k
 			{
 				size_t isExist = countNbrChann + 1;
 				if (isExist >= cmd.parametresMiddle.size()) // pas de params on pleures
@@ -755,6 +843,8 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 					client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
 					return;
 				}
+				if ((*it).haveParameter && (*it).parameter.empty())
+					(*it).parameter = cmd.parametresMiddle[isExist]; // on rajoute le param du mode si c'est k
 				countNbrChann++;
 			}
 		}
@@ -768,12 +858,56 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 	}
 
 	// wip -------------------------------------------------
-	// wip gestion des modes une fois que tout est bien valide (normalement le parsing au dessu est bon (inch'))
+	// wip gestion des modes une fois que tout est bien valide (normalement le parsing au dessu est bon (inch') (non il faut traiter mode sans rien apres car la sa segfault))
 
-	// for (size_t i = 0; i < modeWant.size(); i++)
-	// {
-	// 	channelTarget->mode.setMode(,);
-	// }
+	for (size_t i = 0; i < _modeWantPair.size(); i++)
+	{
+		// std::cout << "debug " << i + 1 << ": \n" << "Del: "; msg debug ---------
+		// if (_modeWantPair[i].del)
+		// 	std::cout << "+" << std::endl;
+		// else
+		// 	std::cout << "-" << std::endl;
+		// std::cout << "mode: " << _modeWantPair[i].mode << std::endl;
+		// if (_modeWantPair[i].haveParameter)
+		// 	std::cout << "parameter: " << _modeWantPair[i].parameter << std::endl;---
+
+
+
+		int ret = channelTarget->mode.setMode(_modeWantPair[i].mode, client, _modeWantPair[i].targetUser, _modeWantPair[i].parameter, channelTarget);
+
+		std::string msg = client->getMask() + " MODE " + channelTarget->getName();
+
+		if (ret == 1 && _modeWantPair[i].mode == "l")
+		{
+			if (_modeWantPair[i].del)
+				msg += " +" + _modeWantPair[i].mode;
+			else
+				msg += " -" + _modeWantPair[i].mode;
+			if (_modeWantPair[i].haveParameter)
+				msg += " " + _modeWantPair[i].parameter;
+		}
+		else if (ret == ERR_CHANOPRIVSNEEDED)
+		{
+			client->sendReply(formatMessage(ERR_CHANOPRIVSNEEDED, MSG_CHANOPRIVSNEEDED, client, ""));
+			return ;
+		}
+		else if (ret == ERR_USERNOTINCHANNEL)
+		{
+			client->sendReply(formatMessage(ERR_USERNOTINCHANNEL, MSG_USERNOTINCHANNEL, client, _modeWantPair[i].parameter));
+			return ;
+		}
+		else if (ret == 1 && _modeWantPair[i].mode != "l")
+		{
+			if (_modeWantPair[i].del)
+				msg += " +" + _modeWantPair[i].mode;
+			else
+				msg += " -" + _modeWantPair[i].mode;
+			if (_modeWantPair[i].haveParameter)
+				msg += " " + _modeWantPair[i].parameter;
+		}
+
+		channelTarget->sendToAll(msg);
+	}
 	// 	---------------------------------------------------
 }
 
@@ -872,12 +1006,15 @@ void Server::broadcastQuit(Client *client, std::string reason)
 	if (reason.empty())
 		reason = "Client Quit";
 
-	std::string quitMsg = ":" + nick + " QUIT :" + reason;
+	std::string quitMsg;
+
 
 	for (std::map<std::string, Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
 	{
 		if ((*it).second->isInChannel(client))
 		{
+			quitMsg = client->getMask() + " QUIT :" + reason;
+
 			(*it).second->sendToAll(quitMsg);
 			(*it).second->leaveChannel(client);
 		}

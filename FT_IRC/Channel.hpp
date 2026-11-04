@@ -5,7 +5,9 @@
 #include <vector>
 #include <iterator>
 
-#include "Client.hpp"
+#include "IrcErrors.hpp"
+
+class Client;
 
 class Channel
 {
@@ -21,10 +23,13 @@ public:
 	int getNbrConnected() const;
 	bool haveTopic();
 	bool isInChannel(Client *user) const;
+	bool isInChannel(std::string &nickname) const;
+	bool isOperator(Client *user) const;
+	bool isOwner(Client *user) const;
 
 	// setter
 
-	void setTopic(std::string &topic, Client *user);
+	void setTopic(std::string &topic);
 
 	// other
 
@@ -56,8 +61,10 @@ public:
 
 		// setters
 
-		bool setMode(std::string mode, Client *user, Client *userTarget, std::string param);
+		int setMode(std::string mode, Client *user, Client *userTarget, std::string param, Channel* chann = NULL);
 		// void suppMode(std::string mode, Client *user, Client *userTarget, std::string param); wip
+		void setOwner(Client *creator);
+		void deleteOwner();
 
 		void removeOperator(Client *user);
 		// getters
@@ -65,19 +72,24 @@ public:
 		bool getMode(std::string mode);
 		std::string getModeActive();
 
+		bool isOwner(Client *user) const;
+		bool isOp(Client* user) const;
 		bool isInviteOnly();
 		bool hasKey();
 		bool isFull(int currentUsers);
 		bool checkKey(const std::string &key);
 
+		bool hasOwner() const;
+
 	private:
 		bool _i;				  // invitation mode
-		bool _t;				  // operators reserved
+		bool _t;				  //  (Topic protection) operators reserved
 		bool _k;				  // set a pass
 		std::vector<Client *> _o; // set operator mode to a user
 		bool _l;				  // limit nbr of members
 		std::string _password;
 		int _limitNbr;
+		Client* _owner;
 	};
 	Mode mode;
 
