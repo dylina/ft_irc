@@ -17,6 +17,19 @@ void Channel::joinChannel(Client *user)
 	if (user == NULL || this->isInChannel(user))
         return;
 
+	// check des permission et limit +i
+	if (this->mode.isInviteOnly())
+	{
+		if (!this->mode.isInvited(user)) //si le user a pas son ticket et que le chann est en +i ca natchav
+		{
+			user->sendReply(":ircserv 473 " + user->getNickName() + " " + this->getName() + MSG_INVITEONLYCHAN);
+			return ;
+		}
+		else // si il a son ticket on le suprrime de la liste (usage unique)
+			this->mode.removeInviteUser(user);
+	}
+	// -----
+
 	this->_users.push_back(user);
 	user->join(this->_name);
 	this->_nbrOfUsersConnected++;
@@ -316,6 +329,42 @@ bool Channel::Mode::isOp(Client* user) const
 	{
 		if (user == (*it))
 			return true;
+	}
+	return false;
+}
+
+bool Channel::Mode::addInviteUser(Client *user, Client *userTarget)
+{
+	if (!this->isOp(user)) //on check si le user est bien op pour inviter la target
+		return false;
+
+	if (!this->isInviteOnly()) // si le channel est pas en +i on bypass l'invitation
+		return true;
+
+	this->_iList.push_back(userTarget);
+	return true;
+}
+
+void Channel::Mode::removeInviteUser(Client *userTarget)
+{
+	for (std::vector<Client*>::iterator it = this->_iList.begin(); it != this->_iList.end(); it++)
+	{
+		if (userTarget == (*it))
+		{
+			this->_iList.erase(it);
+			break;
+		}
+	}
+}
+
+bool Channel::Mode::isInvited(Client *user)
+{
+		for (std::vector<Client*>::iterator it = this->_iList.begin(); it != this->_iList.end(); it++)
+	{
+		if (user == (*it))
+		{
+			return true;
+		}
 	}
 	return false;
 }

@@ -645,6 +645,14 @@ void Server::cmdInvite(Client *client, Client::parsedCommand &cmd)
         return;
     }
 
+	int ret = chan->mode.addInviteUser(client, target);
+
+	if (!ret)
+	{
+		client->sendReply(formatMessage(ERR_CHANOPRIVSNEEDED, MSG_CHANOPRIVSNEEDED, client, ""));
+		return;
+	}
+
     target->sendReply(":" + client->getNickName()
         + " INVITE " + nick + " :" + channel);
 
@@ -667,7 +675,6 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 
 	int countNbrChann = 0;
 
-	std::vector<std::string> modeWant;
 	std::vector<_pair> _modeWantPair;
 	Channel *channelTarget = NULL;
 

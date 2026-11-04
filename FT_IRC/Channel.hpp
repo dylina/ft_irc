@@ -65,12 +65,17 @@ public:
 		// void suppMode(std::string mode, Client *user, Client *userTarget, std::string param); wip
 		void setOwner(Client *creator);
 		void deleteOwner();
+		bool addInviteUser(Client *user, Client *userTarget);
+		void removeInviteUser(Client *userTarget);
+
 
 		void removeOperator(Client *user);
 		// getters
 
 		bool getMode(std::string mode);
 		std::string getModeActive();
+
+		bool isInvited(Client *user);
 
 		bool isOwner(Client *user) const;
 		bool isOp(Client* user) const;
@@ -83,6 +88,7 @@ public:
 
 	private:
 		bool _i;				  // invitation mode
+		std::vector<Client*> _iList;
 		bool _t;				  //  (Topic protection) operators reserved
 		bool _k;				  // set a pass
 		std::vector<Client *> _o; // set operator mode to a user
