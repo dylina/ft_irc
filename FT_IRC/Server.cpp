@@ -419,11 +419,24 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 		return;
 	}
 
+	//variable pour parser les arguments de mot de passe en fonction du chann
+	int del = 0;
+	std::string arg;
+
 	// separation du param par virgule
 	std::stringstream ss(cmd.parametresMiddle[0]);
 	std::string chan;
 	while (std::getline(ss, chan, ','))
 	{
+
+		// a chaque nouveau channel on +1 le del et on va chercher son argument perso
+		del++;
+		if (cmd.parametresMiddle.size() > (size_t)del)
+			arg = cmd.parametresMiddle[del];
+		else
+			arg = "";
+
+
 		// le nom commence tjr avec #
 		if (chan.empty() || chan[0] != '#')
 		{
@@ -446,7 +459,9 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 
 		try
 		{
-			this->_channels.at(chan)->joinChannel(client);
+			int ret = this->_channels.at(chan)->joinChannel(client, arg);
+			if (!ret)
+				continue;
 		}
 		catch (...) // si on catch une erreur c'est que le salon n'existe pas encore, alor on le creer
 		{

@@ -12,36 +12,57 @@ Channel::Channel(Client *creator, std::string &topic, std::string name) : _name(
 	this->mode.setMode("o", creator, creator, creator->getNickName());
 }
 
-void Channel::joinChannel(Client *user)
+bool Channel::joinChannel(Client *user, std::string arg)
 {
+	bool hasPass = 0;
+
 	if (user == NULL || this->isInChannel(user))
-        return;
+        return false;
 
 	// check des permission et limit +i
-	if (this->mode.isInviteOnly())
+	if (this->mode.isInviteOnly() )
 	{
 		if (!this->mode.isInvited(user)) //si le user a pas son ticket et que le chann est en +i ca natchav
 		{
 			user->sendReply(":ircserv 473 " + user->getNickName() + " " + this->getName() + MSG_INVITEONLYCHAN);
-			return ;
+			return false;
 		}
 		else // si il a son ticket on le suprrime de la liste (usage unique)
-			this->mode.removeInviteUser(user);
+			hasPass = 1;
 	}
 	// -----
+
+	// check +k
+	if (this->mode.getMode("k"))
+	{
+
+		if ((arg.empty() || !this->mode.checkKey(arg)))
+		{
+			if (!this->mode.isInvited(user)) // si l'user a ete inviter on bypass le +k
+			{
+				user->sendReply(":ircserv 475 " + user->getNickName() + " " + this->getName() + MSG_BADCHANNELKEY);
+				return false;
+			}
+			else
+				hasPass = 1;
+		}
+	}
 
 	if (this->mode.getMode("l")) // si le serv est en +l on check si il est full ou non
 	{
 		if (this->mode.isFull(this->_nbrOfUsersConnected))
 		{
 			user->sendReply(":ircserv 471 " + user->getNickName() + " " + this->getName() + MSG_CHANNELISFULL);
-			return ;
+			return false;
 		}
 	}
 
 	this->_users.push_back(user);
 	user->join(this->_name);
 	this->_nbrOfUsersConnected++;
+	if (hasPass)
+		this->mode.removeInviteUser(user);
+	return true;
 }
 
 std::vector<int> Channel::getAllUsers()
@@ -346,9 +367,6 @@ bool Channel::Mode::addInviteUser(Client *user, Client *userTarget)
 {
 	if (!this->isOp(user)) //on check si le user est bien op pour inviter la target
 		return false;
-
-	if (!this->isInviteOnly()) // si le channel est pas en +i on bypass l'invitation
-		return true;
 
 	this->_iList.push_back(userTarget);
 	return true;

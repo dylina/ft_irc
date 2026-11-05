@@ -33,7 +33,7 @@ public:
 
 	// other
 
-	void joinChannel(Client *user);
+	bool joinChannel(Client *user, std::string arg = "");
 	void leaveChannel(Client *user);
 	void sendToAll(std::string &msg);
 	void sendToAllOtherClient(std::string &msg, Client *user);
