@@ -61,8 +61,8 @@ public:
 
 		// setters
 
-		int setMode(std::string mode, Client *user, Client *userTarget, std::string param, Channel* chann = NULL);
-		// void suppMode(std::string mode, Client *user, Client *userTarget, std::string param); wip
+		int setMode(std::string mode, Client *user, Client *userTarget, std::string param, Channel* chann = NULL); // a utiliser pour mode +
+		int suppMode(std::string mode, Client *user, Client *userTarget, std::string param, Channel *chann = NULL); // a utiliser pour mode -
 		void setOwner(Client *creator);
 		void deleteOwner();
 		bool addInviteUser(Client *user, Client *userTarget);

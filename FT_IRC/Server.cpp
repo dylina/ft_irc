@@ -893,9 +893,16 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 		// if (_modeWantPair[i].haveParameter)
 		// 	std::cout << "parameter: " << _modeWantPair[i].parameter << std::endl;---
 
+		int ret = -1;
 
+		if (_modeWantPair[i].del == false) // si le mode est -
+			ret = channelTarget->mode.suppMode(_modeWantPair[i].mode, client, _modeWantPair[i].targetUser, _modeWantPair[i].parameter, channelTarget);
+		else // si le mode est +
+			ret = channelTarget->mode.setMode(_modeWantPair[i].mode, client, _modeWantPair[i].targetUser, _modeWantPair[i].parameter, channelTarget);
 
-		int ret = channelTarget->mode.setMode(_modeWantPair[i].mode, client, _modeWantPair[i].targetUser, _modeWantPair[i].parameter, channelTarget);
+		if (ret == -1) // erreur qui ne devrait pas arriver #jepuelamerdenecode
+			continue ;
+
 
 		std::string msg = client->getMask() + " MODE " + channelTarget->getName();
 
@@ -911,6 +918,11 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 		else if (ret == ERR_CHANOPRIVSNEEDED)
 		{
 			client->sendReply(formatMessage(ERR_CHANOPRIVSNEEDED, MSG_CHANOPRIVSNEEDED, client, ""));
+			return ;
+		}
+		else if (ret == ERR_KEYSET)
+		{
+			client->sendReply(formatMessage(ERR_KEYSET, MSG_KEYSET, client, ""));
 			return ;
 		}
 		else if (ret == ERR_USERNOTINCHANNEL)

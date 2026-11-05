@@ -231,37 +231,22 @@ int Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, s
 
 	if (mode == "t")
 	{
-		// if (_t)
-		// 	throw ModeAlreadySet();
-		// else
-			this->_t = true;
+		this->_t = true;
 		return 1;
 	}
 	else if (mode == "i")
 	{
-		// if (_i)
-		// 	throw ModeAlreadySet();
-		// else
-			this->_i = true;
+		this->_i = true;
 		return 1;
 	}
 	else if (mode == "k")
 	{
-		// if (_k)
-		// 	throw ModeAlreadySet();
-
-		// if (param.empty())
-		// 	throw ModeDontHaveParams();
-
 		_password = param;
 		this->_k = true;
 		return 1;
 	}
 	else if (mode == "l")
 	{
-		// if (_l)
-		// 	throw ModeAlreadySet();
-
 		this->_l = true;
 		this->_limitNbr = std::atoi(param.c_str());
 		return _l;
@@ -273,16 +258,52 @@ int Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, s
 
 		if (chann->isInChannel(param))
 			this->_o.push_back(userTarget);
-		// else
-		// 	throw ModeAlreadySet();
 	}
 	return 1;
 }
 
-// void Channel::Mode::suppMode(std::string mode, Client *user, Client *userTarget, std::string param) // a utiliser pour -
-// {
-// 	// wip
-// }
+int Channel::Mode::suppMode(std::string mode, Client *user, Client *userTarget, std::string param, Channel *chann) // a utiliser pour -
+{
+	// wip
+	if (!this->isOp(user)) //verif si user est un operateur
+		return ERR_CHANOPRIVSNEEDED;
+
+	if (mode == "t")
+	{
+		this->_t = false;
+		return 1;
+	}
+	else if (mode == "i")
+	{
+
+		this->_i = false;
+		return 1;
+	}
+	else if (mode == "k")
+	{
+		if (this->checkKey(param))
+			_password = "";
+		else
+			return ERR_KEYSET;
+
+		this->_k = false;
+		return 1;
+	}
+	else if (mode == "l")
+	{
+		this->_l = false;
+		return 1;
+	}
+	else if (mode == "o")
+	{
+		if (!chann->isInChannel(param)) // si la target n'est pas enregsitrer dans le chann
+			return ERR_USERNOTINCHANNEL;
+		else
+			this->removeOperator(userTarget);
+	}
+	return 1;
+
+}
 
 void Channel::Mode::removeOperator(Client *user)
 {
