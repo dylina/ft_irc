@@ -63,5 +63,4 @@ class Socket
 		//Network parameter port
 		std::string port;
 
-
 };

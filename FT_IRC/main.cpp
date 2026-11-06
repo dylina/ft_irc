@@ -10,6 +10,19 @@
 #include "Server.hpp"
 #include <cstdlib>
 #include <ctime>
+#include <signal.h>
+#include <csignal>
+
+volatile sig_atomic_t g_running = 1;
+volatile sig_atomic_t g_sigusr1 = 0;
+
+void handleSignal(int sig)
+{
+	if (sig == SIGINT || sig == SIGTERM)
+		g_running = 0;
+	else if (sig == SIGUSR1)
+		g_sigusr1 = 1;
+}
 
 int main(int argc, char **argv)
 {
@@ -23,6 +36,9 @@ int main(int argc, char **argv)
 		std::cout << "Usage : ./ircserv <port> <password>" << std::endl;
 		return 1;
 	}
+
+	signal(SIGINT, handleSignal);
+	signal(SIGUSR1, handleSignal);
 
 
 	try
