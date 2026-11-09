@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "Client.hpp"
+#include <fcntl.h>
 
 const char *Server::BindErr::what() const throw()
 {
@@ -170,6 +171,14 @@ void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
 {
 	if (clientFd < 0)
 		throw AcceptErr();
+
+	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
+    {
+        perror("fcntl");
+        close(clientFd);
+        throw AcceptErr();
+    }
+
 	struct pollfd newClientStruct;
 
 	newClientStruct.fd = clientFd;
@@ -207,10 +216,16 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		client->addData(data, client->getFdWithColor());
 		this->processCommands(client); // apres quit client invalid
 	}
-	else
+	else if (retRecv == 0)
 	{
 		this->broadcastQuit(client, "Connection closed");
 		this->removeClient(fd);
+	}
+	else
+	{
+		perror("recv");
+    	this->broadcastQuit(client, "Connection error");
+    	this->removeClient(fd);
 	}
 }
 

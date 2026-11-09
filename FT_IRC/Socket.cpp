@@ -16,14 +16,16 @@ const char* Socket::NoPort::what() const throw()
 
 static bool portIsGood(std::string portRc)
 {
+	if (portRc.empty())
+		return false;
+
 	for (size_t i = 0; i < portRc.length(); i++)
 	{
-		if (isalpha(portRc[i]))
+		if (portRc[i] < '0' || portRc[i] > '9')
 			return false;
 	}
 	return true;
 }
-
 
 // check errors in parameters of Socket(int domain, std::string ip, std::string port)
 static void checkError(int domain, std::string ip, std::string portRc)
@@ -82,6 +84,25 @@ Socket::Socket(int domain, std::string ip, std::string port)
 		perror("socket");
 		throw Socket::ErrorOfSocket();
 	}
+
+	int reuse = 1;
+	if (setsockopt(this->sockFd, SOL_SOCKET, SO_REUSEADDR,
+               	&reuse, sizeof(reuse)) == -1)
+	{
+    	perror("setsockopt");
+    	close(this->sockFd);
+    	this->sockFd = -1;
+    	throw Socket::ErrorOfSocket();
+	}
+	
+	if (fcntl(this->sockFd, F_SETFL, O_NONBLOCK) == -1)
+	{
+    	perror("fcntl");
+    	close(this->sockFd);
+    	this->sockFd = -1;
+    	throw Socket::ErrorOfSocket();
+	}
+
 	std::cerr << BOLD BRIGHT_GREEN << "socket() success!" << RESET << std::endl;
 
 	this->port = port;
