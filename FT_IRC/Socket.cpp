@@ -16,9 +16,12 @@ const char* Socket::NoPort::what() const throw()
 
 static bool portIsGood(std::string portRc)
 {
+	if (portRc.empty())
+		return false;
+
 	for (size_t i = 0; i < portRc.length(); i++)
 	{
-		if (isalpha(portRc[i]))
+		if (portRc[i] < '0' || portRc[i] > '9')
 			return false;
 	}
 	return true;
