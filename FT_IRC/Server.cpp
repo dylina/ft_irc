@@ -311,8 +311,8 @@ void Server::handleUSER(Client *client, std::vector<std::string> &params, std::s
 	}
 
 	client->setUsername(params[0]);
-	client->setNickName(realname);
-	client->setHasNick(true);
+	// client->setNickName(realname);
+	// client->setHasNick(true);
 	client->setHasUser(true);
 
 	finalizeRegistration(client);
