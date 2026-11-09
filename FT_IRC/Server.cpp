@@ -115,7 +115,7 @@ void Server::on()
 						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
 				}
-				continue;
+				//continue;
 			}
 
 			if (i < fds.size() && (fds[i].revents & POLLOUT))
