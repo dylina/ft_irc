@@ -27,7 +27,6 @@ static bool portIsGood(std::string portRc)
 	return true;
 }
 
-
 // check errors in parameters of Socket(int domain, std::string ip, std::string port)
 static void checkError(int domain, std::string ip, std::string portRc)
 {
@@ -85,6 +84,17 @@ Socket::Socket(int domain, std::string ip, std::string port)
 		perror("socket");
 		throw Socket::ErrorOfSocket();
 	}
+
+	int reuse = 1;
+if (setsockopt(this->sockFd, SOL_SOCKET, SO_REUSEADDR,
+               &reuse, sizeof(reuse)) == -1)
+{
+    perror("setsockopt");
+    close(this->sockFd);
+    this->sockFd = -1;
+    throw Socket::ErrorOfSocket();
+}
+
 	std::cerr << BOLD BRIGHT_GREEN << "socket() success!" << RESET << std::endl;
 
 	this->port = port;
