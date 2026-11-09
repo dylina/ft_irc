@@ -178,7 +178,7 @@ void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
         close(clientFd);
         throw AcceptErr();
     }
-	
+
 	struct pollfd newClientStruct;
 
 	newClientStruct.fd = clientFd;
@@ -216,10 +216,16 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 		client->addData(data, client->getFdWithColor());
 		this->processCommands(client); // apres quit client invalid
 	}
-	else
+	else if (retRecv == 0)
 	{
 		this->broadcastQuit(client, "Connection closed");
 		this->removeClient(fd);
+	}
+	else
+	{
+		perror("recv");
+    	this->broadcastQuit(client, "Connection error");
+    	this->removeClient(fd);
 	}
 }
 
