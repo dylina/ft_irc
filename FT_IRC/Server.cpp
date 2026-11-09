@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "Client.hpp"
+#include <fcntl.h>
 
 const char *Server::BindErr::what() const throw()
 {
@@ -170,6 +171,14 @@ void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
 {
 	if (clientFd < 0)
 		throw AcceptErr();
+
+	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
+    {
+        perror("fcntl");
+        close(clientFd);
+        throw AcceptErr();
+    }
+	
 	struct pollfd newClientStruct;
 
 	newClientStruct.fd = clientFd;
