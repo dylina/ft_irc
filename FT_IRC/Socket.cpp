@@ -86,14 +86,22 @@ Socket::Socket(int domain, std::string ip, std::string port)
 	}
 
 	int reuse = 1;
-if (setsockopt(this->sockFd, SOL_SOCKET, SO_REUSEADDR,
-               &reuse, sizeof(reuse)) == -1)
-{
-    perror("setsockopt");
-    close(this->sockFd);
-    this->sockFd = -1;
-    throw Socket::ErrorOfSocket();
-}
+	if (setsockopt(this->sockFd, SOL_SOCKET, SO_REUSEADDR,
+               	&reuse, sizeof(reuse)) == -1)
+	{
+    	perror("setsockopt");
+    	close(this->sockFd);
+    	this->sockFd = -1;
+    	throw Socket::ErrorOfSocket();
+	}
+	
+	if (fcntl(this->sockFd, F_SETFL, O_NONBLOCK) == -1)
+	{
+    	perror("fcntl");
+    	close(this->sockFd);
+    	this->sockFd = -1;
+    	throw Socket::ErrorOfSocket();
+	}
 
 	std::cerr << BOLD BRIGHT_GREEN << "socket() success!" << RESET << std::endl;
 
