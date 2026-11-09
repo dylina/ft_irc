@@ -48,6 +48,7 @@
 #define MSG_BADCHANMASK ":Bad Channel Mask"
 #define MSG_CHANOPRIVSNEEDED ":You're not channel operator"
 #define MSG_INVALIDMODEPARAM ":Invalid limit parameter"
+#define MSG_KEYSET				":Channel key already set"
 
 // ============================================
 // PRIVILEGES / COMMANDES

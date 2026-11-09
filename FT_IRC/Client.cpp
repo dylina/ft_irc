@@ -206,15 +206,12 @@ void Client::clearStructCommand(Client::parsedCommand &newCommand)
 
 void Client::parseCommand()
 {
-	// * on coupe la ligne sur '\n' : marche avec "\r\n" (irssi, hexchat, nc -C) ET "\n" seul (nc sans -C)
-	// ! avant on cherchait "\r\n" : avec nc sans -C le serveur ne repondait jamais
 	size_t end = this->_dataBuffer.find('\n');
 	if (end == std::string::npos)
 		return;
 
 	std::string line = this->_dataBuffer.substr(0, end);
 	this->_dataBuffer.erase(0, end + 1);
-	// * s'il y avait un '\r' juste avant le '\n', on l'enleve
 	if (!line.empty() && line[line.size() - 1] == '\r')
 		line.erase(line.size() - 1);
 
@@ -341,7 +338,6 @@ void Client::addData(std::string buffer, std::string clientFd)
 
 	this->printBufferEnhance();
 
-	// ! doit chercher la meme fin de ligne que parseCommand(), sinon le parser n'est jamais appele
 	while (this->_dataBuffer.find('\n') != std::string::npos)
 		this->parseCommand();
 }
@@ -479,14 +475,6 @@ std::string Client::getNickname() const
 	return this->_nickname;
 }
 
-// * identite complete d'un client dans les messages IRC : ":nick!user@localhost"
-// ? a utiliser comme debut de tout message envoye au nom d'un client (JOIN, PRIVMSG, KICK, NICK...)
-// TODO : JOIN / PART / PRIVMSG / TOPIC utilisent encore ":" + nick -> passer a getPrefix()
-std::string Client::getPrefix() const
-{
-	return ":" + this->_nickname + "!" + this->_username + "@localhost";
-}
-
 void Client::leave(std::string &name)
 {
 	std::vector<std::string>::iterator it = std::find(this->_channels.begin(), this->_channels.end(), name);
@@ -501,4 +489,9 @@ void Client::leave(std::string &name)
 void Client::join(std::string &name)
 {
 	this->_channels.push_back(name);
+}
+
+std::string Client::getMask()
+{
+	return ":" + this->getNickName() + "!" + this->getUsername() + "@" + "localhost";
 }

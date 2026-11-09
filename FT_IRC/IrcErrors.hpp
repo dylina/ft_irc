@@ -49,6 +49,7 @@
 #define ERR_BADCHANMASK         476 // Masque de channel invalide
 #define ERR_CHANOPRIVSNEEDED    482 // Opérateur requis
 #define ERR_INVALIDMODEPARAM	696 // mauvaise limit pour le mode l
+#define ERR_KEYSET				467 // Channel key already set
 
 // ============================================
 // PRIVILEGES / COMMANDES

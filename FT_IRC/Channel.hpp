@@ -5,7 +5,9 @@
 #include <vector>
 #include <iterator>
 
-#include "Client.hpp"
+#include "IrcErrors.hpp"
+
+class Client;
 
 class Channel
 {
@@ -22,14 +24,17 @@ public:
 	bool haveTopic();
 	bool isInChannel(Client *user) const;
 	const std::vector<Client *> &getUsers() const;
+	bool isInChannel(std::string &nickname) const;
+	bool isOperator(Client *user) const;
+	bool isOwner(Client *user) const;
 
 	// setter
 
-	void setTopic(std::string &topic, Client *user);
+	void setTopic(std::string &topic);
 
 	// other
 
-	void joinChannel(Client *user);
+	bool joinChannel(Client *user, std::string arg = "");
 	void leaveChannel(Client *user);
 	void sendToAll(std::string &msg);
 	void sendToAllOtherClient(std::string &msg, Client *user);
@@ -57,8 +62,13 @@ public:
 
 		// setters
 
-		bool setMode(std::string mode, Client *user, Client *userTarget, std::string param);
-		// void suppMode(std::string mode, Client *user, Client *userTarget, std::string param); wip
+		int setMode(std::string mode, Client *user, Client *userTarget, std::string param, Channel* chann = NULL); // a utiliser pour mode +
+		int suppMode(std::string mode, Client *user, Client *userTarget, std::string param, Channel *chann = NULL); // a utiliser pour mode -
+		void setOwner(Client *creator);
+		void deleteOwner();
+		bool addInviteUser(Client *user, Client *userTarget);
+		void removeInviteUser(Client *userTarget);
+
 
 		void removeOperator(Client *user);
 		// getters
@@ -66,19 +76,27 @@ public:
 		bool getMode(std::string mode);
 		std::string getModeActive();
 
+		bool isInvited(Client *user);
+
+		bool isOwner(Client *user) const;
+		bool isOp(Client* user) const;
 		bool isInviteOnly();
 		bool hasKey();
 		bool isFull(int currentUsers);
 		bool checkKey(const std::string &key);
 
+		bool hasOwner() const;
+
 	private:
 		bool _i;				  // invitation mode
-		bool _t;				  // operators reserved
+		std::vector<Client*> _iList;
+		bool _t;				  //  (Topic protection) operators reserved
 		bool _k;				  // set a pass
 		std::vector<Client *> _o; // set operator mode to a user
 		bool _l;				  // limit nbr of members
 		std::string _password;
 		int _limitNbr;
+		Client* _owner;
 	};
 	Mode mode;
 

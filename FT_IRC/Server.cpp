@@ -137,8 +137,6 @@ static std::string formatMessage(
 	Client *client,
 	std::string channelTarget = "")
 {
-	// * avant le premier NICK le client n'a pas de pseudo : la RFC demande "*" a la place
-	// ! sans ca on obtenait ":ircserv 461  :..." (un trou entre le numero et le message)
 	std::string nick = client->getNickName().empty() ? "*" : client->getNickName();
 
 	std::ostringstream oss;
@@ -158,7 +156,6 @@ bool Server::isvalidNick(const std::string &nick) const
 {
 	if (nick.empty() || nick.length() > 9)
 		return false;
-	// * premier caractere : lettre ou _ [ ] \ ` ^ { } (pas de chiffre ni de -)
 	std::string validFirst = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_[]\\`^{}";
 	if (validFirst.find(nick[0]) == std::string::npos)
 		return false;
@@ -219,29 +216,18 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 	}
 }
 
-// ============================================================================
-// *                            AUTHENTIFICATION
-// *  Un client doit envoyer PASS, NICK et USER (dans cet ordre en pratique)
-// *  avant de pouvoir utiliser les autres commandes (JOIN, PRIVMSG, ...).
-// ============================================================================
-
-// * PASS <password>
-// * Verifie le mot de passe du serveur (celui donne a ./ircserv <port> <password>)
 void Server::handlePASS(Client *client, std::vector<std::string> &params)
 {
-	// ! deja enregistre : on ne peut pas recommencer (462), sinon le welcome serait renvoye
 	if (client->isRegistered())
 	{
 		client->sendReply(formatMessage(ERR_ALREADYREGISTERED, MSG_ALREADYREGISTERED, client));
 		return;
 	}
-	// ! "PASS" seul -> 461, avec le nom de la commande devant le message
 	if (params.empty())
 	{
 		client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, "PASS " MSG_NEEDMOREPARAMS, client));
 		return;
 	}
-	// ! mauvais mot de passe -> 464
 	if (params[0] != this->_password)
 	{
 		client->sendReply(formatMessage(ERR_PASSWDMISMATCH, MSG_PASSWDMISMATCH, client));
@@ -251,28 +237,22 @@ void Server::handlePASS(Client *client, std::vector<std::string> &params)
 	finalizeRegistration(client);
 }
 
-// * Passe un pseudo en minuscules, uniquement pour COMPARER deux pseudos
-// ? pourquoi : en IRC "Alice", "alice" et "ALICE" sont le meme pseudo
-// ? static = fonction interne a ce fichier, pas besoin de la declarer dans Server.hpp
 static std::string lowerNick(const std::string &s)
 {
 	std::string r(s);
 	for (size_t i = 0; i < r.size(); ++i)
-		r[i] = std::tolower(static_cast<unsigned char>(r[i])); // ? cast : evite un comportement indefini avec les accents
+		r[i] = std::tolower(static_cast<unsigned char>(r[i]));
 	return r;
 }
 
-// * Renvoie true (et envoie 433) si un AUTRE client utilise deja ce pseudo
 bool Server::isNickIsAlreadyUse(Client *client, std::string &nick)
 {
 	std::string wanted = lowerNick(nick);
 
 	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); ++it)
 	{
-		// ? it->second != client : on ne se compare pas a soi-meme (permet "NICK Alice" quand on s'appelle alice)
 		if (it->second != client && lowerNick(it->second->getNickName()) == wanted)
 		{
-			// ! 433 : on met le pseudo refuse dans le message pour que le client sache lequel changer
 			client->sendReply(formatMessage(ERR_NICKNAMEINUSE, nick + " " MSG_NICKNAMEINUSE, client));
 			return true;
 		}
@@ -280,13 +260,10 @@ bool Server::isNickIsAlreadyUse(Client *client, std::string &nick)
 	return false;
 }
 
-// * Envoie msg UNE seule fois au client et a chaque personne qui partage au moins un channel avec lui
-// ? std::set : si bob est avec nous dans #a ET #b, il n'est ajoute qu'une fois -> pas de message en double
-// TODO : pourra aussi servir a broadcastQuit() (qui envoie aujourd'hui le QUIT en double)
 void Server::broadcastToSharedChannels(Client *client, const std::string &msg)
 {
 	std::set<Client *> targets;
-	targets.insert(client); // * le client lui-meme recoit aussi le message
+	targets.insert(client);
 
 	for (std::map<std::string, Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); ++it)
 	{
@@ -299,19 +276,13 @@ void Server::broadcastToSharedChannels(Client *client, const std::string &msg)
 		(*t)->sendReply(msg);
 }
 
-// * NICK <nickname>
-// * - pendant la connexion : enregistre le pseudo
-// * - une fois connecte    : change le pseudo et previent les gens des memes channels
 void Server::handleNICK(Client *client, std::vector<std::string> &params)
 {
-	// ! PASS obligatoire avant NICK : sinon n'importe qui peut "reserver" un pseudo sans mot de passe
-	// ? irssi et hexchat envoient toujours CAP LS -> PASS -> NICK -> USER, donc ca ne les gene pas
 	if (!client->isPassOk())
 	{
 		client->sendReply(formatMessage(ERR_PASSWDMISMATCH, MSG_PASSWDMISMATCH, client));
 		return;
 	}
-	// ! "NICK" seul -> 431
 	if (params.empty())
 	{
 		client->sendReply(formatMessage(ERR_NONICKNAMEGIVEN, MSG_NONICKNAMEGIVEN, client));
@@ -319,23 +290,19 @@ void Server::handleNICK(Client *client, std::vector<std::string> &params)
 	}
 	std::string nick = params[0];
 
-	// ! caracteres interdits ou plus de 9 caracteres -> 432
 	if (!isvalidNick(nick))
 	{
 		client->sendReply(formatMessage(ERR_ERRONEUSNICKNAME, nick + " " MSG_ERRONEUSNICKNAME, client));
 		return;
 	}
-	if (nick == client->getNickName()) // * exactement le meme pseudo : rien a faire
+	if (nick == client->getNickName())
 		return;
-	if (isNickIsAlreadyUse(client, nick)) // ! pseudo pris -> 433 (envoye dans la fonction)
+	if (isNickIsAlreadyUse(client, nick))
 		return;
 
 	if (client->isRegistered())
 	{
-		// ! ORDRE IMPORTANT : le message est construit AVANT setNickName,
-		// ! pour que getPrefix() contienne encore l'ANCIEN pseudo
-		// * resultat envoye : ":alice!alice@localhost NICK :alicia"
-		std::string msg = client->getPrefix() + " NICK :" + nick;
+		std::string msg = client->getMask() + " NICK :" + nick;
 		broadcastToSharedChannels(client, msg);
 	}
 	client->setNickName(nick);
@@ -343,28 +310,23 @@ void Server::handleNICK(Client *client, std::vector<std::string> &params)
 	finalizeRegistration(client);
 }
 
-// * USER <username> <mode> <unused> :<realname>
 void Server::handleUSER(Client *client, std::vector<std::string> &params, std::string trailing)
 {
-	// ! PASS obligatoire avant USER (meme raison que pour NICK)
 	if (!client->isPassOk())
 	{
 		client->sendReply(formatMessage(ERR_PASSWDMISMATCH, MSG_PASSWDMISMATCH, client));
 		return;
 	}
-	// ! deja enregistre -> 462
 	if (client->isRegistered())
 	{
 		client->sendReply(formatMessage(ERR_ALREADYREGISTERED, MSG_ALREADYREGISTERED, client));
 		return;
 	}
 
-	// ? le realname est normalement apres ":" (trailing), sinon on prend le 4e parametre
 	std::string realname = trailing;
 	if (realname.empty() && params.size() >= 4)
 		realname = params[3];
 
-	// ! moins de 4 infos -> 461
 	if (params.size() < 3 || realname.empty())
 	{
 		client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, "USER " MSG_NEEDMOREPARAMS, client));
@@ -376,26 +338,20 @@ void Server::handleUSER(Client *client, std::vector<std::string> &params, std::s
 	finalizeRegistration(client);
 }
 
-// * Envoie le message de bienvenue UNE seule fois, quand PASS + NICK + USER sont tous valides
 void Server::finalizeRegistration(Client *client)
 {
-	// ! deja enregistre : on sort, sinon chaque NICK/PASS renverrait le welcome
 	if (client->isRegistered())
 		return;
-	// * il manque encore PASS, NICK ou USER : on attend
 	if (!client->isPassOk() || !client->hasNick() || !client->hasUser())
 		return;
 
 	client->setRegistered(true);
 
 	std::string nick = client->getNickName();
-	// ? getPrefix().substr(1) = "nick!user@localhost" (sans le ':' du debut)
-	client->sendReply(":ircserv 001 " + nick + " :Welcome to the IRC network " + client->getPrefix().substr(1));
+	client->sendReply(":ircserv 001 " + nick + " :Welcome to the IRC network " + client->getMask().substr(1));
 	client->sendReply(":ircserv 002 " + nick + " :Your host is ircserv, running version 1.0");
 	client->sendReply(":ircserv 003 " + nick + " :This server was created today");
-	// ? 004 : <serveur> <version> <modes user> <modes channel> <modes channel qui prennent un parametre>
 	client->sendReply(":ircserv 004 " + nick + " ircserv 1.0 o itkol kol");
-	// ? 005 : fiche technique lue par irssi/hexchat (prefixe @ des ops, types de modes, longueur max du pseudo)
 	client->sendReply(":ircserv 005 " + nick + " CHANTYPES=# PREFIX=(o)@ CHANMODES=,k,l,it NICKLEN=9 :are supported by this server");
 }
 
@@ -413,8 +369,6 @@ void Server::processCommands(Client *client)
 			handleNICK(client, cmd.parametresMiddle);
 		else if (cmd.command == "USER")
 			handleUSER(client, cmd.parametresMiddle, cmd.trailing);
-		// ! QUIT est teste AVANT "!isRegistered()" : sinon un client pas encore enregistre
-		// ! recevait 451 et ne pouvait jamais se deconnecter
 		else if (cmd.command == "QUIT")
 		{
 			cmdQuit(client, cmd);
@@ -503,11 +457,24 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 		return;
 	}
 
+	//variable pour parser les arguments de mot de passe en fonction du chann
+	int del = 0;
+	std::string arg;
+
 	// separation du param par virgule
 	std::stringstream ss(cmd.parametresMiddle[0]);
 	std::string chan;
 	while (std::getline(ss, chan, ','))
 	{
+
+		// a chaque nouveau channel on +1 le del et on va chercher son argument perso
+		del++;
+		if (cmd.parametresMiddle.size() > (size_t)del)
+			arg = cmd.parametresMiddle[del];
+		else
+			arg = "";
+
+
 		// le nom commence tjr avec #
 		if (chan.empty() || chan[0] != '#')
 		{
@@ -530,7 +497,9 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 
 		try
 		{
-			this->_channels.at(chan)->joinChannel(client);
+			int ret = this->_channels.at(chan)->joinChannel(client, arg);
+			if (!ret)
+				continue;
 		}
 		catch (...) // si on catch une erreur c'est que le salon n'existe pas encore, alor on le creer
 		{
@@ -590,8 +559,9 @@ void Server::cmdPart(Client *client, Client::parsedCommand &cmd)
 		std::string reason;
 		if (!cmd.trailing.empty())
             reason = " :" + cmd.trailing;
-			
-		std::string partMsg = ":" + client->getNickName() + " PART " + chan + reason;
+//
+		std::string partMsg;
+		partMsg = client->getMask() + " PART " + chan + reason;
 
 		channel->sendToAll(partMsg);
 		channel->leaveChannel(client);
@@ -639,10 +609,21 @@ void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
 		}
 		return;
 	}
+	if (this->_channels[channel]->mode.getMode("t"))	// verif si le chann est en +t
+	{
+		if (!this->_channels[channel]->mode.isOp(client))
+		{
+			client->sendReply(formatMessage(ERR_CHANOPRIVSNEEDED, MSG_CHANOPRIVSNEEDED, client, channel)); // a verif
+			return ;
+		}
+	}
 
-	this->_channels[channel]->setTopic(cmd.trailing, client);
+	this->_channels[channel]->setTopic(cmd.trailing);
 
-	std::string topicMsg = ":" + client->getNickName() + " TOPIC " + channel + " :" + cmd.trailing;
+
+	std::string topicMsg;
+	topicMsg = client->getMask() + " TOPIC " + channel + " :" + cmd.trailing;
+
 	this->_channels[channel]->sendToAll(topicMsg);
 }
 
@@ -689,7 +670,7 @@ void Server::cmdInvite(Client *client, Client::parsedCommand &cmd)
        	 	+ " " + nick + " :No such nick");
     	return;
 	}
-	
+
     std::map<std::string, Channel *>::iterator it =
         this->_channels.find(channel);
 
@@ -716,6 +697,13 @@ void Server::cmdInvite(Client *client, Client::parsedCommand &cmd)
             + " :is already on channel");
         return;
     }
+	int ret = chan->mode.addInviteUser(client, target);
+
+	if (!ret)
+	{
+		client->sendReply(formatMessage(ERR_CHANOPRIVSNEEDED, MSG_CHANOPRIVSNEEDED, client, ""));
+		return;
+	}
 
     target->sendReply(":" + client->getNickName()
         + " INVITE " + nick + " :" + channel);
@@ -724,12 +712,30 @@ void Server::cmdInvite(Client *client, Client::parsedCommand &cmd)
         + " " + nick + " " + channel);
 }
 
+struct _pair{
+		bool del; // true = + et false = -
+		bool haveParameter; // false = nn, true = oui -_-
+		std::string mode;
+		std::string parameter;
+		Client *targetUser;
+
+		_pair() : del(false), haveParameter(false), targetUser(NULL) {}
+};
+
 void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 {
 
 	int countNbrChann = 0;
-	std::vector<std::string> modeWant;
+
+	std::vector<_pair> _modeWantPair;
 	Channel *channelTarget = NULL;
+
+	if (cmd.parametresMiddle.empty()) //mode vide
+	{
+		client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, ""));
+		return ;
+	}
+
 
 	for (std::vector<std::string>::iterator it = cmd.parametresMiddle.begin(); it != cmd.parametresMiddle.end(); it++) // boucle pour verif si tout les args sont bons
 	{
@@ -760,10 +766,35 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 						char del = (*it)[i];
 						char mode = (*it)[i + 1];
 
-						std::string modeAndDel;
-						modeAndDel += del;
-						modeAndDel += mode;
-						modeWant.push_back(modeAndDel);
+						// std::string modeAndDel;
+						// modeAndDel += del;
+						// modeAndDel += mode;
+						// modeWant.push_back(modeAndDel);
+
+
+						_pair request;
+						if (del == '+')
+							request.del = true;
+						else
+						{
+							request.del = false;
+							if (mode == 'k')
+								request.haveParameter = true;
+							else
+								request.haveParameter = false;
+						}
+
+						request.mode = mode;
+
+						if (request.del) // si c'est un +
+						{
+							if (mode == 'k' || mode == 'o' || mode == 'l')
+								request.haveParameter = true;
+							else
+								request.haveParameter = false;
+						}
+
+						_modeWantPair.push_back(request);
 
 						i++;
 						continue;
@@ -777,10 +808,22 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 				else if (isModeIsHandle((*it)[i])) // si pas de + ou de - on suppose que c'est un +
 				{
 					char mode = (*it)[i];
-					std::string modeAndDel = "+";
 
-					modeAndDel += mode;
-					modeWant.push_back(modeAndDel);
+
+					// std::string modeAndDel = "+";
+
+					// modeAndDel += mode;
+					// modeWant.push_back(modeAndDel);
+
+
+					_pair request;
+					request.del = true;
+					request.mode = mode;
+					if (mode == 'k' || mode == 'o' || mode == 'l')
+						request.haveParameter = true;
+					else
+						request.haveParameter = false;
+					_modeWantPair.push_back(request);
 				}
 				else
 				{
@@ -796,20 +839,20 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 		}
 	}
 
-	if (countNbrChann == 1 && modeWant.empty()) // si aucun argument n'est donne en plus du canal on renvoi les modes actif sur le channel
+	if (countNbrChann == 1 && _modeWantPair.empty()) // si aucun argument n'est donne en plus du canal on renvoi les modes actif sur le channel
 	{
 		client->sendReply(formatMessage(RPL_CHANNELMODEIS, channelTarget->mode.getModeActive(), client, channelTarget->getName()));
 		return;
 	}
 
 	countNbrChann = 1;
-	for (std::vector<std::string>::iterator it = modeWant.begin(); it != modeWant.end(); it++) // dernier check des modes si il y en a avec des attributs on check si il existe genre mdp et limites
+	for (std::vector<_pair>::iterator it = _modeWantPair.begin(); it != _modeWantPair.end(); it++) // dernier check des modes si il y en a avec des attributs on check si il existe genre mdp et limites
 	{
-		if ((*it)[0] == '+')
+		if ((*it).del) // si c'est un +
 		{
 			std::cerr << "debug: add mode" << std::endl; // debug
 
-			if ((*it)[1] == 'k' || (*it)[1] == 'l') // on verifie les params de k et de l (mdp et limite de nbr)
+			if ((*it).mode == "k" || (*it).mode == "l" || (*it).mode == "o") // on verifie les params de k et de l (mdp et limite de nbr)
 			{
 				size_t isExist = countNbrChann + 1;
 				if (isExist >= cmd.parametresMiddle.size())
@@ -817,7 +860,7 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 					client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
 					return;
 				}
-				if ((*it)[1] == 'l') // on verifie le param de l si c'est bien que 1 nombre positif
+				if ((*it).mode == "l") // on verifie le param de l si c'est bien que 1 nombre positif
 				{
 					for (size_t i = 0; cmd.parametresMiddle[isExist].size() > i; i++)
 					{
@@ -828,14 +871,30 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 						}
 					}
 				}
+
+				if ((*it).mode == "o") // on verifie les args de 0 (si l'utilisateur rechercher est good)
+				{
+					for (std::map<int, Client*>::iterator ite = this->clients.begin(); ite != this->clients.end(); ite++)
+					{
+						if (cmd.parametresMiddle[isExist] == (*ite).second->getNickname())
+						{
+							(*it).parameter = cmd.parametresMiddle[isExist];
+							(*it).targetUser = (*ite).second;
+							break;
+						}
+					}
+				}
+
+				if ((*it).haveParameter && (*it).parameter.empty())
+					(*it).parameter = cmd.parametresMiddle[isExist]; // on rajoute le param du mode si c'est k ou l
 				countNbrChann++;
 			}
 		}
-		else
+		else // si c'est un -
 		{
 			std::cerr << "debug: supp mode" << std::endl; // debug
 
-			if ((*it)[1] == 'k') // on verifie les params de k
+			if ((*it).mode == "k") // on verifie les params de k
 			{
 				size_t isExist = countNbrChann + 1;
 				if (isExist >= cmd.parametresMiddle.size()) // pas de params on pleures
@@ -843,6 +902,8 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 					client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
 					return;
 				}
+				if ((*it).haveParameter && (*it).parameter.empty())
+					(*it).parameter = cmd.parametresMiddle[isExist]; // on rajoute le param du mode si c'est k
 				countNbrChann++;
 			}
 		}
@@ -856,12 +917,68 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 	}
 
 	// wip -------------------------------------------------
-	// wip gestion des modes une fois que tout est bien valide (normalement le parsing au dessu est bon (inch'))
+	// wip gestion des modes une fois que tout est bien valide (normalement le parsing au dessu est bon (inch') (non il faut traiter mode sans rien apres car la sa segfault))
 
-	// for (size_t i = 0; i < modeWant.size(); i++)
-	// {
-	// 	channelTarget->mode.setMode(,);
-	// }
+	for (size_t i = 0; i < _modeWantPair.size(); i++)
+	{
+		// std::cout << "debug " << i + 1 << ": \n" << "Del: "; msg debug ---------
+		// if (_modeWantPair[i].del)
+		// 	std::cout << "+" << std::endl;
+		// else
+		// 	std::cout << "-" << std::endl;
+		// std::cout << "mode: " << _modeWantPair[i].mode << std::endl;
+		// if (_modeWantPair[i].haveParameter)
+		// 	std::cout << "parameter: " << _modeWantPair[i].parameter << std::endl;---
+
+		int ret = -1;
+
+		if (_modeWantPair[i].del == false) // si le mode est -
+			ret = channelTarget->mode.suppMode(_modeWantPair[i].mode, client, _modeWantPair[i].targetUser, _modeWantPair[i].parameter, channelTarget);
+		else // si le mode est +
+			ret = channelTarget->mode.setMode(_modeWantPair[i].mode, client, _modeWantPair[i].targetUser, _modeWantPair[i].parameter, channelTarget);
+
+		if (ret == -1) // erreur qui ne devrait pas arriver #jepuelamerdenecode
+			continue ;
+
+
+		std::string msg = client->getMask() + " MODE " + channelTarget->getName();
+
+		if (ret == 1 && _modeWantPair[i].mode == "l")
+		{
+			if (_modeWantPair[i].del)
+				msg += " +" + _modeWantPair[i].mode;
+			else
+				msg += " -" + _modeWantPair[i].mode;
+			if (_modeWantPair[i].haveParameter)
+				msg += " " + _modeWantPair[i].parameter;
+		}
+		else if (ret == ERR_CHANOPRIVSNEEDED)
+		{
+			client->sendReply(formatMessage(ERR_CHANOPRIVSNEEDED, MSG_CHANOPRIVSNEEDED, client, ""));
+			return ;
+		}
+		else if (ret == ERR_KEYSET)
+		{
+			client->sendReply(formatMessage(ERR_KEYSET, MSG_KEYSET, client, ""));
+			return ;
+		}
+		else if (ret == ERR_USERNOTINCHANNEL)
+		{
+			client->sendReply(formatMessage(ERR_USERNOTINCHANNEL, MSG_USERNOTINCHANNEL, client, _modeWantPair[i].parameter));
+			return ;
+		}
+		else if (ret == 1 && _modeWantPair[i].mode != "l")
+		{
+			if (_modeWantPair[i].del)
+				msg += " +" + _modeWantPair[i].mode;
+			else
+				msg += " -" + _modeWantPair[i].mode;
+			if (_modeWantPair[i].haveParameter)
+				msg += " " + _modeWantPair[i].parameter;
+		}
+
+		channelTarget->sendToAll(msg);
+	}
 	// 	---------------------------------------------------
 }
 
@@ -960,12 +1077,15 @@ void Server::broadcastQuit(Client *client, std::string reason)
 	if (reason.empty())
 		reason = "Client Quit";
 
-	std::string quitMsg = ":" + nick + " QUIT :" + reason;
+	std::string quitMsg;
+
 
 	for (std::map<std::string, Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
 	{
 		if ((*it).second->isInChannel(client))
 		{
+			quitMsg = client->getMask() + " QUIT :" + reason;
+
 			(*it).second->sendToAll(quitMsg);
 			(*it).second->leaveChannel(client);
 		}

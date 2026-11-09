@@ -14,6 +14,7 @@
 #include <algorithm>
 
 #include "colors.hpp"
+#include "Channel.hpp"
 
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE 512 // limitation doc irc
@@ -40,7 +41,7 @@ public:
 		bool hasUser() const;
 		std::string getUsername() const;
 		std::string getNickname() const;
-		std::string getPrefix() const;
+		std::string getMask();
 
 	int getFd() const;
 	sockaddr_in getAddr() const;
@@ -161,4 +162,5 @@ private:
 
 	// Canale la care clientul e conectat in prezent
 	std::vector<std::string> _channels;
+
 };
