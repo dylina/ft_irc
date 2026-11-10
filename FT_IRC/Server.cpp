@@ -139,6 +139,7 @@ static std::string formatMessage(
 	std::string channelTarget = "")
 {
 	std::ostringstream oss;
+	
 	oss << ":ircserv "
 		<< std::setfill('0') << std::setw(3) << error
 		<< " " << client->getNickName();
@@ -282,8 +283,45 @@ void Server::handleNICK(Client *client, std::vector<std::string> &params)
 
 	if (isNickIsAlreadyUse(client, nick) == true)
 		return;
+	
+	bool isNickChange = client->hasNick();
+	std::string oldMask = client->getMask();
+
 	client->setNickName(nick);
 	client->setHasNick(true);
+
+	if (isNickChange)
+    client->sendReply(oldMask + " NICK :" + nick);
+
+	if (isNickChange)
+	{
+    	std::string nickMsg = oldMask + " NICK :" + nick;
+
+    	for (std::map<int, Client *>::iterator it = this->clients.begin();
+        	it != this->clients.end(); ++it)
+    	{
+        	Client *other = it->second;
+
+        	if (other == client)
+           		continue;
+
+        	bool sharesChannel = false;
+
+        	for (std::map<std::string, Channel *>::iterator ch = this->_channels.begin();
+            	ch != this->_channels.end(); ++ch)
+        	{
+            	if (ch->second->isInChannel(client)
+                	&& ch->second->isInChannel(other))
+            	{
+                	sharesChannel = true;
+                	break;
+          		}
+        	}
+
+        	if (sharesChannel)
+        	    other->sendReply(nickMsg);
+    	}
+	}
 	finalizeRegistration(client);
 }
 
