@@ -8,6 +8,8 @@ Channel::Channel(Client *creator, std::string &topic, std::string name) : _name(
 	else
 		this->_topic = topic;
 	this->_users.push_back(creator);
+	creator->join(_name);
+
 	this->mode.setOwner(creator);
 	this->mode.setMode("o", creator, creator, creator->getNickName());
 }
@@ -82,6 +84,7 @@ void Channel::leaveChannel(Client *user)
 	{
 		if (*it == user)
 		{
+			this->mode.removeInviteUser(user);
 			// removeoperator cherche dans tous les op et si le user en est un le supprime de sa db
 			this->mode.removeOperator(user);
 
