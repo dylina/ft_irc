@@ -534,6 +534,40 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 
 		// envoier a tous meme le new client
 		this->_channels[chan]->sendToAll(joinMsg);
+
+		// NAMES : liste des utilisateurs
+		std::string names = ":ircserv 353 " + client->getNickName()
+    		+ " = " + chan + " :";
+
+		std::vector<int> users = this->_channels[chan]->getAllUsers();
+
+		for (size_t i = 0; i < users.size(); ++i)
+		{
+    		// Récupérer les clients pour obtenir leurs nicknames
+    		for (std::map<int, Client *>::iterator it = this->clients.begin();
+        		it != this->clients.end(); ++it)
+    		{
+        		if (it->first == users[i])
+        		{
+            		if (this->_channels[chan]->isOperator(it->second))
+                		names += "@";
+            		names += it->second->getNickName() + " ";
+            		break;
+        		}
+    		}
+		}
+
+		client->sendReply(names);
+
+		client->sendReply(":ircserv 366 " + client->getNickName()
+    		+ " " + chan + " :End of /NAMES list");
+
+		// Envoyer le topic existant au nouvel arrivant
+		if (this->_channels[chan]->haveTopic())
+		{
+    		client->sendReply(":ircserv 332 " + client->getNickName()
+        		+ " " + chan + " :" + this->_channels[chan]->getTopic());
+		}
 	}
 }
 
@@ -644,8 +678,89 @@ void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
 
 void Server::cmdKick(Client *client, Client::parsedCommand &cmd)
 {
-	(void)client;
-	(void)cmd;
+	if (cmd.parametresMiddle.size() < 2)
+    {
+        client->sendReply(":ircserv 461 " + client->getNickName()
+            + " INVITE :Not enough parameters");
+        return;
+    }
+	
+	std::string channelName = cmd.parametresMiddle[0];
+	std::string targetNick = cmd.parametresMiddle[1];
+
+	//verification if the channel exist
+	std::map<std::string, Channel *>::iterator it = this->_channels.find(channelName);
+	if (it == this->_channels.end())
+	{
+		client->sendReply(":ircerv 403 " + client->getNickname()
+			+ " " + channelName + " :No such channel");
+		return;
+	}
+	Channel *channel = it->second;
+
+	//verif if the expeditor is in channel
+	if (!channel->isInChannel(client))
+	{
+		client->sendReply(":ircserv 442 " + client->getNickName()
+			+ " " + channelName + " :You're not on that channel");
+		return;
+	}
+
+	//verification if is the operator
+	if (!channel->isOperator(client))
+	{
+		client->sendReply(":ircserv 482 " + client->getNickName()
+			+ " " + channelName + " :You're not channel operator");
+		return;
+	}
+
+	//search for the user to delete
+	Client *target = NULL;
+
+	for (std::map<int, Client *>::iterator user = this->clients.begin();
+		user != this->clients.end(); ++user)
+	{
+		if (user->second->getNickName() == targetNick)
+		{
+			target = user->second;
+			break;
+		}
+	}
+
+	if (target == NULL)
+	{
+		client->sendReply(":ircserv 401 " + client->getNickName()
+			+ " " + targetNick + " :No such nick");
+		return;
+	}
+
+	//verif if the user to kick is in the channel
+	if (!channel->isInChannel(target))
+	{
+		client->sendReply(":ircserv 441 " + client->getNickName()
+			+ " " + targetNick + " :They aren't on that channel");
+		return;
+	}
+
+	//the kick message
+	std::string reason = cmd.trailing.empty()
+		? client->getNickName()
+		: cmd.trailing;
+	std::string cmdKickmessage = client->getMask() + " KICK " + channelName
+		+ " " + targetNick + " :" + reason;
+
+	//send the message to all channel members
+	channel->sendToAll(cmdKickmessage);
+
+	//delete user fron channel
+	channel->leaveChannel(target);
+
+	//if no more members delete the channel
+	if (channel->getNbrConnected() == 0)
+	{
+		delete channel;
+		this->_channels.erase(it);
+	}
 }
 
 void Server::cmdInvite(Client *client, Client::parsedCommand &cmd)
