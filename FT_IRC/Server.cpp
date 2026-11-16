@@ -139,7 +139,7 @@ static std::string formatMessage(
 	std::string channelTarget = "")
 {
 	std::ostringstream oss;
-	
+
 	oss << ":ircserv "
 		<< std::setfill('0') << std::setw(3) << error
 		<< " " << client->getNickName();
@@ -283,7 +283,7 @@ void Server::handleNICK(Client *client, std::vector<std::string> &params)
 
 	if (isNickIsAlreadyUse(client, nick) == true)
 		return;
-	
+
 	bool isNickChange = client->hasNick();
 	std::string oldMask = client->getMask();
 
@@ -359,7 +359,10 @@ void Server::handleUSER(Client *client, std::vector<std::string> &params, std::s
 void Server::finalizeRegistration(Client *client)
 {
 	if (client->isRegistered())
+	{
+		client->sendReply(formatMessage(ERR_ALREADYREGISTERED, MSG_ALREADYREGISTERED, client));
 		return ;
+	}
 	if (client->isPassOk() && client->hasNick() && client->hasUser())
 	{
 		client->setRegistered(true);
@@ -402,8 +405,8 @@ void Server::processCommands(Client *client)
 			cmdPrivmsg(client, cmd);
 		// else if (cmd.command == "NOTICE")
 		// cmdNotice(client, cmd);
-		// else if (cmd.command == "PING")
-		// 	cmdPing(client, cmd);
+		else if (cmd.command == "PING")
+			cmdPing(client, cmd);
 		else if (cmd.command == "QUIT")
 		{
 			cmdQuit(client, cmd);
@@ -684,7 +687,7 @@ void Server::cmdKick(Client *client, Client::parsedCommand &cmd)
             + " INVITE :Not enough parameters");
         return;
     }
-	
+
 	std::string channelName = cmd.parametresMiddle[0];
 	std::string targetNick = cmd.parametresMiddle[1];
 
@@ -981,7 +984,6 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 	{
 		if ((*it).del) // si c'est un +
 		{
-			std::cerr << "debug: add mode" << std::endl; // debug
 
 			if ((*it).mode == "k" || (*it).mode == "l" || (*it).mode == "o") // on verifie les params de k et de l (mdp et limite de nbr)
 			{
@@ -1000,6 +1002,7 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 							client->sendReply(formatMessage(ERR_INVALIDMODEPARAM, MSG_INVALIDMODEPARAM, client, channelTarget->getName()));
 							return;
 						}
+
 					}
 				}
 
@@ -1021,46 +1024,36 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 				countNbrChann++;
 			}
 		}
-		else // si c'est un -
+		else
 		{
-			std::cerr << "debug: supp mode" << std::endl; // debug
-
-			if ((*it).mode == "k") // on verifie les params de k
+			if ((*it).mode == "o") // on verif les args pour -o
 			{
 				size_t isExist = countNbrChann + 1;
-				if (isExist >= cmd.parametresMiddle.size()) // pas de params on pleures
+				for (std::map<int, Client*>::iterator ite = this->clients.begin(); ite != this->clients.end(); ite++)
 				{
-					client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
-					return;
+					if (cmd.parametresMiddle[isExist] == (*ite).second->getNickname())
+					{
+						(*it).parameter = cmd.parametresMiddle[isExist];
+						(*it).targetUser = (*ite).second;
+						break;
+					}
 				}
-				if ((*it).haveParameter && (*it).parameter.empty())
-					(*it).parameter = cmd.parametresMiddle[isExist]; // on rajoute le param du mode si c'est k
 				countNbrChann++;
 			}
 		}
 	}
 
 	size_t paramsNbr = countNbrChann + 1;
-	if (paramsNbr != cmd.parametresMiddle.size()) // si il y a trop de parametres dans le mode, on pleures encore
+	if (paramsNbr != cmd.parametresMiddle.size()) // si il y a trop de parametres dans le mode
 	{
 		client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
 		return;
 	}
 
-	// wip -------------------------------------------------
-	// wip gestion des modes une fois que tout est bien valide (normalement le parsing au dessu est bon (inch') (non il faut traiter mode sans rien apres car la sa segfault))
+	// gestion des modes une fois que tout est bien valide
 
 	for (size_t i = 0; i < _modeWantPair.size(); i++)
 	{
-		// std::cout << "debug " << i + 1 << ": \n" << "Del: "; msg debug ---------
-		// if (_modeWantPair[i].del)
-		// 	std::cout << "+" << std::endl;
-		// else
-		// 	std::cout << "-" << std::endl;
-		// std::cout << "mode: " << _modeWantPair[i].mode << std::endl;
-		// if (_modeWantPair[i].haveParameter)
-		// 	std::cout << "parameter: " << _modeWantPair[i].parameter << std::endl;---
-
 		int ret = -1;
 
 		if (_modeWantPair[i].del == false) // si le mode est -
@@ -1068,7 +1061,7 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 		else // si le mode est +
 			ret = channelTarget->mode.setMode(_modeWantPair[i].mode, client, _modeWantPair[i].targetUser, _modeWantPair[i].parameter, channelTarget);
 
-		if (ret == -1) // erreur qui ne devrait pas arriver #jepuelamerdenecode
+		if (ret == -1) // erreur qui ne devrait pas arriver
 			continue ;
 
 
@@ -1110,7 +1103,6 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 
 		channelTarget->sendToAll(msg);
 	}
-	// 	---------------------------------------------------
 }
 
 bool Server::isModeIsHandle(char &mode)
