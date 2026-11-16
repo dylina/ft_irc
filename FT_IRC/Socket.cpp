@@ -1,5 +1,6 @@
 #include "Socket.hpp"
 #include "colors.hpp"
+#include <fcntl.h> 
 
 const char* Socket::ErrorOfSocket::what() const throw()
 {

@@ -1,0 +1,2709 @@
+ft_irc tester - log detaille  (2026-11-10 15:56:43)
+serveur : 127.0.0.1:6667   mot de passe : 'pass'   executable : ../FT_IRC/ircserv
+>> = envoye par le testeur    << = recu du serveur    !! = verification echouee
+temps en secondes depuis le debut de chaque test
+
+==============================================================================
+[VALIDE] auth_wrong_password   (Authentification, test 1/77, 1.00s)
+------------------------------------------------------------------------------
+     0.000  [uoiugwap] >> 'PASS wrongpass\r\n'
+     0.000  [uoiugwap] >> 'NICK uoiugwap\r\n'
+     0.000  [uoiugwap] >> 'USER uoiugwap 0 * :x\r\n'
+     0.000  [uoiugwap] << :ircserv 464  :Password incorrect
+
+==============================================================================
+[VALIDE] auth_no_password   (Authentification, test 2/77, 1.00s)
+------------------------------------------------------------------------------
+     0.000  [uvcstkak] >> 'NICK uvcstkak\r\n'
+     0.000  [uvcstkak] >> 'USER uvcstkak 0 * :x\r\n'
+
+==============================================================================
+[VALIDE] auth_ok   (Authentification, test 3/77, 0.10s)
+------------------------------------------------------------------------------
+     0.000  [uuavhaiy] >> 'PASS pass\r\n'
+     0.000  [uuavhaiy] >> 'NICK uuavhaiy\r\n'
+     0.000  [uuavhaiy] >> 'USER uuavhaiy 0 * :Real uuavhaiy\r\n'
+     0.000  [uuavhaiy] << :ircserv 001 uuavhaiy :Welcome to the IRC network uuavhaiy!uuavhaiy@localhost
+     0.000  [uuavhaiy] << :ircserv 002 uuavhaiy :Your host is ircserv, running version 1.0
+     0.000  [uuavhaiy] << :ircserv 003 uuavhaiy :This server was created today
+     0.000  [uuavhaiy] << :ircserv 004 uuavhaiy ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] auth_password_after_nick_user   (Authentification, test 4/77, 0.00s)
+------------------------------------------------------------------------------
+     0.000  [upejjufn] >> 'NICK upejjufn\r\n'
+     0.000  [upejjufn] >> 'USER upejjufn 0 * :x\r\n'
+     0.000  [upejjufn] >> 'PASS pass\r\n'
+     0.000  [upejjufn] << :ircserv 001 upejjufn :Welcome to the IRC network upejjufn!upejjufn@localhost
+     0.000  [upejjufn] << :ircserv 002 upejjufn :Your host is ircserv, running version 1.0
+     0.000  [upejjufn] << :ircserv 003 upejjufn :This server was created today
+     0.000  [upejjufn] << :ircserv 004 upejjufn ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] auth_pass_missing_param   (Authentification, test 5/77, 0.00s)
+------------------------------------------------------------------------------
+     0.000  [uzjcezhd] >> 'PASS\r\n'
+     0.000  [uzjcezhd] << :ircserv 461  :Not enough parameters
+
+==============================================================================
+[VALIDE] auth_command_before_registration   (Authentification, test 6/77, 0.00s)
+------------------------------------------------------------------------------
+     0.000  [ujbyyvay] >> 'JOIN #notregistered\r\n'
+     0.000  [ujbyyvay] << :ircserv 451 * :You have not registered
+     0.000  [ujbyyvay] >> 'PRIVMSG someone :hi\r\n'
+     0.000  [ujbyyvay] << :ircserv 451 * :You have not registered
+
+==============================================================================
+[A VERIFIER] auth_pass_twice_after_register   (Authentification, test 7/77, 1.60s)
+  raison : pas de 462 (ERR_ALREADYREGISTRED) apres un second PASS
+------------------------------------------------------------------------------
+     0.000  [uvbsyont] >> 'PASS pass\r\n'
+     0.000  [uvbsyont] >> 'NICK uvbsyont\r\n'
+     0.000  [uvbsyont] >> 'USER uvbsyont 0 * :Real uvbsyont\r\n'
+     0.000  [uvbsyont] << :ircserv 001 uvbsyont :Welcome to the IRC network uvbsyont!uvbsyont@localhost
+     0.000  [uvbsyont] << :ircserv 002 uvbsyont :Your host is ircserv, running version 1.0
+     0.000  [uvbsyont] << :ircserv 003 uvbsyont :This server was created today
+     0.000  [uvbsyont] << :ircserv 004 uvbsyont ircserv 1.0 o o
+     0.100  [uvbsyont] >> 'PASS pass\r\n'
+     1.603  !! A VERIFIER : pas de 462 (ERR_ALREADYREGISTRED) apres un second PASS
+
+==============================================================================
+[VALIDE] nick_in_use   (Nick / User, test 8/77, 0.10s)
+------------------------------------------------------------------------------
+     0.000  [utqluory] >> 'PASS pass\r\n'
+     0.000  [utqluory] >> 'NICK utqluory\r\n'
+     0.000  [utqluory] >> 'USER utqluory 0 * :Real utqluory\r\n'
+     0.000  [utqluory] << :ircserv 001 utqluory :Welcome to the IRC network utqluory!utqluory@localhost
+     0.000  [utqluory] << :ircserv 002 utqluory :Your host is ircserv, running version 1.0
+     0.000  [utqluory] << :ircserv 003 utqluory :This server was created today
+     0.000  [utqluory] << :ircserv 004 utqluory ircserv 1.0 o o
+     0.101  [ucwfbokd] >> 'PASS pass\r\n'
+     0.101  [ucwfbokd] >> 'NICK utqluory\r\n'
+     0.101  [ucwfbokd] << :ircserv 433  :Nickname is already in use
+
+==============================================================================
+[VALIDE] nick_change   (Nick / User, test 9/77, 0.10s)
+------------------------------------------------------------------------------
+     0.000  [ujvrkzwn] >> 'PASS pass\r\n'
+     0.000  [ujvrkzwn] >> 'NICK ujvrkzwn\r\n'
+     0.000  [ujvrkzwn] >> 'USER ujvrkzwn 0 * :Real ujvrkzwn\r\n'
+     0.000  [ujvrkzwn] << :ircserv 001 ujvrkzwn :Welcome to the IRC network ujvrkzwn!ujvrkzwn@localhost
+     0.000  [ujvrkzwn] << :ircserv 002 ujvrkzwn :Your host is ircserv, running version 1.0
+     0.000  [ujvrkzwn] << :ircserv 003 ujvrkzwn :This server was created today
+     0.000  [ujvrkzwn] << :ircserv 004 ujvrkzwn ircserv 1.0 o o
+     0.100  [ujvrkzwn] >> 'NICK ntpjqgrm\r\n'
+     0.101  [ujvrkzwn] << :ujvrkzwn!ujvrkzwn@localhost NICK :ntpjqgrm
+
+==============================================================================
+[VALIDE] nick_change_broadcast   (Nick / User, test 10/77, 0.40s)
+------------------------------------------------------------------------------
+     0.000  [uhfoaoiu] >> 'PASS pass\r\n'
+     0.000  [uhfoaoiu] >> 'NICK uhfoaoiu\r\n'
+     0.000  [uhfoaoiu] >> 'USER uhfoaoiu 0 * :Real uhfoaoiu\r\n'
+     0.000  [uhfoaoiu] << :ircserv 001 uhfoaoiu :Welcome to the IRC network uhfoaoiu!uhfoaoiu@localhost
+     0.000  [uhfoaoiu] << :ircserv 002 uhfoaoiu :Your host is ircserv, running version 1.0
+     0.000  [uhfoaoiu] << :ircserv 003 uhfoaoiu :This server was created today
+     0.000  [uhfoaoiu] << :ircserv 004 uhfoaoiu ircserv 1.0 o o
+     0.101  [uocpppoj] >> 'PASS pass\r\n'
+     0.101  [uocpppoj] >> 'NICK uocpppoj\r\n'
+     0.101  [uocpppoj] >> 'USER uocpppoj 0 * :Real uocpppoj\r\n'
+     0.101  [uocpppoj] << :ircserv 001 uocpppoj :Welcome to the IRC network uocpppoj!uocpppoj@localhost
+     0.101  [uocpppoj] << :ircserv 002 uocpppoj :Your host is ircserv, running version 1.0
+     0.101  [uocpppoj] << :ircserv 003 uocpppoj :This server was created today
+     0.101  [uocpppoj] << :ircserv 004 uocpppoj ircserv 1.0 o o
+     0.201  [uhfoaoiu] >> 'JOIN #tzbeeb\r\n'
+     0.201  [uhfoaoiu] << :uhfoaoiu JOIN :#tzbeeb
+     0.201  [uhfoaoiu] << :ircserv 353 uhfoaoiu = #tzbeeb :@uhfoaoiu 
+     0.201  [uhfoaoiu] << :ircserv 366 uhfoaoiu #tzbeeb :End of /NAMES list
+     0.201  [uocpppoj] >> 'JOIN #tzbeeb\r\n'
+     0.201  [uocpppoj] << :uocpppoj JOIN :#tzbeeb
+     0.201  [uocpppoj] << :ircserv 353 uocpppoj = #tzbeeb :@uhfoaoiu uocpppoj 
+     0.201  [uocpppoj] << :ircserv 366 uocpppoj #tzbeeb :End of /NAMES list
+     0.201  [uhfoaoiu] << :uocpppoj JOIN :#tzbeeb
+     0.402  [uhfoaoiu] >> 'NICK niilersf\r\n'
+     0.402  [uhfoaoiu] << :uhfoaoiu!uhfoaoiu@localhost NICK :niilersf
+     0.402  [uocpppoj] << :uhfoaoiu!uhfoaoiu@localhost NICK :niilersf
+
+==============================================================================
+[VALIDE] nick_no_param_and_invalid   (Nick / User, test 11/77, 0.10s)
+------------------------------------------------------------------------------
+     0.000  [uoqbllci] >> 'PASS pass\r\n'
+     0.000  [uoqbllci] >> 'NICK uoqbllci\r\n'
+     0.000  [uoqbllci] >> 'USER uoqbllci 0 * :Real uoqbllci\r\n'
+     0.000  [uoqbllci] << :ircserv 001 uoqbllci :Welcome to the IRC network uoqbllci!uoqbllci@localhost
+     0.000  [uoqbllci] << :ircserv 002 uoqbllci :Your host is ircserv, running version 1.0
+     0.000  [uoqbllci] << :ircserv 003 uoqbllci :This server was created today
+     0.000  [uoqbllci] << :ircserv 004 uoqbllci ircserv 1.0 o o
+     0.100  [uoqbllci] >> 'NICK\r\n'
+     0.101  [uoqbllci] << :ircserv 431 uoqbllci :No nickname given
+     0.101  [uoqbllci] >> 'NICK #bad\r\n'
+     0.101  [uoqbllci] << :ircserv 432 * #bad :Erroneous nickname
+
+==============================================================================
+[A VERIFIER] unknown_command   (Nick / User, test 12/77, 1.10s)
+  raison : PING sans PONG
+------------------------------------------------------------------------------
+     0.000  [udxezyfy] >> 'PASS pass\r\n'
+     0.000  [udxezyfy] >> 'NICK udxezyfy\r\n'
+     0.000  [udxezyfy] >> 'USER udxezyfy 0 * :Real udxezyfy\r\n'
+     0.000  [udxezyfy] << :ircserv 001 udxezyfy :Welcome to the IRC network udxezyfy!udxezyfy@localhost
+     0.000  [udxezyfy] << :ircserv 002 udxezyfy :Your host is ircserv, running version 1.0
+     0.000  [udxezyfy] << :ircserv 003 udxezyfy :This server was created today
+     0.000  [udxezyfy] << :ircserv 004 udxezyfy ircserv 1.0 o o
+     0.100  [udxezyfy] >> 'FOOBAR a b\r\n'
+     0.101  [udxezyfy] << :ircserv 421 * FOOBAR :Unknown command
+     0.101  [udxezyfy] >> 'PING tok\r\n'
+     0.101  [udxezyfy] << :ircserv 421 * PING :Unknown command
+     1.102  !! A VERIFIER : PING sans PONG
+
+==============================================================================
+[VALIDE] unknown_prefix_and_case   (Nick / User, test 13/77, 0.10s)
+------------------------------------------------------------------------------
+     0.000  [uakhhrtx] >> 'PASS pass\r\n'
+     0.000  [uakhhrtx] >> 'NICK uakhhrtx\r\n'
+     0.000  [uakhhrtx] >> 'USER uakhhrtx 0 * :Real uakhhrtx\r\n'
+     0.000  [uakhhrtx] << :ircserv 001 uakhhrtx :Welcome to the IRC network uakhhrtx!uakhhrtx@localhost
+     0.000  [uakhhrtx] << :ircserv 002 uakhhrtx :Your host is ircserv, running version 1.0
+     0.000  [uakhhrtx] << :ircserv 003 uakhhrtx :This server was created today
+     0.000  [uakhhrtx] << :ircserv 004 uakhhrtx ircserv 1.0 o o
+     0.101  [uakhhrtx] >> 'join #nfpg\r\n'
+     0.101  [uakhhrtx] << :uakhhrtx JOIN :#nfpg
+     0.101  [uakhhrtx] << :ircserv 353 uakhhrtx = #nfpg :@uakhhrtx 
+     0.101  [uakhhrtx] << :ircserv 366 uakhhrtx #nfpg :End of /NAMES list
+
+==============================================================================
+[VALIDE] user_registration_params   (Nick / User, test 14/77, 0.00s)
+------------------------------------------------------------------------------
+     0.000  [uoxcldly] >> 'PASS pass\r\n'
+     0.000  [uoxcldly] >> 'USER onlyone\r\n'
+     0.000  [uoxcldly] << :ircserv 461 * USER :Not enough parameters
+
+==============================================================================
+[VALIDE] join_basic   (Canaux, test 15/77, 0.10s)
+------------------------------------------------------------------------------
+     0.000  [unebvjwu] >> 'PASS pass\r\n'
+     0.000  [unebvjwu] >> 'NICK unebvjwu\r\n'
+     0.000  [unebvjwu] >> 'USER unebvjwu 0 * :Real unebvjwu\r\n'
+     0.000  [unebvjwu] << :ircserv 001 unebvjwu :Welcome to the IRC network unebvjwu!unebvjwu@localhost
+     0.000  [unebvjwu] << :ircserv 002 unebvjwu :Your host is ircserv, running version 1.0
+     0.000  [unebvjwu] << :ircserv 003 unebvjwu :This server was created today
+     0.000  [unebvjwu] << :ircserv 004 unebvjwu ircserv 1.0 o o
+     0.100  [unebvjwu] >> 'JOIN #jzuhuc\r\n'
+     0.101  [unebvjwu] << :unebvjwu JOIN :#jzuhuc
+     0.101  [unebvjwu] << :ircserv 353 unebvjwu = #jzuhuc :@unebvjwu 
+     0.101  [unebvjwu] << :ircserv 366 unebvjwu #jzuhuc :End of /NAMES list
+
+==============================================================================
+[VALIDE] join_first_is_operator   (Canaux, test 16/77, 0.10s)
+------------------------------------------------------------------------------
+     0.000  [udlcuyor] >> 'PASS pass\r\n'
+     0.000  [udlcuyor] >> 'NICK udlcuyor\r\n'
+     0.000  [udlcuyor] >> 'USER udlcuyor 0 * :Real udlcuyor\r\n'
+     0.000  [udlcuyor] << :ircserv 001 udlcuyor :Welcome to the IRC network udlcuyor!udlcuyor@localhost
+     0.000  [udlcuyor] << :ircserv 002 udlcuyor :Your host is ircserv, running version 1.0
+     0.000  [udlcuyor] << :ircserv 003 udlcuyor :This server was created today
+     0.000  [udlcuyor] << :ircserv 004 udlcuyor ircserv 1.0 o o
+     0.100  [udlcuyor] >> 'JOIN #ohedoi\r\n'
+     0.101  [udlcuyor] << :udlcuyor JOIN :#ohedoi
+     0.101  [udlcuyor] << :ircserv 353 udlcuyor = #ohedoi :@udlcuyor 
+     0.101  [udlcuyor] << :ircserv 366 udlcuyor #ohedoi :End of /NAMES list
+
+==============================================================================
+[VALIDE] join_notifies_members   (Canaux, test 17/77, 0.30s)
+------------------------------------------------------------------------------
+     0.000  [ujimdjvy] >> 'PASS pass\r\n'
+     0.000  [ujimdjvy] >> 'NICK ujimdjvy\r\n'
+     0.000  [ujimdjvy] >> 'USER ujimdjvy 0 * :Real ujimdjvy\r\n'
+     0.000  [ujimdjvy] << :ircserv 001 ujimdjvy :Welcome to the IRC network ujimdjvy!ujimdjvy@localhost
+     0.000  [ujimdjvy] << :ircserv 002 ujimdjvy :Your host is ircserv, running version 1.0
+     0.000  [ujimdjvy] << :ircserv 003 ujimdjvy :This server was created today
+     0.000  [ujimdjvy] << :ircserv 004 ujimdjvy ircserv 1.0 o o
+     0.100  [ujimdjvy] >> 'JOIN #tvgvrw\r\n'
+     0.101  [ujimdjvy] << :ujimdjvy JOIN :#tvgvrw
+     0.101  [ujimdjvy] << :ircserv 353 ujimdjvy = #tvgvrw :@ujimdjvy 
+     0.101  [ujimdjvy] << :ircserv 366 ujimdjvy #tvgvrw :End of /NAMES list
+     0.201  [uheddzrj] >> 'PASS pass\r\n'
+     0.201  [uheddzrj] >> 'NICK uheddzrj\r\n'
+     0.201  [uheddzrj] >> 'USER uheddzrj 0 * :Real uheddzrj\r\n'
+     0.201  [uheddzrj] << :ircserv 001 uheddzrj :Welcome to the IRC network uheddzrj!uheddzrj@localhost
+     0.201  [uheddzrj] << :ircserv 002 uheddzrj :Your host is ircserv, running version 1.0
+     0.201  [uheddzrj] << :ircserv 003 uheddzrj :This server was created today
+     0.201  [uheddzrj] << :ircserv 004 uheddzrj ircserv 1.0 o o
+     0.301  [uheddzrj] >> 'JOIN #tvgvrw\r\n'
+     0.302  [ujimdjvy] << :uheddzrj JOIN :#tvgvrw
+
+==============================================================================
+[VALIDE] join_no_param   (Canaux, test 18/77, 0.10s)
+------------------------------------------------------------------------------
+     0.000  [uisanhru] >> 'PASS pass\r\n'
+     0.000  [uisanhru] >> 'NICK uisanhru\r\n'
+     0.000  [uisanhru] >> 'USER uisanhru 0 * :Real uisanhru\r\n'
+     0.000  [uisanhru] << :ircserv 001 uisanhru :Welcome to the IRC network uisanhru!uisanhru@localhost
+     0.000  [uisanhru] << :ircserv 002 uisanhru :Your host is ircserv, running version 1.0
+     0.000  [uisanhru] << :ircserv 003 uisanhru :This server was created today
+     0.000  [uisanhru] << :ircserv 004 uisanhru ircserv 1.0 o o
+     0.101  [uisanhru] >> 'JOIN\r\n'
+     0.101  [uisanhru] << :ircserv 461 uisanhru JOIN :Not enough parameters
+
+==============================================================================
+[VALIDE] join_multiple_channels   (Canaux, test 19/77, 0.10s)
+------------------------------------------------------------------------------
+     0.000  [uqehojzh] >> 'PASS pass\r\n'
+     0.000  [uqehojzh] >> 'NICK uqehojzh\r\n'
+     0.000  [uqehojzh] >> 'USER uqehojzh 0 * :Real uqehojzh\r\n'
+     0.000  [uqehojzh] << :ircserv 001 uqehojzh :Welcome to the IRC network uqehojzh!uqehojzh@localhost
+     0.000  [uqehojzh] << :ircserv 002 uqehojzh :Your host is ircserv, running version 1.0
+     0.000  [uqehojzh] << :ircserv 003 uqehojzh :This server was created today
+     0.000  [uqehojzh] << :ircserv 004 uqehojzh ircserv 1.0 o o
+     0.101  [uqehojzh] >> 'JOIN #mhhri,#mhiot\r\n'
+     0.101  [uqehojzh] << :uqehojzh JOIN :#mhhri
+     0.101  [uqehojzh] << :ircserv 353 uqehojzh = #mhhri :@uqehojzh 
+     0.101  [uqehojzh] << :ircserv 366 uqehojzh #mhhri :End of /NAMES list
+     0.101  [uqehojzh] << :uqehojzh JOIN :#mhiot
+     0.101  [uqehojzh] << :ircserv 353 uqehojzh = #mhiot :@uqehojzh 
+     0.101  [uqehojzh] << :ircserv 366 uqehojzh #mhiot :End of /NAMES list
+
+==============================================================================
+[VALIDE] part_basic   (Canaux, test 20/77, 0.90s)
+------------------------------------------------------------------------------
+     0.000  [ujhhditk] >> 'PASS pass\r\n'
+     0.000  [ujhhditk] >> 'NICK ujhhditk\r\n'
+     0.000  [ujhhditk] >> 'USER ujhhditk 0 * :Real ujhhditk\r\n'
+     0.000  [ujhhditk] << :ircserv 001 ujhhditk :Welcome to the IRC network ujhhditk!ujhhditk@localhost
+     0.000  [ujhhditk] << :ircserv 002 ujhhditk :Your host is ircserv, running version 1.0
+     0.000  [ujhhditk] << :ircserv 003 ujhhditk :This server was created today
+     0.000  [ujhhditk] << :ircserv 004 ujhhditk ircserv 1.0 o o
+     0.101  [udyavsem] >> 'PASS pass\r\n'
+     0.101  [udyavsem] >> 'NICK udyavsem\r\n'
+     0.101  [udyavsem] >> 'USER udyavsem 0 * :Real udyavsem\r\n'
+     0.101  [udyavsem] << :ircserv 001 udyavsem :Welcome to the IRC network udyavsem!udyavsem@localhost
+     0.101  [udyavsem] << :ircserv 002 udyavsem :Your host is ircserv, running version 1.0
+     0.101  [udyavsem] << :ircserv 003 udyavsem :This server was created today
+     0.101  [udyavsem] << :ircserv 004 udyavsem ircserv 1.0 o o
+     0.201  [ujhhditk] >> 'JOIN #tuwwxs\r\n'
+     0.201  [ujhhditk] << :ujhhditk JOIN :#tuwwxs
+     0.201  [ujhhditk] << :ircserv 353 ujhhditk = #tuwwxs :@ujhhditk 
+     0.201  [ujhhditk] << :ircserv 366 ujhhditk #tuwwxs :End of /NAMES list
+     0.201  [udyavsem] >> 'JOIN #tuwwxs\r\n'
+     0.201  [udyavsem] << :udyavsem JOIN :#tuwwxs
+     0.201  [udyavsem] << :ircserv 353 udyavsem = #tuwwxs :@ujhhditk udyavsem 
+     0.201  [udyavsem] << :ircserv 366 udyavsem #tuwwxs :End of /NAMES list
+     0.201  [ujhhditk] << :udyavsem JOIN :#tuwwxs
+     0.402  [udyavsem] >> 'PART #tuwwxs :bye\r\n'
+     0.402  [udyavsem] << :udyavsem!udyavsem@localhost PART #tuwwxs :bye
+     0.402  [ujhhditk] << :udyavsem!udyavsem@localhost PART #tuwwxs :bye
+     0.402  [ujhhditk] >> 'PRIVMSG #tuwwxs :hello\r\n'
+
+==============================================================================
+[VALIDE] part_not_on_channel_and_no_such   (Canaux, test 21/77, 0.10s)
+------------------------------------------------------------------------------
+     0.000  [urbdczyh] >> 'PASS pass\r\n'
+     0.000  [urbdczyh] >> 'NICK urbdczyh\r\n'
+     0.000  [urbdczyh] >> 'USER urbdczyh 0 * :Real urbdczyh\r\n'
+     0.000  [urbdczyh] << :ircserv 001 urbdczyh :Welcome to the IRC network urbdczyh!urbdczyh@localhost
+     0.000  [urbdczyh] << :ircserv 002 urbdczyh :Your host is ircserv, running version 1.0
+     0.000  [urbdczyh] << :ircserv 003 urbdczyh :This server was created today
+     0.000  [urbdczyh] << :ircserv 004 urbdczyh ircserv 1.0 o o
+     0.100  [urbdczyh] >> 'PART #nochanhysf\r\n'
+     0.101  [urbdczyh] << :ircserv 403 urbdczyh #nochanhysf :No such channel
+
+==============================================================================
+[VALIDE] channel_recreated_after_all_leave   (Canaux, test 22/77, 0.50s)
+------------------------------------------------------------------------------
+     0.000  [uicjnndp] >> 'PASS pass\r\n'
+     0.000  [uicjnndp] >> 'NICK uicjnndp\r\n'
+     0.000  [uicjnndp] >> 'USER uicjnndp 0 * :Real uicjnndp\r\n'
+     0.000  [uicjnndp] << :ircserv 001 uicjnndp :Welcome to the IRC network uicjnndp!uicjnndp@localhost
+     0.000  [uicjnndp] << :ircserv 002 uicjnndp :Your host is ircserv, running version 1.0
+     0.000  [uicjnndp] << :ircserv 003 uicjnndp :This server was created today
+     0.000  [uicjnndp] << :ircserv 004 uicjnndp ircserv 1.0 o o
+     0.100  [uicjnndp] >> 'JOIN #tglbji\r\n'
+     0.101  [uicjnndp] << :uicjnndp JOIN :#tglbji
+     0.101  [uicjnndp] << :ircserv 353 uicjnndp = #tglbji :@uicjnndp 
+     0.101  [uicjnndp] << :ircserv 366 uicjnndp #tglbji :End of /NAMES list
+     0.201  [uicjnndp] >> 'PART #tglbji\r\n'
+     0.201  [uicjnndp] << :uicjnndp!uicjnndp@localhost PART #tglbji
+     0.401  [ugtfdbmm] >> 'PASS pass\r\n'
+     0.401  [ugtfdbmm] >> 'NICK ugtfdbmm\r\n'
+     0.401  [ugtfdbmm] >> 'USER ugtfdbmm 0 * :Real ugtfdbmm\r\n'
+     0.402  [ugtfdbmm] << :ircserv 001 ugtfdbmm :Welcome to the IRC network ugtfdbmm!ugtfdbmm@localhost
+     0.402  [ugtfdbmm] << :ircserv 002 ugtfdbmm :Your host is ircserv, running version 1.0
+     0.402  [ugtfdbmm] << :ircserv 003 ugtfdbmm :This server was created today
+     0.402  [ugtfdbmm] << :ircserv 004 ugtfdbmm ircserv 1.0 o o
+     0.502  [ugtfdbmm] >> 'JOIN #tglbji\r\n'
+     0.502  [ugtfdbmm] << :ugtfdbmm JOIN :#tglbji
+     0.502  [ugtfdbmm] << :ircserv 353 ugtfdbmm = #tglbji :@ugtfdbmm 
+     0.502  [ugtfdbmm] << :ircserv 366 ugtfdbmm #tglbji :End of /NAMES list
+
+==============================================================================
+[VALIDE] partial_ctrl_d_style   (Canaux, test 23/77, 1.20s)
+------------------------------------------------------------------------------
+     0.000  [uzghdqti] >> 'PASS pass\r\n'
+     0.000  [uzghdqti] >> 'NICK uzghdqti\r\n'
+     0.000  [uzghdqti] >> 'USER uzghdqti 0 * :Real uzghdqti\r\n'
+     0.000  [uzghdqti] << :ircserv 001 uzghdqti :Welcome to the IRC network uzghdqti!uzghdqti@localhost
+     0.000  [uzghdqti] << :ircserv 002 uzghdqti :Your host is ircserv, running version 1.0
+     0.000  [uzghdqti] << :ircserv 003 uzghdqti :This server was created today
+     0.000  [uzghdqti] << :ircserv 004 uzghdqti ircserv 1.0 o o
+     0.101  [uadqqflu] >> 'PASS pass\r\n'
+     0.101  [uadqqflu] >> 'NICK uadqqflu\r\n'
+     0.101  [uadqqflu] >> 'USER uadqqflu 0 * :Real uadqqflu\r\n'
+     0.101  [uadqqflu] << :ircserv 001 uadqqflu :Welcome to the IRC network uadqqflu!uadqqflu@localhost
+     0.101  [uadqqflu] << :ircserv 002 uadqqflu :Your host is ircserv, running version 1.0
+     0.101  [uadqqflu] << :ircserv 003 uadqqflu :This server was created today
+     0.101  [uadqqflu] << :ircserv 004 uadqqflu ircserv 1.0 o o
+     0.201  [uzghdqti] >> 'PRIV'
+     0.451  [uzghdqti] >> 'MSG uadqqflu :hel'
+     0.701  [uzghdqti] >> 'lo wor'
+     0.952  [uzghdqti] >> 'ld\r\n'
+     1.202  [uadqqflu] << :uzghdqti PRIVMSG uadqqflu :hello world
+
+==============================================================================
+[VALIDE] partial_com_man_d   (Canaux, test 24/77, 1.25s)
+------------------------------------------------------------------------------
+     0.000  [uqngejsg] >> 'PASS pass\r\n'
+     0.000  [uqngejsg] >> 'NICK uqngejsg\r\n'
+     0.000  [uqngejsg] >> 'USER uqngejsg 0 * :Real uqngejsg\r\n'
+     0.000  [uqngejsg] << :ircserv 001 uqngejsg :Welcome to the IRC network uqngejsg!uqngejsg@localhost
+     0.000  [uqngejsg] << :ircserv 002 uqngejsg :Your host is ircserv, running version 1.0
+     0.000  [uqngejsg] << :ircserv 003 uqngejsg :This server was created today
+     0.000  [uqngejsg] << :ircserv 004 uqngejsg ircserv 1.0 o o
+     0.100  [uqngejsg] >> 'com'
+     0.351  [uqngejsg] >> 'man'
+     0.601  [uqngejsg] >> 'd\n'
+     1.152  [ujkgazmo] >> 'PASS pass\r\n'
+     1.152  [ujkgazmo] >> 'NICK ujkgazmo\r\n'
+     1.152  [ujkgazmo] >> 'USER ujkgazmo 0 * :Real ujkgazmo\r\n'
+     1.152  [ujkgazmo] << :ircserv 001 ujkgazmo :Welcome to the IRC network ujkgazmo!ujkgazmo@localhost
+     1.152  [ujkgazmo] << :ircserv 002 ujkgazmo :Your host is ircserv, running version 1.0
+     1.152  [ujkgazmo] << :ircserv 003 ujkgazmo :This server was created today
+     1.152  [ujkgazmo] << :ircserv 004 ujkgazmo ircserv 1.0 o o
+
+==============================================================================
+[NON VALIDE] partial_bare_lf   (Canaux, test 25/77, 1.70s)
+  raison : terminaison '\n' seul non geree (nc sans -C)
+------------------------------------------------------------------------------
+     0.000  [ukpozxvb] >> 'PASS pass\r\n'
+     0.000  [ukpozxvb] >> 'NICK ukpozxvb\r\n'
+     0.000  [ukpozxvb] >> 'USER ukpozxvb 0 * :Real ukpozxvb\r\n'
+     0.000  [ukpozxvb] << :ircserv 001 ukpozxvb :Welcome to the IRC network ukpozxvb!ukpozxvb@localhost
+     0.000  [ukpozxvb] << :ircserv 002 ukpozxvb :Your host is ircserv, running version 1.0
+     0.000  [ukpozxvb] << :ircserv 003 ukpozxvb :This server was created today
+     0.000  [ukpozxvb] << :ircserv 004 ukpozxvb ircserv 1.0 o o
+     0.100  [udxiwklh] >> 'PASS pass\r\n'
+     0.100  [udxiwklh] >> 'NICK udxiwklh\r\n'
+     0.100  [udxiwklh] >> 'USER udxiwklh 0 * :Real udxiwklh\r\n'
+     0.101  [udxiwklh] << :ircserv 001 udxiwklh :Welcome to the IRC network udxiwklh!udxiwklh@localhost
+     0.101  [udxiwklh] << :ircserv 002 udxiwklh :Your host is ircserv, running version 1.0
+     0.101  [udxiwklh] << :ircserv 003 udxiwklh :This server was created today
+     0.101  [udxiwklh] << :ircserv 004 udxiwklh ircserv 1.0 o o
+     0.201  [ukpozxvb] >> 'PRIVMSG udxiwklh :lf only\n'
+     1.704  !! ECHEC : terminaison '\n' seul non geree (nc sans -C)
+
+==============================================================================
+[VALIDE] partial_byte_by_byte   (Canaux, test 26/77, 0.68s)
+------------------------------------------------------------------------------
+     0.000  [udymhoeb] >> 'PASS pass\r\n'
+     0.000  [udymhoeb] >> 'NICK udymhoeb\r\n'
+     0.000  [udymhoeb] >> 'USER udymhoeb 0 * :Real udymhoeb\r\n'
+     0.000  [udymhoeb] << :ircserv 001 udymhoeb :Welcome to the IRC network udymhoeb!udymhoeb@localhost
+     0.000  [udymhoeb] << :ircserv 002 udymhoeb :Your host is ircserv, running version 1.0
+     0.000  [udymhoeb] << :ircserv 003 udymhoeb :This server was created today
+     0.000  [udymhoeb] << :ircserv 004 udymhoeb ircserv 1.0 o o
+     0.101  [uhphdqlw] >> 'PASS pass\r\n'
+     0.101  [uhphdqlw] >> 'NICK uhphdqlw\r\n'
+     0.101  [uhphdqlw] >> 'USER uhphdqlw 0 * :Real uhphdqlw\r\n'
+     0.101  [uhphdqlw] << :ircserv 001 uhphdqlw :Welcome to the IRC network uhphdqlw!uhphdqlw@localhost
+     0.101  [uhphdqlw] << :ircserv 002 uhphdqlw :Your host is ircserv, running version 1.0
+     0.101  [uhphdqlw] << :ircserv 003 uhphdqlw :This server was created today
+     0.101  [uhphdqlw] << :ircserv 004 uhphdqlw ircserv 1.0 o o
+     0.201  [udymhoeb] >> 'P'
+     0.221  [udymhoeb] >> 'R'
+     0.241  [udymhoeb] >> 'I'
+     0.261  [udymhoeb] >> 'V'
+     0.281  [udymhoeb] >> 'M'
+     0.301  [udymhoeb] >> 'S'
+     0.322  [udymhoeb] >> 'G'
+     0.342  [udymhoeb] >> ' '
+     0.362  [udymhoeb] >> 'u'
+     0.382  [udymhoeb] >> 'h'
+     0.402  [udymhoeb] >> 'p'
+     0.422  [udymhoeb] >> 'h'
+     0.442  [udymhoeb] >> 'd'
+     0.462  [udymhoeb] >> 'q'
+     0.482  [udymhoeb] >> 'l'
+     0.503  [udymhoeb] >> 'w'
+     0.523  [udymhoeb] >> ' '
+     0.543  [udymhoeb] >> ':'
+     0.563  [udymhoeb] >> 'l'
+     0.583  [udymhoeb] >> 'e'
+     0.603  [udymhoeb] >> 'n'
+     0.623  [udymhoeb] >> 't'
+     0.643  [udymhoeb] >> '\r'
+     0.663  [udymhoeb] >> '\n'
+     0.683  [uhphdqlw] << :udymhoeb PRIVMSG uhphdqlw :lent
+
+==============================================================================
+[VALIDE] partial_registration_split   (Canaux, test 27/77, 1.00s)
+------------------------------------------------------------------------------
+     0.000  [uhotdqxt] >> 'PA'
+     0.200  [uhotdqxt] >> 'SS pass\r'
+     0.401  [uhotdqxt] >> '\nNICK pil'
+     0.601  [uhotdqxt] >> 'hfxx\r\nUSER u 0 * :r'
+     0.801  [uhotdqxt] >> 'n\r\n'
+     1.002  [uhotdqxt] << :ircserv 001 pilhfxx :Welcome to the IRC network pilhfxx!u@localhost
+     1.002  [uhotdqxt] << :ircserv 002 pilhfxx :Your host is ircserv, running version 1.0
+     1.002  [uhotdqxt] << :ircserv 003 pilhfxx :This server was created today
+     1.002  [uhotdqxt] << :ircserv 004 pilhfxx ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] privmsg_channel_broadcast   (Messages, test 28/77, 1.10s)
+------------------------------------------------------------------------------
+     0.000  [urmvsowr] >> 'PASS pass\r\n'
+     0.000  [urmvsowr] >> 'NICK urmvsowr\r\n'
+     0.000  [urmvsowr] >> 'USER urmvsowr 0 * :Real urmvsowr\r\n'
+     0.000  [urmvsowr] << :ircserv 001 urmvsowr :Welcome to the IRC network urmvsowr!urmvsowr@localhost
+     0.000  [urmvsowr] << :ircserv 002 urmvsowr :Your host is ircserv, running version 1.0
+     0.000  [urmvsowr] << :ircserv 003 urmvsowr :This server was created today
+     0.000  [urmvsowr] << :ircserv 004 urmvsowr ircserv 1.0 o o
+     0.101  [uyprhqxz] >> 'PASS pass\r\n'
+     0.101  [uyprhqxz] >> 'NICK uyprhqxz\r\n'
+     0.101  [uyprhqxz] >> 'USER uyprhqxz 0 * :Real uyprhqxz\r\n'
+     0.101  [uyprhqxz] << :ircserv 001 uyprhqxz :Welcome to the IRC network uyprhqxz!uyprhqxz@localhost
+     0.101  [uyprhqxz] << :ircserv 002 uyprhqxz :Your host is ircserv, running version 1.0
+     0.101  [uyprhqxz] << :ircserv 003 uyprhqxz :This server was created today
+     0.101  [uyprhqxz] << :ircserv 004 uyprhqxz ircserv 1.0 o o
+     0.201  [ujinnwmg] >> 'PASS pass\r\n'
+     0.201  [ujinnwmg] >> 'NICK ujinnwmg\r\n'
+     0.201  [ujinnwmg] >> 'USER ujinnwmg 0 * :Real ujinnwmg\r\n'
+     0.201  [ujinnwmg] << :ircserv 001 ujinnwmg :Welcome to the IRC network ujinnwmg!ujinnwmg@localhost
+     0.201  [ujinnwmg] << :ircserv 002 ujinnwmg :Your host is ircserv, running version 1.0
+     0.201  [ujinnwmg] << :ircserv 003 ujinnwmg :This server was created today
+     0.201  [ujinnwmg] << :ircserv 004 ujinnwmg ircserv 1.0 o o
+     0.301  [urmvsowr] >> 'JOIN #tyzlln\r\n'
+     0.301  [urmvsowr] << :urmvsowr JOIN :#tyzlln
+     0.301  [urmvsowr] << :ircserv 353 urmvsowr = #tyzlln :@urmvsowr 
+     0.301  [urmvsowr] << :ircserv 366 urmvsowr #tyzlln :End of /NAMES list
+     0.301  [uyprhqxz] >> 'JOIN #tyzlln\r\n'
+     0.301  [uyprhqxz] << :uyprhqxz JOIN :#tyzlln
+     0.301  [uyprhqxz] << :ircserv 353 uyprhqxz = #tyzlln :@urmvsowr uyprhqxz 
+     0.301  [uyprhqxz] << :ircserv 366 uyprhqxz #tyzlln :End of /NAMES list
+     0.301  [ujinnwmg] >> 'JOIN #tyzlln\r\n'
+     0.302  [ujinnwmg] << :ujinnwmg JOIN :#tyzlln
+     0.302  [ujinnwmg] << :ircserv 353 ujinnwmg = #tyzlln :@urmvsowr uyprhqxz ujinnwmg 
+     0.302  [ujinnwmg] << :ircserv 366 ujinnwmg #tyzlln :End of /NAMES list
+     0.302  [urmvsowr] << :uyprhqxz JOIN :#tyzlln
+     0.302  [urmvsowr] << :ujinnwmg JOIN :#tyzlln
+     0.402  [uyprhqxz] << :ujinnwmg JOIN :#tyzlln
+     0.602  [urmvsowr] >> 'PRIVMSG #tyzlln :hello everyone\r\n'
+     0.602  [uyprhqxz] << :urmvsowr PRIVMSG #tyzlln :hello everyone
+     0.602  [ujinnwmg] << :urmvsowr PRIVMSG #tyzlln :hello everyone
+
+==============================================================================
+[VALIDE] privmsg_channel_isolated   (Messages, test 29/77, 1.10s)
+------------------------------------------------------------------------------
+     0.000  [unbgcxse] >> 'PASS pass\r\n'
+     0.000  [unbgcxse] >> 'NICK unbgcxse\r\n'
+     0.000  [unbgcxse] >> 'USER unbgcxse 0 * :Real unbgcxse\r\n'
+     0.000  [unbgcxse] << :ircserv 001 unbgcxse :Welcome to the IRC network unbgcxse!unbgcxse@localhost
+     0.000  [unbgcxse] << :ircserv 002 unbgcxse :Your host is ircserv, running version 1.0
+     0.000  [unbgcxse] << :ircserv 003 unbgcxse :This server was created today
+     0.000  [unbgcxse] << :ircserv 004 unbgcxse ircserv 1.0 o o
+     0.101  [usekfntd] >> 'PASS pass\r\n'
+     0.101  [usekfntd] >> 'NICK usekfntd\r\n'
+     0.101  [usekfntd] >> 'USER usekfntd 0 * :Real usekfntd\r\n'
+     0.101  [usekfntd] << :ircserv 001 usekfntd :Welcome to the IRC network usekfntd!usekfntd@localhost
+     0.101  [usekfntd] << :ircserv 002 usekfntd :Your host is ircserv, running version 1.0
+     0.101  [usekfntd] << :ircserv 003 usekfntd :This server was created today
+     0.101  [usekfntd] << :ircserv 004 usekfntd ircserv 1.0 o o
+     0.201  [unbgcxse] >> 'JOIN #tzyllf\r\n'
+     0.201  [unbgcxse] << :unbgcxse JOIN :#tzyllf
+     0.201  [unbgcxse] << :ircserv 353 unbgcxse = #tzyllf :@unbgcxse 
+     0.201  [unbgcxse] << :ircserv 366 unbgcxse #tzyllf :End of /NAMES list
+     0.201  [usekfntd] >> 'JOIN #tzyllf\r\n'
+     0.201  [usekfntd] << :usekfntd JOIN :#tzyllf
+     0.201  [usekfntd] << :ircserv 353 usekfntd = #tzyllf :@unbgcxse usekfntd 
+     0.201  [usekfntd] << :ircserv 366 usekfntd #tzyllf :End of /NAMES list
+     0.201  [unbgcxse] << :usekfntd JOIN :#tzyllf
+     0.402  [upglzykz] >> 'PASS pass\r\n'
+     0.402  [upglzykz] >> 'NICK upglzykz\r\n'
+     0.402  [upglzykz] >> 'USER upglzykz 0 * :Real upglzykz\r\n'
+     0.402  [upglzykz] << :ircserv 001 upglzykz :Welcome to the IRC network upglzykz!upglzykz@localhost
+     0.402  [upglzykz] << :ircserv 002 upglzykz :Your host is ircserv, running version 1.0
+     0.402  [upglzykz] << :ircserv 003 upglzykz :This server was created today
+     0.402  [upglzykz] << :ircserv 004 upglzykz ircserv 1.0 o o
+     0.502  [upglzykz] >> 'JOIN #tozieq\r\n'
+     0.502  [upglzykz] << :upglzykz JOIN :#tozieq
+     0.502  [upglzykz] << :ircserv 353 upglzykz = #tozieq :@upglzykz 
+     0.502  [upglzykz] << :ircserv 366 upglzykz #tozieq :End of /NAMES list
+     0.602  [unbgcxse] >> 'PRIVMSG #tzyllf :secret\r\n'
+
+==============================================================================
+[VALIDE] privmsg_private   (Messages, test 30/77, 0.70s)
+------------------------------------------------------------------------------
+     0.000  [urvphxyz] >> 'PASS pass\r\n'
+     0.000  [urvphxyz] >> 'NICK urvphxyz\r\n'
+     0.000  [urvphxyz] >> 'USER urvphxyz 0 * :Real urvphxyz\r\n'
+     0.000  [urvphxyz] << :ircserv 001 urvphxyz :Welcome to the IRC network urvphxyz!urvphxyz@localhost
+     0.000  [urvphxyz] << :ircserv 002 urvphxyz :Your host is ircserv, running version 1.0
+     0.000  [urvphxyz] << :ircserv 003 urvphxyz :This server was created today
+     0.000  [urvphxyz] << :ircserv 004 urvphxyz ircserv 1.0 o o
+     0.101  [ukjqtcbb] >> 'PASS pass\r\n'
+     0.101  [ukjqtcbb] >> 'NICK ukjqtcbb\r\n'
+     0.101  [ukjqtcbb] >> 'USER ukjqtcbb 0 * :Real ukjqtcbb\r\n'
+     0.101  [ukjqtcbb] << :ircserv 001 ukjqtcbb :Welcome to the IRC network ukjqtcbb!ukjqtcbb@localhost
+     0.101  [ukjqtcbb] << :ircserv 002 ukjqtcbb :Your host is ircserv, running version 1.0
+     0.101  [ukjqtcbb] << :ircserv 003 ukjqtcbb :This server was created today
+     0.101  [ukjqtcbb] << :ircserv 004 ukjqtcbb ircserv 1.0 o o
+     0.201  [urvphxyz] >> 'PRIVMSG ukjqtcbb :salut en prive\r\n'
+     0.201  [ukjqtcbb] << :urvphxyz PRIVMSG ukjqtcbb :salut en prive
+     0.702  [ukjqtcbb] >> 'PRIVMSG urvphxyz :reponse\r\n'
+     0.702  [urvphxyz] << :ukjqtcbb PRIVMSG urvphxyz :reponse
+
+==============================================================================
+[VALIDE] privmsg_with_spaces_and_colons   (Messages, test 31/77, 0.20s)
+------------------------------------------------------------------------------
+     0.000  [uxwlppzz] >> 'PASS pass\r\n'
+     0.000  [uxwlppzz] >> 'NICK uxwlppzz\r\n'
+     0.000  [uxwlppzz] >> 'USER uxwlppzz 0 * :Real uxwlppzz\r\n'
+     0.000  [uxwlppzz] << :ircserv 001 uxwlppzz :Welcome to the IRC network uxwlppzz!uxwlppzz@localhost
+     0.000  [uxwlppzz] << :ircserv 002 uxwlppzz :Your host is ircserv, running version 1.0
+     0.000  [uxwlppzz] << :ircserv 003 uxwlppzz :This server was created today
+     0.000  [uxwlppzz] << :ircserv 004 uxwlppzz ircserv 1.0 o o
+     0.101  [ufvngbuc] >> 'PASS pass\r\n'
+     0.101  [ufvngbuc] >> 'NICK ufvngbuc\r\n'
+     0.101  [ufvngbuc] >> 'USER ufvngbuc 0 * :Real ufvngbuc\r\n'
+     0.101  [ufvngbuc] << :ircserv 001 ufvngbuc :Welcome to the IRC network ufvngbuc!ufvngbuc@localhost
+     0.101  [ufvngbuc] << :ircserv 002 ufvngbuc :Your host is ircserv, running version 1.0
+     0.101  [ufvngbuc] << :ircserv 003 ufvngbuc :This server was created today
+     0.101  [ufvngbuc] << :ircserv 004 ufvngbuc ircserv 1.0 o o
+     0.201  [uxwlppzz] >> 'PRIVMSG ufvngbuc :a b  c : d :e\r\n'
+     0.201  [ufvngbuc] << :uxwlppzz PRIVMSG ufvngbuc :a b  c : d :e
+
+==============================================================================
+[VALIDE] privmsg_errors   (Messages, test 32/77, 0.10s)
+------------------------------------------------------------------------------
+     0.000  [uqumgwgq] >> 'PASS pass\r\n'
+     0.000  [uqumgwgq] >> 'NICK uqumgwgq\r\n'
+     0.000  [uqumgwgq] >> 'USER uqumgwgq 0 * :Real uqumgwgq\r\n'
+     0.000  [uqumgwgq] << :ircserv 001 uqumgwgq :Welcome to the IRC network uqumgwgq!uqumgwgq@localhost
+     0.000  [uqumgwgq] << :ircserv 002 uqumgwgq :Your host is ircserv, running version 1.0
+     0.000  [uqumgwgq] << :ircserv 003 uqumgwgq :This server was created today
+     0.000  [uqumgwgq] << :ircserv 004 uqumgwgq ircserv 1.0 o o
+     0.101  [uqumgwgq] >> 'PRIVMSG nobodyylek :hi\r\n'
+     0.101  [uqumgwgq] << :ircserv 401 uqumgwgq nobodyylek :No such nick/channel
+     0.101  [uqumgwgq] >> 'PRIVMSG #nochanyxvg :hi\r\n'
+     0.101  [uqumgwgq] << :ircserv 403 uqumgwgq #nochanyxvg :No such channel
+     0.101  [uqumgwgq] >> 'PRIVMSG\r\n'
+     0.101  [uqumgwgq] << :ircserv 411 uqumgwgq :No recipient given
+     0.101  [uqumgwgq] >> 'PRIVMSG uqumgwgq\r\n'
+     0.101  [uqumgwgq] << :ircserv 412 uqumgwgq :No text to send
+
+==============================================================================
+[A VERIFIER] privmsg_to_channel_not_member   (Messages, test 33/77, 1.30s)
+  raison : pas de 404 (ERR_CANNOTSENDTOCHAN) pour un non-membre (+n par defaut sur les vrais serveurs)
+------------------------------------------------------------------------------
+     0.000  [uwpeyufl] >> 'PASS pass\r\n'
+     0.000  [uwpeyufl] >> 'NICK uwpeyufl\r\n'
+     0.000  [uwpeyufl] >> 'USER uwpeyufl 0 * :Real uwpeyufl\r\n'
+     0.000  [uwpeyufl] << :ircserv 001 uwpeyufl :Welcome to the IRC network uwpeyufl!uwpeyufl@localhost
+     0.000  [uwpeyufl] << :ircserv 002 uwpeyufl :Your host is ircserv, running version 1.0
+     0.000  [uwpeyufl] << :ircserv 003 uwpeyufl :This server was created today
+     0.000  [uwpeyufl] << :ircserv 004 uwpeyufl ircserv 1.0 o o
+     0.100  [uwpeyufl] >> 'JOIN #tteidq\r\n'
+     0.101  [uwpeyufl] << :uwpeyufl JOIN :#tteidq
+     0.101  [uwpeyufl] << :ircserv 353 uwpeyufl = #tteidq :@uwpeyufl 
+     0.101  [uwpeyufl] << :ircserv 366 uwpeyufl #tteidq :End of /NAMES list
+     0.201  [uipbpedc] >> 'PASS pass\r\n'
+     0.201  [uipbpedc] >> 'NICK uipbpedc\r\n'
+     0.201  [uipbpedc] >> 'USER uipbpedc 0 * :Real uipbpedc\r\n'
+     0.201  [uipbpedc] << :ircserv 001 uipbpedc :Welcome to the IRC network uipbpedc!uipbpedc@localhost
+     0.201  [uipbpedc] << :ircserv 002 uipbpedc :Your host is ircserv, running version 1.0
+     0.201  [uipbpedc] << :ircserv 003 uipbpedc :This server was created today
+     0.201  [uipbpedc] << :ircserv 004 uipbpedc ircserv 1.0 o o
+     0.301  [uipbpedc] >> 'PRIVMSG #tteidq :intrus\r\n'
+     0.301  [uipbpedc] << :ircserv 442 uipbpedc #tteidq :You're not on that channel
+     1.303  !! A VERIFIER : pas de 404 (ERR_CANNOTSENDTOCHAN) pour un non-membre (+n par defaut sur les vrais serveurs)
+
+==============================================================================
+[A VERIFIER] notice   (Messages, test 34/77, 2.20s)
+  raison : NOTICE non gere
+------------------------------------------------------------------------------
+     0.000  [uycyqntv] >> 'PASS pass\r\n'
+     0.000  [uycyqntv] >> 'NICK uycyqntv\r\n'
+     0.000  [uycyqntv] >> 'USER uycyqntv 0 * :Real uycyqntv\r\n'
+     0.000  [uycyqntv] << :ircserv 001 uycyqntv :Welcome to the IRC network uycyqntv!uycyqntv@localhost
+     0.000  [uycyqntv] << :ircserv 002 uycyqntv :Your host is ircserv, running version 1.0
+     0.000  [uycyqntv] << :ircserv 003 uycyqntv :This server was created today
+     0.000  [uycyqntv] << :ircserv 004 uycyqntv ircserv 1.0 o o
+     0.101  [uaumkbbl] >> 'PASS pass\r\n'
+     0.101  [uaumkbbl] >> 'NICK uaumkbbl\r\n'
+     0.101  [uaumkbbl] >> 'USER uaumkbbl 0 * :Real uaumkbbl\r\n'
+     0.101  [uaumkbbl] << :ircserv 001 uaumkbbl :Welcome to the IRC network uaumkbbl!uaumkbbl@localhost
+     0.101  [uaumkbbl] << :ircserv 002 uaumkbbl :Your host is ircserv, running version 1.0
+     0.101  [uaumkbbl] << :ircserv 003 uaumkbbl :This server was created today
+     0.101  [uaumkbbl] << :ircserv 004 uaumkbbl ircserv 1.0 o o
+     0.201  [uycyqntv] >> 'NOTICE uaumkbbl :note\r\n'
+     2.204  !! A VERIFIER : NOTICE non gere
+
+==============================================================================
+[A VERIFIER] privmsg_multiple_targets   (Messages, test 35/77, 2.30s)
+  raison : cibles multiples non gerees
+------------------------------------------------------------------------------
+     0.000  [ucgbrimu] >> 'PASS pass\r\n'
+     0.000  [ucgbrimu] >> 'NICK ucgbrimu\r\n'
+     0.000  [ucgbrimu] >> 'USER ucgbrimu 0 * :Real ucgbrimu\r\n'
+     0.000  [ucgbrimu] << :ircserv 001 ucgbrimu :Welcome to the IRC network ucgbrimu!ucgbrimu@localhost
+     0.000  [ucgbrimu] << :ircserv 002 ucgbrimu :Your host is ircserv, running version 1.0
+     0.000  [ucgbrimu] << :ircserv 003 ucgbrimu :This server was created today
+     0.000  [ucgbrimu] << :ircserv 004 ucgbrimu ircserv 1.0 o o
+     0.101  [uxvczqkz] >> 'PASS pass\r\n'
+     0.101  [uxvczqkz] >> 'NICK uxvczqkz\r\n'
+     0.101  [uxvczqkz] >> 'USER uxvczqkz 0 * :Real uxvczqkz\r\n'
+     0.101  [uxvczqkz] << :ircserv 001 uxvczqkz :Welcome to the IRC network uxvczqkz!uxvczqkz@localhost
+     0.101  [uxvczqkz] << :ircserv 002 uxvczqkz :Your host is ircserv, running version 1.0
+     0.101  [uxvczqkz] << :ircserv 003 uxvczqkz :This server was created today
+     0.101  [uxvczqkz] << :ircserv 004 uxvczqkz ircserv 1.0 o o
+     0.201  [uhvmxiou] >> 'PASS pass\r\n'
+     0.201  [uhvmxiou] >> 'NICK uhvmxiou\r\n'
+     0.201  [uhvmxiou] >> 'USER uhvmxiou 0 * :Real uhvmxiou\r\n'
+     0.201  [uhvmxiou] << :ircserv 001 uhvmxiou :Welcome to the IRC network uhvmxiou!uhvmxiou@localhost
+     0.201  [uhvmxiou] << :ircserv 002 uhvmxiou :Your host is ircserv, running version 1.0
+     0.201  [uhvmxiou] << :ircserv 003 uhvmxiou :This server was created today
+     0.201  [uhvmxiou] << :ircserv 004 uhvmxiou ircserv 1.0 o o
+     0.302  [ucgbrimu] >> 'PRIVMSG uxvczqkz,uhvmxiou :multi\r\n'
+     2.305  !! A VERIFIER : cibles multiples non gerees
+
+==============================================================================
+[VALIDE] kick_basic   (KICK, test 36/77, 1.60s)
+------------------------------------------------------------------------------
+     0.000  [ujbvrwev] >> 'PASS pass\r\n'
+     0.000  [ujbvrwev] >> 'NICK ujbvrwev\r\n'
+     0.000  [ujbvrwev] >> 'USER ujbvrwev 0 * :Real ujbvrwev\r\n'
+     0.000  [ujbvrwev] << :ircserv 001 ujbvrwev :Welcome to the IRC network ujbvrwev!ujbvrwev@localhost
+     0.000  [ujbvrwev] << :ircserv 002 ujbvrwev :Your host is ircserv, running version 1.0
+     0.000  [ujbvrwev] << :ircserv 003 ujbvrwev :This server was created today
+     0.000  [ujbvrwev] << :ircserv 004 ujbvrwev ircserv 1.0 o o
+     0.100  [uwcdypqg] >> 'PASS pass\r\n'
+     0.100  [uwcdypqg] >> 'NICK uwcdypqg\r\n'
+     0.100  [uwcdypqg] >> 'USER uwcdypqg 0 * :Real uwcdypqg\r\n'
+     0.101  [uwcdypqg] << :ircserv 001 uwcdypqg :Welcome to the IRC network uwcdypqg!uwcdypqg@localhost
+     0.101  [uwcdypqg] << :ircserv 002 uwcdypqg :Your host is ircserv, running version 1.0
+     0.101  [uwcdypqg] << :ircserv 003 uwcdypqg :This server was created today
+     0.101  [uwcdypqg] << :ircserv 004 uwcdypqg ircserv 1.0 o o
+     0.201  [uygdmclp] >> 'PASS pass\r\n'
+     0.201  [uygdmclp] >> 'NICK uygdmclp\r\n'
+     0.201  [uygdmclp] >> 'USER uygdmclp 0 * :Real uygdmclp\r\n'
+     0.201  [uygdmclp] << :ircserv 001 uygdmclp :Welcome to the IRC network uygdmclp!uygdmclp@localhost
+     0.201  [uygdmclp] << :ircserv 002 uygdmclp :Your host is ircserv, running version 1.0
+     0.201  [uygdmclp] << :ircserv 003 uygdmclp :This server was created today
+     0.201  [uygdmclp] << :ircserv 004 uygdmclp ircserv 1.0 o o
+     0.301  [ujbvrwev] >> 'JOIN #trlrlo\r\n'
+     0.301  [ujbvrwev] << :ujbvrwev JOIN :#trlrlo
+     0.301  [ujbvrwev] << :ircserv 353 ujbvrwev = #trlrlo :@ujbvrwev 
+     0.301  [ujbvrwev] << :ircserv 366 ujbvrwev #trlrlo :End of /NAMES list
+     0.301  [uwcdypqg] >> 'JOIN #trlrlo\r\n'
+     0.301  [uwcdypqg] << :uwcdypqg JOIN :#trlrlo
+     0.301  [uwcdypqg] << :ircserv 353 uwcdypqg = #trlrlo :@ujbvrwev uwcdypqg 
+     0.301  [uwcdypqg] << :ircserv 366 uwcdypqg #trlrlo :End of /NAMES list
+     0.301  [uygdmclp] >> 'JOIN #trlrlo\r\n'
+     0.301  [uygdmclp] << :uygdmclp JOIN :#trlrlo
+     0.301  [uygdmclp] << :ircserv 353 uygdmclp = #trlrlo :@ujbvrwev uwcdypqg uygdmclp 
+     0.301  [uygdmclp] << :ircserv 366 uygdmclp #trlrlo :End of /NAMES list
+     0.301  [ujbvrwev] << :uwcdypqg JOIN :#trlrlo
+     0.301  [ujbvrwev] << :uygdmclp JOIN :#trlrlo
+     0.402  [uwcdypqg] << :uygdmclp JOIN :#trlrlo
+     0.602  [ujbvrwev] >> 'KICK #trlrlo uwcdypqg :dehors\r\n'
+     0.602  [uwcdypqg] << :ujbvrwev!ujbvrwev@localhost KICK #trlrlo uwcdypqg :dehors
+     0.602  [uygdmclp] << :ujbvrwev!ujbvrwev@localhost KICK #trlrlo uwcdypqg :dehors
+     0.602  [ujbvrwev] << :ujbvrwev!ujbvrwev@localhost KICK #trlrlo uwcdypqg :dehors
+     0.602  [uygdmclp] >> 'PRIVMSG #trlrlo :apres kick\r\n'
+     1.103  [uwcdypqg] >> 'PRIVMSG #trlrlo :je suis la\r\n'
+     1.103  [ujbvrwev] << :uygdmclp PRIVMSG #trlrlo :apres kick
+
+==============================================================================
+[VALIDE] kick_without_reason   (KICK, test 37/77, 0.40s)
+------------------------------------------------------------------------------
+     0.000  [urkaumtu] >> 'PASS pass\r\n'
+     0.000  [urkaumtu] >> 'NICK urkaumtu\r\n'
+     0.000  [urkaumtu] >> 'USER urkaumtu 0 * :Real urkaumtu\r\n'
+     0.000  [urkaumtu] << :ircserv 001 urkaumtu :Welcome to the IRC network urkaumtu!urkaumtu@localhost
+     0.000  [urkaumtu] << :ircserv 002 urkaumtu :Your host is ircserv, running version 1.0
+     0.000  [urkaumtu] << :ircserv 003 urkaumtu :This server was created today
+     0.000  [urkaumtu] << :ircserv 004 urkaumtu ircserv 1.0 o o
+     0.101  [uxorngqk] >> 'PASS pass\r\n'
+     0.101  [uxorngqk] >> 'NICK uxorngqk\r\n'
+     0.101  [uxorngqk] >> 'USER uxorngqk 0 * :Real uxorngqk\r\n'
+     0.101  [uxorngqk] << :ircserv 001 uxorngqk :Welcome to the IRC network uxorngqk!uxorngqk@localhost
+     0.101  [uxorngqk] << :ircserv 002 uxorngqk :Your host is ircserv, running version 1.0
+     0.101  [uxorngqk] << :ircserv 003 uxorngqk :This server was created today
+     0.101  [uxorngqk] << :ircserv 004 uxorngqk ircserv 1.0 o o
+     0.201  [urkaumtu] >> 'JOIN #tmzssi\r\n'
+     0.201  [urkaumtu] << :urkaumtu JOIN :#tmzssi
+     0.201  [urkaumtu] << :ircserv 353 urkaumtu = #tmzssi :@urkaumtu 
+     0.201  [urkaumtu] << :ircserv 366 urkaumtu #tmzssi :End of /NAMES list
+     0.201  [uxorngqk] >> 'JOIN #tmzssi\r\n'
+     0.201  [uxorngqk] << :uxorngqk JOIN :#tmzssi
+     0.201  [uxorngqk] << :ircserv 353 uxorngqk = #tmzssi :@urkaumtu uxorngqk 
+     0.201  [uxorngqk] << :ircserv 366 uxorngqk #tmzssi :End of /NAMES list
+     0.201  [urkaumtu] << :uxorngqk JOIN :#tmzssi
+     0.402  [urkaumtu] >> 'KICK #tmzssi uxorngqk\r\n'
+     0.402  [uxorngqk] << :urkaumtu!urkaumtu@localhost KICK #tmzssi uxorngqk :urkaumtu
+
+==============================================================================
+[VALIDE] kick_non_operator   (KICK, test 38/77, 1.10s)
+------------------------------------------------------------------------------
+     0.000  [uzxsinyk] >> 'PASS pass\r\n'
+     0.000  [uzxsinyk] >> 'NICK uzxsinyk\r\n'
+     0.000  [uzxsinyk] >> 'USER uzxsinyk 0 * :Real uzxsinyk\r\n'
+     0.000  [uzxsinyk] << :ircserv 001 uzxsinyk :Welcome to the IRC network uzxsinyk!uzxsinyk@localhost
+     0.000  [uzxsinyk] << :ircserv 002 uzxsinyk :Your host is ircserv, running version 1.0
+     0.000  [uzxsinyk] << :ircserv 003 uzxsinyk :This server was created today
+     0.000  [uzxsinyk] << :ircserv 004 uzxsinyk ircserv 1.0 o o
+     0.101  [ulatfodg] >> 'PASS pass\r\n'
+     0.101  [ulatfodg] >> 'NICK ulatfodg\r\n'
+     0.101  [ulatfodg] >> 'USER ulatfodg 0 * :Real ulatfodg\r\n'
+     0.101  [ulatfodg] << :ircserv 001 ulatfodg :Welcome to the IRC network ulatfodg!ulatfodg@localhost
+     0.101  [ulatfodg] << :ircserv 002 ulatfodg :Your host is ircserv, running version 1.0
+     0.101  [ulatfodg] << :ircserv 003 ulatfodg :This server was created today
+     0.101  [ulatfodg] << :ircserv 004 ulatfodg ircserv 1.0 o o
+     0.201  [uqvytwsx] >> 'PASS pass\r\n'
+     0.201  [uqvytwsx] >> 'NICK uqvytwsx\r\n'
+     0.201  [uqvytwsx] >> 'USER uqvytwsx 0 * :Real uqvytwsx\r\n'
+     0.201  [uqvytwsx] << :ircserv 001 uqvytwsx :Welcome to the IRC network uqvytwsx!uqvytwsx@localhost
+     0.201  [uqvytwsx] << :ircserv 002 uqvytwsx :Your host is ircserv, running version 1.0
+     0.201  [uqvytwsx] << :ircserv 003 uqvytwsx :This server was created today
+     0.201  [uqvytwsx] << :ircserv 004 uqvytwsx ircserv 1.0 o o
+     0.302  [uzxsinyk] >> 'JOIN #tgxoik\r\n'
+     0.302  [uzxsinyk] << :uzxsinyk JOIN :#tgxoik
+     0.302  [uzxsinyk] << :ircserv 353 uzxsinyk = #tgxoik :@uzxsinyk 
+     0.302  [uzxsinyk] << :ircserv 366 uzxsinyk #tgxoik :End of /NAMES list
+     0.302  [ulatfodg] >> 'JOIN #tgxoik\r\n'
+     0.302  [ulatfodg] << :ulatfodg JOIN :#tgxoik
+     0.302  [ulatfodg] << :ircserv 353 ulatfodg = #tgxoik :@uzxsinyk ulatfodg 
+     0.302  [ulatfodg] << :ircserv 366 ulatfodg #tgxoik :End of /NAMES list
+     0.302  [uqvytwsx] >> 'JOIN #tgxoik\r\n'
+     0.302  [uqvytwsx] << :uqvytwsx JOIN :#tgxoik
+     0.302  [uqvytwsx] << :ircserv 353 uqvytwsx = #tgxoik :@uzxsinyk ulatfodg uqvytwsx 
+     0.302  [uqvytwsx] << :ircserv 366 uqvytwsx #tgxoik :End of /NAMES list
+     0.302  [uzxsinyk] << :ulatfodg JOIN :#tgxoik
+     0.302  [uzxsinyk] << :uqvytwsx JOIN :#tgxoik
+     0.402  [ulatfodg] << :uqvytwsx JOIN :#tgxoik
+     0.603  [ulatfodg] >> 'KICK #tgxoik uqvytwsx :nope\r\n'
+     0.603  [ulatfodg] << :ircserv 482 ulatfodg #tgxoik :You're not channel operator
+
+==============================================================================
+[VALIDE] kick_errors   (KICK, test 39/77, 0.40s)
+------------------------------------------------------------------------------
+     0.000  [uthocfxk] >> 'PASS pass\r\n'
+     0.000  [uthocfxk] >> 'NICK uthocfxk\r\n'
+     0.000  [uthocfxk] >> 'USER uthocfxk 0 * :Real uthocfxk\r\n'
+     0.000  [uthocfxk] << :ircserv 001 uthocfxk :Welcome to the IRC network uthocfxk!uthocfxk@localhost
+     0.000  [uthocfxk] << :ircserv 002 uthocfxk :Your host is ircserv, running version 1.0
+     0.000  [uthocfxk] << :ircserv 003 uthocfxk :This server was created today
+     0.000  [uthocfxk] << :ircserv 004 uthocfxk ircserv 1.0 o o
+     0.101  [upvgaumu] >> 'PASS pass\r\n'
+     0.101  [upvgaumu] >> 'NICK upvgaumu\r\n'
+     0.101  [upvgaumu] >> 'USER upvgaumu 0 * :Real upvgaumu\r\n'
+     0.101  [upvgaumu] << :ircserv 001 upvgaumu :Welcome to the IRC network upvgaumu!upvgaumu@localhost
+     0.101  [upvgaumu] << :ircserv 002 upvgaumu :Your host is ircserv, running version 1.0
+     0.101  [upvgaumu] << :ircserv 003 upvgaumu :This server was created today
+     0.101  [upvgaumu] << :ircserv 004 upvgaumu ircserv 1.0 o o
+     0.201  [uthocfxk] >> 'JOIN #tblzno\r\n'
+     0.201  [uthocfxk] << :uthocfxk JOIN :#tblzno
+     0.201  [uthocfxk] << :ircserv 353 uthocfxk = #tblzno :@uthocfxk 
+     0.201  [uthocfxk] << :ircserv 366 uthocfxk #tblzno :End of /NAMES list
+     0.201  [upvgaumu] >> 'JOIN #tblzno\r\n'
+     0.201  [upvgaumu] << :upvgaumu JOIN :#tblzno
+     0.201  [upvgaumu] << :ircserv 353 upvgaumu = #tblzno :@uthocfxk upvgaumu 
+     0.201  [upvgaumu] << :ircserv 366 upvgaumu #tblzno :End of /NAMES list
+     0.201  [uthocfxk] << :upvgaumu JOIN :#tblzno
+     0.402  [uthocfxk] >> 'KICK #tblzno ghostcns\r\n'
+     0.402  [uthocfxk] << :ircserv 401 uthocfxk ghostcns :No such nick
+     0.402  [uthocfxk] >> 'KICK #nochanyqz upvgaumu\r\n'
+     0.402  [uthocfxk] << :ircerv 403 uthocfxk #nochanyqz :No such channel
+     0.402  [uthocfxk] >> 'KICK\r\n'
+     0.402  [uthocfxk] << :ircserv 461 uthocfxk INVITE :Not enough parameters
+
+==============================================================================
+[VALIDE] kick_can_rejoin   (KICK, test 40/77, 0.70s)
+------------------------------------------------------------------------------
+     0.000  [uvqlwfyt] >> 'PASS pass\r\n'
+     0.000  [uvqlwfyt] >> 'NICK uvqlwfyt\r\n'
+     0.000  [uvqlwfyt] >> 'USER uvqlwfyt 0 * :Real uvqlwfyt\r\n'
+     0.000  [uvqlwfyt] << :ircserv 001 uvqlwfyt :Welcome to the IRC network uvqlwfyt!uvqlwfyt@localhost
+     0.000  [uvqlwfyt] << :ircserv 002 uvqlwfyt :Your host is ircserv, running version 1.0
+     0.000  [uvqlwfyt] << :ircserv 003 uvqlwfyt :This server was created today
+     0.000  [uvqlwfyt] << :ircserv 004 uvqlwfyt ircserv 1.0 o o
+     0.101  [ubxhttjn] >> 'PASS pass\r\n'
+     0.101  [ubxhttjn] >> 'NICK ubxhttjn\r\n'
+     0.101  [ubxhttjn] >> 'USER ubxhttjn 0 * :Real ubxhttjn\r\n'
+     0.101  [ubxhttjn] << :ircserv 001 ubxhttjn :Welcome to the IRC network ubxhttjn!ubxhttjn@localhost
+     0.101  [ubxhttjn] << :ircserv 002 ubxhttjn :Your host is ircserv, running version 1.0
+     0.101  [ubxhttjn] << :ircserv 003 ubxhttjn :This server was created today
+     0.101  [ubxhttjn] << :ircserv 004 ubxhttjn ircserv 1.0 o o
+     0.201  [uvqlwfyt] >> 'JOIN #tzgcaf\r\n'
+     0.201  [uvqlwfyt] << :uvqlwfyt JOIN :#tzgcaf
+     0.201  [uvqlwfyt] << :ircserv 353 uvqlwfyt = #tzgcaf :@uvqlwfyt 
+     0.201  [uvqlwfyt] << :ircserv 366 uvqlwfyt #tzgcaf :End of /NAMES list
+     0.201  [ubxhttjn] >> 'JOIN #tzgcaf\r\n'
+     0.201  [ubxhttjn] << :ubxhttjn JOIN :#tzgcaf
+     0.201  [ubxhttjn] << :ircserv 353 ubxhttjn = #tzgcaf :@uvqlwfyt ubxhttjn 
+     0.201  [ubxhttjn] << :ircserv 366 ubxhttjn #tzgcaf :End of /NAMES list
+     0.201  [uvqlwfyt] << :ubxhttjn JOIN :#tzgcaf
+     0.402  [uvqlwfyt] >> 'KICK #tzgcaf ubxhttjn\r\n'
+     0.402  [ubxhttjn] << :uvqlwfyt!uvqlwfyt@localhost KICK #tzgcaf ubxhttjn :uvqlwfyt
+     0.702  [ubxhttjn] >> 'JOIN #tzgcaf\r\n'
+     0.703  [ubxhttjn] << :ubxhttjn JOIN :#tzgcaf
+     0.703  [ubxhttjn] << :ircserv 353 ubxhttjn = #tzgcaf :@uvqlwfyt ubxhttjn 
+     0.703  [ubxhttjn] << :ircserv 366 ubxhttjn #tzgcaf :End of /NAMES list
+
+==============================================================================
+[VALIDE] invite_basic   (INVITE, test 41/77, 0.80s)
+------------------------------------------------------------------------------
+     0.000  [uddpxosz] >> 'PASS pass\r\n'
+     0.000  [uddpxosz] >> 'NICK uddpxosz\r\n'
+     0.000  [uddpxosz] >> 'USER uddpxosz 0 * :Real uddpxosz\r\n'
+     0.000  [uddpxosz] << :ircserv 001 uddpxosz :Welcome to the IRC network uddpxosz!uddpxosz@localhost
+     0.000  [uddpxosz] << :ircserv 002 uddpxosz :Your host is ircserv, running version 1.0
+     0.000  [uddpxosz] << :ircserv 003 uddpxosz :This server was created today
+     0.000  [uddpxosz] << :ircserv 004 uddpxosz ircserv 1.0 o o
+     0.100  [uddpxosz] >> 'JOIN #tpettr\r\n'
+     0.101  [uddpxosz] << :uddpxosz JOIN :#tpettr
+     0.101  [uddpxosz] << :ircserv 353 uddpxosz = #tpettr :@uddpxosz 
+     0.101  [uddpxosz] << :ircserv 366 uddpxosz #tpettr :End of /NAMES list
+     0.201  [ubjzrreg] >> 'PASS pass\r\n'
+     0.201  [ubjzrreg] >> 'NICK ubjzrreg\r\n'
+     0.201  [ubjzrreg] >> 'USER ubjzrreg 0 * :Real ubjzrreg\r\n'
+     0.201  [ubjzrreg] << :ircserv 001 ubjzrreg :Welcome to the IRC network ubjzrreg!ubjzrreg@localhost
+     0.201  [ubjzrreg] << :ircserv 002 ubjzrreg :Your host is ircserv, running version 1.0
+     0.201  [ubjzrreg] << :ircserv 003 ubjzrreg :This server was created today
+     0.201  [ubjzrreg] << :ircserv 004 ubjzrreg ircserv 1.0 o o
+     0.302  [uddpxosz] >> 'MODE #tpettr +i\r\n'
+     0.302  [uddpxosz] << :uddpxosz!uddpxosz@localhost MODE #tpettr +i
+     0.302  [ubjzrreg] >> 'JOIN #tpettr\r\n'
+     0.302  [ubjzrreg] << :ircserv 473 ubjzrreg #tpettr:Cannot join channel (+i)
+     0.803  [uddpxosz] >> 'INVITE ubjzrreg #tpettr\r\n'
+     0.803  [uddpxosz] << :ircserv 341 uddpxosz ubjzrreg #tpettr
+     0.803  [ubjzrreg] << :uddpxosz INVITE ubjzrreg :#tpettr
+     0.803  [ubjzrreg] >> 'JOIN #tpettr\r\n'
+     0.803  [ubjzrreg] << :ubjzrreg JOIN :#tpettr
+     0.803  [ubjzrreg] << :ircserv 353 ubjzrreg = #tpettr :@uddpxosz ubjzrreg 
+     0.803  [ubjzrreg] << :ircserv 366 ubjzrreg #tpettr :End of /NAMES list
+
+==============================================================================
+[VALIDE] invite_non_operator_on_invite_only   (INVITE, test 42/77, 0.50s)
+------------------------------------------------------------------------------
+     0.000  [uzrllgsa] >> 'PASS pass\r\n'
+     0.000  [uzrllgsa] >> 'NICK uzrllgsa\r\n'
+     0.000  [uzrllgsa] >> 'USER uzrllgsa 0 * :Real uzrllgsa\r\n'
+     0.000  [uzrllgsa] << :ircserv 001 uzrllgsa :Welcome to the IRC network uzrllgsa!uzrllgsa@localhost
+     0.000  [uzrllgsa] << :ircserv 002 uzrllgsa :Your host is ircserv, running version 1.0
+     0.000  [uzrllgsa] << :ircserv 003 uzrllgsa :This server was created today
+     0.000  [uzrllgsa] << :ircserv 004 uzrllgsa ircserv 1.0 o o
+     0.101  [uzersdya] >> 'PASS pass\r\n'
+     0.101  [uzersdya] >> 'NICK uzersdya\r\n'
+     0.101  [uzersdya] >> 'USER uzersdya 0 * :Real uzersdya\r\n'
+     0.101  [uzersdya] << :ircserv 001 uzersdya :Welcome to the IRC network uzersdya!uzersdya@localhost
+     0.101  [uzersdya] << :ircserv 002 uzersdya :Your host is ircserv, running version 1.0
+     0.101  [uzersdya] << :ircserv 003 uzersdya :This server was created today
+     0.101  [uzersdya] << :ircserv 004 uzersdya ircserv 1.0 o o
+     0.201  [uzrllgsa] >> 'JOIN #txaxtw\r\n'
+     0.201  [uzrllgsa] << :uzrllgsa JOIN :#txaxtw
+     0.201  [uzrllgsa] << :ircserv 353 uzrllgsa = #txaxtw :@uzrllgsa 
+     0.201  [uzrllgsa] << :ircserv 366 uzrllgsa #txaxtw :End of /NAMES list
+     0.201  [uzersdya] >> 'JOIN #txaxtw\r\n'
+     0.201  [uzersdya] << :uzersdya JOIN :#txaxtw
+     0.201  [uzersdya] << :ircserv 353 uzersdya = #txaxtw :@uzrllgsa uzersdya 
+     0.201  [uzersdya] << :ircserv 366 uzersdya #txaxtw :End of /NAMES list
+     0.201  [uzrllgsa] << :uzersdya JOIN :#txaxtw
+     0.401  [uzrllgsa] >> 'MODE #txaxtw +i\r\n'
+     0.402  [uvtrlrkm] >> 'PASS pass\r\n'
+     0.402  [uvtrlrkm] >> 'NICK uvtrlrkm\r\n'
+     0.402  [uvtrlrkm] >> 'USER uvtrlrkm 0 * :Real uvtrlrkm\r\n'
+     0.402  [uvtrlrkm] << :ircserv 001 uvtrlrkm :Welcome to the IRC network uvtrlrkm!uvtrlrkm@localhost
+     0.402  [uvtrlrkm] << :ircserv 002 uvtrlrkm :Your host is ircserv, running version 1.0
+     0.402  [uvtrlrkm] << :ircserv 003 uvtrlrkm :This server was created today
+     0.402  [uvtrlrkm] << :ircserv 004 uvtrlrkm ircserv 1.0 o o
+     0.502  [uzersdya] >> 'INVITE uvtrlrkm #txaxtw\r\n'
+     0.502  [uzersdya] << :uzrllgsa!uzrllgsa@localhost MODE #txaxtw +i
+     0.502  [uzersdya] << :ircserv 482 uzersdya :You're not channel operator
+
+==============================================================================
+[VALIDE] invite_errors   (INVITE, test 43/77, 0.50s)
+------------------------------------------------------------------------------
+     0.000  [uxefowcl] >> 'PASS pass\r\n'
+     0.000  [uxefowcl] >> 'NICK uxefowcl\r\n'
+     0.000  [uxefowcl] >> 'USER uxefowcl 0 * :Real uxefowcl\r\n'
+     0.000  [uxefowcl] << :ircserv 001 uxefowcl :Welcome to the IRC network uxefowcl!uxefowcl@localhost
+     0.000  [uxefowcl] << :ircserv 002 uxefowcl :Your host is ircserv, running version 1.0
+     0.000  [uxefowcl] << :ircserv 003 uxefowcl :This server was created today
+     0.000  [uxefowcl] << :ircserv 004 uxefowcl ircserv 1.0 o o
+     0.100  [uayjzxup] >> 'PASS pass\r\n'
+     0.101  [uayjzxup] >> 'NICK uayjzxup\r\n'
+     0.101  [uayjzxup] >> 'USER uayjzxup 0 * :Real uayjzxup\r\n'
+     0.101  [uayjzxup] << :ircserv 001 uayjzxup :Welcome to the IRC network uayjzxup!uayjzxup@localhost
+     0.101  [uayjzxup] << :ircserv 002 uayjzxup :Your host is ircserv, running version 1.0
+     0.101  [uayjzxup] << :ircserv 003 uayjzxup :This server was created today
+     0.101  [uayjzxup] << :ircserv 004 uayjzxup ircserv 1.0 o o
+     0.201  [uxefowcl] >> 'JOIN #tehxtg\r\n'
+     0.201  [uxefowcl] << :uxefowcl JOIN :#tehxtg
+     0.201  [uxefowcl] << :ircserv 353 uxefowcl = #tehxtg :@uxefowcl 
+     0.201  [uxefowcl] << :ircserv 366 uxefowcl #tehxtg :End of /NAMES list
+     0.201  [uayjzxup] >> 'JOIN #tehxtg\r\n'
+     0.201  [uayjzxup] << :uayjzxup JOIN :#tehxtg
+     0.201  [uayjzxup] << :ircserv 353 uayjzxup = #tehxtg :@uxefowcl uayjzxup 
+     0.201  [uayjzxup] << :ircserv 366 uayjzxup #tehxtg :End of /NAMES list
+     0.201  [uxefowcl] << :uayjzxup JOIN :#tehxtg
+     0.402  [uxefowcl] >> 'INVITE ghostdog #tehxtg\r\n'
+     0.402  [uxefowcl] << :ircserv 401 uxefowcl ghostdog :No such nick
+     0.402  [uxefowcl] >> 'INVITE uayjzxup #tehxtg\r\n'
+     0.402  [uxefowcl] << :ircserv 443 uxefowcl uayjzxup #tehxtg :is already on channel
+     0.402  [uxefowcl] >> 'INVITE\r\n'
+     0.402  [uxefowcl] << :ircserv 461 uxefowcl INVITE :Not enough parameters
+     0.402  [uldgtpfc] >> 'PASS pass\r\n'
+     0.402  [uldgtpfc] >> 'NICK uldgtpfc\r\n'
+     0.402  [uldgtpfc] >> 'USER uldgtpfc 0 * :Real uldgtpfc\r\n'
+     0.402  [uldgtpfc] << :ircserv 001 uldgtpfc :Welcome to the IRC network uldgtpfc!uldgtpfc@localhost
+     0.402  [uldgtpfc] << :ircserv 002 uldgtpfc :Your host is ircserv, running version 1.0
+     0.402  [uldgtpfc] << :ircserv 003 uldgtpfc :This server was created today
+     0.402  [uldgtpfc] << :ircserv 004 uldgtpfc ircserv 1.0 o o
+     0.502  [uldgtpfc] >> 'INVITE uxefowcl #tehxtg\r\n'
+     0.502  [uldgtpfc] << :ircserv 442 uldgtpfc #tehxtg :You're not on that channel
+
+==============================================================================
+[VALIDE] invite_removal_of_i   (INVITE, test 44/77, 0.60s)
+------------------------------------------------------------------------------
+     0.000  [uwgqrudt] >> 'PASS pass\r\n'
+     0.000  [uwgqrudt] >> 'NICK uwgqrudt\r\n'
+     0.000  [uwgqrudt] >> 'USER uwgqrudt 0 * :Real uwgqrudt\r\n'
+     0.000  [uwgqrudt] << :ircserv 001 uwgqrudt :Welcome to the IRC network uwgqrudt!uwgqrudt@localhost
+     0.000  [uwgqrudt] << :ircserv 002 uwgqrudt :Your host is ircserv, running version 1.0
+     0.000  [uwgqrudt] << :ircserv 003 uwgqrudt :This server was created today
+     0.000  [uwgqrudt] << :ircserv 004 uwgqrudt ircserv 1.0 o o
+     0.100  [uwgqrudt] >> 'JOIN #txncwy\r\n'
+     0.101  [uwgqrudt] << :uwgqrudt JOIN :#txncwy
+     0.101  [uwgqrudt] << :ircserv 353 uwgqrudt = #txncwy :@uwgqrudt 
+     0.101  [uwgqrudt] << :ircserv 366 uwgqrudt #txncwy :End of /NAMES list
+     0.201  [uwgqrudt] >> 'MODE #txncwy +i\r\n'
+     0.201  [uwgqrudt] >> 'MODE #txncwy -i\r\n'
+     0.201  [uwgqrudt] << :uwgqrudt!uwgqrudt@localhost MODE #txncwy +i
+     0.201  [uwgqrudt] << :uwgqrudt!uwgqrudt@localhost MODE #txncwy -i
+     0.502  [uxofbbbz] >> 'PASS pass\r\n'
+     0.502  [uxofbbbz] >> 'NICK uxofbbbz\r\n'
+     0.502  [uxofbbbz] >> 'USER uxofbbbz 0 * :Real uxofbbbz\r\n'
+     0.502  [uxofbbbz] << :ircserv 001 uxofbbbz :Welcome to the IRC network uxofbbbz!uxofbbbz@localhost
+     0.502  [uxofbbbz] << :ircserv 002 uxofbbbz :Your host is ircserv, running version 1.0
+     0.502  [uxofbbbz] << :ircserv 003 uxofbbbz :This server was created today
+     0.502  [uxofbbbz] << :ircserv 004 uxofbbbz ircserv 1.0 o o
+     0.602  [uxofbbbz] >> 'JOIN #txncwy\r\n'
+     0.602  [uxofbbbz] << :uxofbbbz JOIN :#txncwy
+     0.602  [uxofbbbz] << :ircserv 353 uxofbbbz = #txncwy :@uwgqrudt uxofbbbz 
+     0.602  [uxofbbbz] << :ircserv 366 uxofbbbz #txncwy :End of /NAMES list
+
+==============================================================================
+[VALIDE] topic_basic   (TOPIC, test 45/77, 0.50s)
+------------------------------------------------------------------------------
+     0.000  [umlshleq] >> 'PASS pass\r\n'
+     0.000  [umlshleq] >> 'NICK umlshleq\r\n'
+     0.000  [umlshleq] >> 'USER umlshleq 0 * :Real umlshleq\r\n'
+     0.000  [umlshleq] << :ircserv 001 umlshleq :Welcome to the IRC network umlshleq!umlshleq@localhost
+     0.000  [umlshleq] << :ircserv 002 umlshleq :Your host is ircserv, running version 1.0
+     0.000  [umlshleq] << :ircserv 003 umlshleq :This server was created today
+     0.000  [umlshleq] << :ircserv 004 umlshleq ircserv 1.0 o o
+     0.101  [uqjcylry] >> 'PASS pass\r\n'
+     0.101  [uqjcylry] >> 'NICK uqjcylry\r\n'
+     0.101  [uqjcylry] >> 'USER uqjcylry 0 * :Real uqjcylry\r\n'
+     0.101  [uqjcylry] << :ircserv 001 uqjcylry :Welcome to the IRC network uqjcylry!uqjcylry@localhost
+     0.101  [uqjcylry] << :ircserv 002 uqjcylry :Your host is ircserv, running version 1.0
+     0.101  [uqjcylry] << :ircserv 003 uqjcylry :This server was created today
+     0.101  [uqjcylry] << :ircserv 004 uqjcylry ircserv 1.0 o o
+     0.201  [umlshleq] >> 'JOIN #tkgkkx\r\n'
+     0.201  [umlshleq] << :umlshleq JOIN :#tkgkkx
+     0.201  [umlshleq] << :ircserv 353 umlshleq = #tkgkkx :@umlshleq 
+     0.201  [umlshleq] << :ircserv 366 umlshleq #tkgkkx :End of /NAMES list
+     0.201  [uqjcylry] >> 'JOIN #tkgkkx\r\n'
+     0.201  [uqjcylry] << :uqjcylry JOIN :#tkgkkx
+     0.201  [uqjcylry] << :ircserv 353 uqjcylry = #tkgkkx :@umlshleq uqjcylry 
+     0.201  [uqjcylry] << :ircserv 366 uqjcylry #tkgkkx :End of /NAMES list
+     0.201  [umlshleq] << :uqjcylry JOIN :#tkgkkx
+     0.402  [umlshleq] >> 'TOPIC #tkgkkx\r\n'
+     0.402  [umlshleq] << :ircserv 331 umlshleq #tkgkkx :No topic is set
+     0.402  [umlshleq] >> 'TOPIC #tkgkkx :nouveau sujet\r\n'
+     0.402  [uqjcylry] << :umlshleq!umlshleq@localhost TOPIC #tkgkkx :nouveau sujet
+     0.402  [uqjcylry] >> 'TOPIC #tkgkkx\r\n'
+     0.402  [uqjcylry] << :ircserv 332 uqjcylry #tkgkkx :nouveau sujet
+     0.402  [uapzlpfh] >> 'PASS pass\r\n'
+     0.402  [uapzlpfh] >> 'NICK uapzlpfh\r\n'
+     0.402  [uapzlpfh] >> 'USER uapzlpfh 0 * :Real uapzlpfh\r\n'
+     0.403  [uapzlpfh] << :ircserv 001 uapzlpfh :Welcome to the IRC network uapzlpfh!uapzlpfh@localhost
+     0.403  [uapzlpfh] << :ircserv 002 uapzlpfh :Your host is ircserv, running version 1.0
+     0.403  [uapzlpfh] << :ircserv 003 uapzlpfh :This server was created today
+     0.403  [uapzlpfh] << :ircserv 004 uapzlpfh ircserv 1.0 o o
+     0.503  [uapzlpfh] >> 'JOIN #tkgkkx\r\n'
+     0.503  [uapzlpfh] << :uapzlpfh JOIN :#tkgkkx
+     0.503  [uapzlpfh] << :ircserv 353 uapzlpfh = #tkgkkx :@umlshleq uqjcylry uapzlpfh 
+     0.503  [uapzlpfh] << :ircserv 366 uapzlpfh #tkgkkx :End of /NAMES list
+     0.503  [uapzlpfh] << :ircserv 332 uapzlpfh #tkgkkx :nouveau sujet
+
+==============================================================================
+[VALIDE] topic_restricted_mode_t   (TOPIC, test 46/77, 0.90s)
+------------------------------------------------------------------------------
+     0.000  [uxvzipms] >> 'PASS pass\r\n'
+     0.000  [uxvzipms] >> 'NICK uxvzipms\r\n'
+     0.000  [uxvzipms] >> 'USER uxvzipms 0 * :Real uxvzipms\r\n'
+     0.000  [uxvzipms] << :ircserv 001 uxvzipms :Welcome to the IRC network uxvzipms!uxvzipms@localhost
+     0.000  [uxvzipms] << :ircserv 002 uxvzipms :Your host is ircserv, running version 1.0
+     0.000  [uxvzipms] << :ircserv 003 uxvzipms :This server was created today
+     0.000  [uxvzipms] << :ircserv 004 uxvzipms ircserv 1.0 o o
+     0.101  [ugmxyefd] >> 'PASS pass\r\n'
+     0.101  [ugmxyefd] >> 'NICK ugmxyefd\r\n'
+     0.101  [ugmxyefd] >> 'USER ugmxyefd 0 * :Real ugmxyefd\r\n'
+     0.101  [ugmxyefd] << :ircserv 001 ugmxyefd :Welcome to the IRC network ugmxyefd!ugmxyefd@localhost
+     0.101  [ugmxyefd] << :ircserv 002 ugmxyefd :Your host is ircserv, running version 1.0
+     0.101  [ugmxyefd] << :ircserv 003 ugmxyefd :This server was created today
+     0.101  [ugmxyefd] << :ircserv 004 ugmxyefd ircserv 1.0 o o
+     0.201  [uxvzipms] >> 'JOIN #tzwocd\r\n'
+     0.201  [uxvzipms] << :uxvzipms JOIN :#tzwocd
+     0.201  [uxvzipms] << :ircserv 353 uxvzipms = #tzwocd :@uxvzipms 
+     0.201  [uxvzipms] << :ircserv 366 uxvzipms #tzwocd :End of /NAMES list
+     0.201  [ugmxyefd] >> 'JOIN #tzwocd\r\n'
+     0.201  [ugmxyefd] << :ugmxyefd JOIN :#tzwocd
+     0.201  [ugmxyefd] << :ircserv 353 ugmxyefd = #tzwocd :@uxvzipms ugmxyefd 
+     0.201  [ugmxyefd] << :ircserv 366 ugmxyefd #tzwocd :End of /NAMES list
+     0.201  [uxvzipms] << :ugmxyefd JOIN :#tzwocd
+     0.402  [uxvzipms] >> 'MODE #tzwocd +t\r\n'
+     0.402  [uxvzipms] << :uxvzipms!uxvzipms@localhost MODE #tzwocd +t
+     0.402  [ugmxyefd] >> 'TOPIC #tzwocd :interdit\r\n'
+     0.402  [ugmxyefd] << :uxvzipms!uxvzipms@localhost MODE #tzwocd +t
+     0.402  [ugmxyefd] << :ircserv 482 ugmxyefd #tzwocd :You're not channel operator
+     0.903  [uxvzipms] >> 'TOPIC #tzwocd :autorise\r\n'
+     0.903  [ugmxyefd] << :uxvzipms!uxvzipms@localhost TOPIC #tzwocd :autorise
+     0.903  [ugmxyefd] >> 'TOPIC #tzwocd\r\n'
+     0.903  [ugmxyefd] << :ircserv 332 ugmxyefd #tzwocd :autorise
+
+==============================================================================
+[VALIDE] topic_unrestricted_without_t   (TOPIC, test 47/77, 0.60s)
+------------------------------------------------------------------------------
+     0.000  [uvqdrepb] >> 'PASS pass\r\n'
+     0.000  [uvqdrepb] >> 'NICK uvqdrepb\r\n'
+     0.000  [uvqdrepb] >> 'USER uvqdrepb 0 * :Real uvqdrepb\r\n'
+     0.000  [uvqdrepb] << :ircserv 001 uvqdrepb :Welcome to the IRC network uvqdrepb!uvqdrepb@localhost
+     0.000  [uvqdrepb] << :ircserv 002 uvqdrepb :Your host is ircserv, running version 1.0
+     0.000  [uvqdrepb] << :ircserv 003 uvqdrepb :This server was created today
+     0.000  [uvqdrepb] << :ircserv 004 uvqdrepb ircserv 1.0 o o
+     0.101  [uxujxcso] >> 'PASS pass\r\n'
+     0.101  [uxujxcso] >> 'NICK uxujxcso\r\n'
+     0.101  [uxujxcso] >> 'USER uxujxcso 0 * :Real uxujxcso\r\n'
+     0.101  [uxujxcso] << :ircserv 001 uxujxcso :Welcome to the IRC network uxujxcso!uxujxcso@localhost
+     0.101  [uxujxcso] << :ircserv 002 uxujxcso :Your host is ircserv, running version 1.0
+     0.101  [uxujxcso] << :ircserv 003 uxujxcso :This server was created today
+     0.101  [uxujxcso] << :ircserv 004 uxujxcso ircserv 1.0 o o
+     0.201  [uvqdrepb] >> 'JOIN #txxlic\r\n'
+     0.201  [uvqdrepb] << :uvqdrepb JOIN :#txxlic
+     0.201  [uvqdrepb] << :ircserv 353 uvqdrepb = #txxlic :@uvqdrepb 
+     0.201  [uvqdrepb] << :ircserv 366 uvqdrepb #txxlic :End of /NAMES list
+     0.201  [uxujxcso] >> 'JOIN #txxlic\r\n'
+     0.202  [uxujxcso] << :uxujxcso JOIN :#txxlic
+     0.202  [uxujxcso] << :ircserv 353 uxujxcso = #txxlic :@uvqdrepb uxujxcso 
+     0.202  [uxujxcso] << :ircserv 366 uxujxcso #txxlic :End of /NAMES list
+     0.202  [uvqdrepb] << :uxujxcso JOIN :#txxlic
+     0.402  [uvqdrepb] >> 'MODE #txxlic -t\r\n'
+     0.402  [uvqdrepb] << :uvqdrepb!uvqdrepb@localhost MODE #txxlic -t
+     0.602  [uxujxcso] >> 'TOPIC #txxlic :libre\r\n'
+     0.603  [uvqdrepb] << :uxujxcso!uxujxcso@localhost TOPIC #txxlic :libre
+
+==============================================================================
+[VALIDE] topic_errors   (TOPIC, test 48/77, 0.30s)
+------------------------------------------------------------------------------
+     0.000  [uxrvbmkw] >> 'PASS pass\r\n'
+     0.000  [uxrvbmkw] >> 'NICK uxrvbmkw\r\n'
+     0.000  [uxrvbmkw] >> 'USER uxrvbmkw 0 * :Real uxrvbmkw\r\n'
+     0.000  [uxrvbmkw] << :ircserv 001 uxrvbmkw :Welcome to the IRC network uxrvbmkw!uxrvbmkw@localhost
+     0.000  [uxrvbmkw] << :ircserv 002 uxrvbmkw :Your host is ircserv, running version 1.0
+     0.000  [uxrvbmkw] << :ircserv 003 uxrvbmkw :This server was created today
+     0.000  [uxrvbmkw] << :ircserv 004 uxrvbmkw ircserv 1.0 o o
+     0.100  [uxrvbmkw] >> 'TOPIC #nochanchun\r\n'
+     0.101  [uxrvbmkw] << :ircserv 403 uxrvbmkw :No such channel
+     0.101  [uxrvbmkw] >> 'TOPIC\r\n'
+     0.101  [uxrvbmkw] << :ircserv 461 uxrvbmkw :Not enough parameters
+     0.101  [uykqnziv] >> 'PASS pass\r\n'
+     0.101  [uykqnziv] >> 'NICK uykqnziv\r\n'
+     0.101  [uykqnziv] >> 'USER uykqnziv 0 * :Real uykqnziv\r\n'
+     0.101  [uykqnziv] << :ircserv 001 uykqnziv :Welcome to the IRC network uykqnziv!uykqnziv@localhost
+     0.101  [uykqnziv] << :ircserv 002 uykqnziv :Your host is ircserv, running version 1.0
+     0.101  [uykqnziv] << :ircserv 003 uykqnziv :This server was created today
+     0.101  [uykqnziv] << :ircserv 004 uykqnziv ircserv 1.0 o o
+     0.201  [uykqnziv] >> 'JOIN #tmxucn\r\n'
+     0.201  [uykqnziv] << :uykqnziv JOIN :#tmxucn
+     0.201  [uykqnziv] << :ircserv 353 uykqnziv = #tmxucn :@uykqnziv 
+     0.201  [uykqnziv] << :ircserv 366 uykqnziv #tmxucn :End of /NAMES list
+     0.302  [uxrvbmkw] >> 'TOPIC #tmxucn :hack\r\n'
+     0.302  [uxrvbmkw] << :ircserv 442 uxrvbmkw #tmxucn :You're not on that channel
+
+==============================================================================
+[A VERIFIER] topic_clear   (TOPIC, test 49/77, 1.60s)
+  raison : effacement du topic (TOPIC #c :) non gere
+------------------------------------------------------------------------------
+     0.000  [uvkrhiob] >> 'PASS pass\r\n'
+     0.000  [uvkrhiob] >> 'NICK uvkrhiob\r\n'
+     0.000  [uvkrhiob] >> 'USER uvkrhiob 0 * :Real uvkrhiob\r\n'
+     0.000  [uvkrhiob] << :ircserv 001 uvkrhiob :Welcome to the IRC network uvkrhiob!uvkrhiob@localhost
+     0.000  [uvkrhiob] << :ircserv 002 uvkrhiob :Your host is ircserv, running version 1.0
+     0.000  [uvkrhiob] << :ircserv 003 uvkrhiob :This server was created today
+     0.000  [uvkrhiob] << :ircserv 004 uvkrhiob ircserv 1.0 o o
+     0.101  [ugkwxsjc] >> 'PASS pass\r\n'
+     0.101  [ugkwxsjc] >> 'NICK ugkwxsjc\r\n'
+     0.101  [ugkwxsjc] >> 'USER ugkwxsjc 0 * :Real ugkwxsjc\r\n'
+     0.101  [ugkwxsjc] << :ircserv 001 ugkwxsjc :Welcome to the IRC network ugkwxsjc!ugkwxsjc@localhost
+     0.101  [ugkwxsjc] << :ircserv 002 ugkwxsjc :Your host is ircserv, running version 1.0
+     0.101  [ugkwxsjc] << :ircserv 003 ugkwxsjc :This server was created today
+     0.101  [ugkwxsjc] << :ircserv 004 ugkwxsjc ircserv 1.0 o o
+     0.201  [uvkrhiob] >> 'JOIN #tqscvv\r\n'
+     0.201  [uvkrhiob] << :uvkrhiob JOIN :#tqscvv
+     0.201  [uvkrhiob] << :ircserv 353 uvkrhiob = #tqscvv :@uvkrhiob 
+     0.201  [uvkrhiob] << :ircserv 366 uvkrhiob #tqscvv :End of /NAMES list
+     0.201  [ugkwxsjc] >> 'JOIN #tqscvv\r\n'
+     0.202  [ugkwxsjc] << :ugkwxsjc JOIN :#tqscvv
+     0.202  [ugkwxsjc] << :ircserv 353 ugkwxsjc = #tqscvv :@uvkrhiob ugkwxsjc 
+     0.202  [ugkwxsjc] << :ircserv 366 ugkwxsjc #tqscvv :End of /NAMES list
+     0.202  [uvkrhiob] << :ugkwxsjc JOIN :#tqscvv
+     0.402  [uvkrhiob] >> 'TOPIC #tqscvv :abc\r\n'
+     0.402  [ugkwxsjc] << :uvkrhiob!uvkrhiob@localhost TOPIC #tqscvv :abc
+     0.603  [uvkrhiob] >> 'TOPIC #tqscvv :\r\n'
+     1.604  !! A VERIFIER : effacement du topic (TOPIC #c :) non gere
+
+==============================================================================
+[VALIDE] mode_query   (MODE, test 50/77, 0.20s)
+------------------------------------------------------------------------------
+     0.000  [uyyjfgww] >> 'PASS pass\r\n'
+     0.000  [uyyjfgww] >> 'NICK uyyjfgww\r\n'
+     0.000  [uyyjfgww] >> 'USER uyyjfgww 0 * :Real uyyjfgww\r\n'
+     0.000  [uyyjfgww] << :ircserv 001 uyyjfgww :Welcome to the IRC network uyyjfgww!uyyjfgww@localhost
+     0.000  [uyyjfgww] << :ircserv 002 uyyjfgww :Your host is ircserv, running version 1.0
+     0.000  [uyyjfgww] << :ircserv 003 uyyjfgww :This server was created today
+     0.000  [uyyjfgww] << :ircserv 004 uyyjfgww ircserv 1.0 o o
+     0.101  [uyyjfgww] >> 'JOIN #thhvnx\r\n'
+     0.101  [uyyjfgww] << :uyyjfgww JOIN :#thhvnx
+     0.101  [uyyjfgww] << :ircserv 353 uyyjfgww = #thhvnx :@uyyjfgww 
+     0.101  [uyyjfgww] << :ircserv 366 uyyjfgww #thhvnx :End of /NAMES list
+     0.201  [uyyjfgww] >> 'MODE #thhvnx\r\n'
+     0.201  [uyyjfgww] << :ircserv 324 uyyjfgww #thhvnx +
+
+==============================================================================
+[NON VALIDE] mode_key   (MODE, test 51/77, 3.11s)
+  raison : JOIN refuse apres MODE -k
+------------------------------------------------------------------------------
+     0.000  [uhoakrpf] >> 'PASS pass\r\n'
+     0.000  [uhoakrpf] >> 'NICK uhoakrpf\r\n'
+     0.000  [uhoakrpf] >> 'USER uhoakrpf 0 * :Real uhoakrpf\r\n'
+     0.000  [uhoakrpf] << :ircserv 001 uhoakrpf :Welcome to the IRC network uhoakrpf!uhoakrpf@localhost
+     0.000  [uhoakrpf] << :ircserv 002 uhoakrpf :Your host is ircserv, running version 1.0
+     0.000  [uhoakrpf] << :ircserv 003 uhoakrpf :This server was created today
+     0.000  [uhoakrpf] << :ircserv 004 uhoakrpf ircserv 1.0 o o
+     0.100  [uhoakrpf] >> 'JOIN #thidul\r\n'
+     0.101  [uhoakrpf] << :uhoakrpf JOIN :#thidul
+     0.101  [uhoakrpf] << :ircserv 353 uhoakrpf = #thidul :@uhoakrpf 
+     0.101  [uhoakrpf] << :ircserv 366 uhoakrpf #thidul :End of /NAMES list
+     0.201  [uhoakrpf] >> 'MODE #thidul +k secret\r\n'
+     0.201  [uhoakrpf] << :uhoakrpf!uhoakrpf@localhost MODE #thidul +k secret
+     0.201  [ulhwzczm] >> 'PASS pass\r\n'
+     0.201  [ulhwzczm] >> 'NICK ulhwzczm\r\n'
+     0.201  [ulhwzczm] >> 'USER ulhwzczm 0 * :Real ulhwzczm\r\n'
+     0.201  [ulhwzczm] << :ircserv 001 ulhwzczm :Welcome to the IRC network ulhwzczm!ulhwzczm@localhost
+     0.201  [ulhwzczm] << :ircserv 002 ulhwzczm :Your host is ircserv, running version 1.0
+     0.201  [ulhwzczm] << :ircserv 003 ulhwzczm :This server was created today
+     0.201  [ulhwzczm] << :ircserv 004 ulhwzczm ircserv 1.0 o o
+     0.301  [ulhwzczm] >> 'JOIN #thidul\r\n'
+     0.301  [ulhwzczm] << :ircserv 475 ulhwzczm #thidul:Cannot join channel (+k)
+     0.301  [ulhwzczm] >> 'JOIN #thidul wrong\r\n'
+     0.302  [ulhwzczm] << :ircserv 475 ulhwzczm #thidul:Cannot join channel (+k)
+     0.802  [ulhwzczm] >> 'JOIN #thidul secret\r\n'
+     0.803  [ulhwzczm] << :ulhwzczm JOIN :#thidul
+     0.803  [ulhwzczm] << :ircserv 353 ulhwzczm = #thidul :@uhoakrpf ulhwzczm 
+     0.803  [ulhwzczm] << :ircserv 366 ulhwzczm #thidul :End of /NAMES list
+     0.803  [uhoakrpf] >> 'MODE #thidul -k\r\n'
+     0.803  [uhoakrpf] << :ulhwzczm JOIN :#thidul
+     0.803  [uhoakrpf] << :ircserv 461 uhoakrpf #thidul :Not enough parameters
+     1.003  [uayporft] >> 'PASS pass\r\n'
+     1.003  [uayporft] >> 'NICK uayporft\r\n'
+     1.003  [uayporft] >> 'USER uayporft 0 * :Real uayporft\r\n'
+     1.003  [uayporft] << :ircserv 001 uayporft :Welcome to the IRC network uayporft!uayporft@localhost
+     1.003  [uayporft] << :ircserv 002 uayporft :Your host is ircserv, running version 1.0
+     1.003  [uayporft] << :ircserv 003 uayporft :This server was created today
+     1.003  [uayporft] << :ircserv 004 uayporft ircserv 1.0 o o
+     1.104  [uayporft] >> 'JOIN #thidul\r\n'
+     1.104  [uayporft] << :ircserv 475 uayporft #thidul:Cannot join channel (+k)
+     3.107  !! ECHEC : JOIN refuse apres MODE -k
+
+==============================================================================
+[VALIDE] mode_limit   (MODE, test 52/77, 1.30s)
+------------------------------------------------------------------------------
+     0.000  [ugakgbiq] >> 'PASS pass\r\n'
+     0.000  [ugakgbiq] >> 'NICK ugakgbiq\r\n'
+     0.000  [ugakgbiq] >> 'USER ugakgbiq 0 * :Real ugakgbiq\r\n'
+     0.000  [ugakgbiq] << :ircserv 001 ugakgbiq :Welcome to the IRC network ugakgbiq!ugakgbiq@localhost
+     0.000  [ugakgbiq] << :ircserv 002 ugakgbiq :Your host is ircserv, running version 1.0
+     0.000  [ugakgbiq] << :ircserv 003 ugakgbiq :This server was created today
+     0.000  [ugakgbiq] << :ircserv 004 ugakgbiq ircserv 1.0 o o
+     0.101  [uabncnxs] >> 'PASS pass\r\n'
+     0.101  [uabncnxs] >> 'NICK uabncnxs\r\n'
+     0.101  [uabncnxs] >> 'USER uabncnxs 0 * :Real uabncnxs\r\n'
+     0.101  [uabncnxs] << :ircserv 001 uabncnxs :Welcome to the IRC network uabncnxs!uabncnxs@localhost
+     0.101  [uabncnxs] << :ircserv 002 uabncnxs :Your host is ircserv, running version 1.0
+     0.101  [uabncnxs] << :ircserv 003 uabncnxs :This server was created today
+     0.101  [uabncnxs] << :ircserv 004 uabncnxs ircserv 1.0 o o
+     0.201  [ugakgbiq] >> 'JOIN #tkhrgm\r\n'
+     0.201  [ugakgbiq] << :ugakgbiq JOIN :#tkhrgm
+     0.201  [ugakgbiq] << :ircserv 353 ugakgbiq = #tkhrgm :@ugakgbiq 
+     0.201  [ugakgbiq] << :ircserv 366 ugakgbiq #tkhrgm :End of /NAMES list
+     0.201  [uabncnxs] >> 'JOIN #tkhrgm\r\n'
+     0.201  [uabncnxs] << :uabncnxs JOIN :#tkhrgm
+     0.201  [uabncnxs] << :ircserv 353 uabncnxs = #tkhrgm :@ugakgbiq uabncnxs 
+     0.201  [uabncnxs] << :ircserv 366 uabncnxs #tkhrgm :End of /NAMES list
+     0.201  [ugakgbiq] << :uabncnxs JOIN :#tkhrgm
+     0.402  [ugakgbiq] >> 'MODE #tkhrgm +l 3\r\n'
+     0.402  [ugakgbiq] << :ugakgbiq!ugakgbiq@localhost MODE #tkhrgm +l 3
+     0.402  [uprxqchm] >> 'PASS pass\r\n'
+     0.402  [uprxqchm] >> 'NICK uprxqchm\r\n'
+     0.402  [uprxqchm] >> 'USER uprxqchm 0 * :Real uprxqchm\r\n'
+     0.402  [uprxqchm] << :ircserv 001 uprxqchm :Welcome to the IRC network uprxqchm!uprxqchm@localhost
+     0.402  [uprxqchm] << :ircserv 002 uprxqchm :Your host is ircserv, running version 1.0
+     0.402  [uprxqchm] << :ircserv 003 uprxqchm :This server was created today
+     0.402  [uprxqchm] << :ircserv 004 uprxqchm ircserv 1.0 o o
+     0.503  [umuxiifq] >> 'PASS pass\r\n'
+     0.503  [umuxiifq] >> 'NICK umuxiifq\r\n'
+     0.503  [umuxiifq] >> 'USER umuxiifq 0 * :Real umuxiifq\r\n'
+     0.503  [umuxiifq] << :ircserv 001 umuxiifq :Welcome to the IRC network umuxiifq!umuxiifq@localhost
+     0.503  [umuxiifq] << :ircserv 002 umuxiifq :Your host is ircserv, running version 1.0
+     0.503  [umuxiifq] << :ircserv 003 umuxiifq :This server was created today
+     0.503  [umuxiifq] << :ircserv 004 umuxiifq ircserv 1.0 o o
+     0.603  [uprxqchm] >> 'JOIN #tkhrgm\r\n'
+     0.603  [uprxqchm] << :uprxqchm JOIN :#tkhrgm
+     0.603  [uprxqchm] << :ircserv 353 uprxqchm = #tkhrgm :@ugakgbiq uabncnxs uprxqchm 
+     0.603  [uprxqchm] << :ircserv 366 uprxqchm #tkhrgm :End of /NAMES list
+     0.603  [umuxiifq] >> 'JOIN #tkhrgm\r\n'
+     0.603  [umuxiifq] << :ircserv 471 umuxiifq #tkhrgm:Cannot join channel (+l)
+     1.104  [ugakgbiq] >> 'MODE #tkhrgm -l\r\n'
+     1.104  [ugakgbiq] << :uprxqchm JOIN :#tkhrgm
+     1.104  [ugakgbiq] << :ugakgbiq!ugakgbiq@localhost MODE #tkhrgm -l
+     1.304  [umuxiifq] >> 'JOIN #tkhrgm\r\n'
+     1.305  [umuxiifq] << :umuxiifq JOIN :#tkhrgm
+     1.305  [umuxiifq] << :ircserv 353 umuxiifq = #tkhrgm :@ugakgbiq uabncnxs uprxqchm umuxiifq 
+     1.305  [umuxiifq] << :ircserv 366 umuxiifq #tkhrgm :End of /NAMES list
+
+==============================================================================
+[A VERIFIER] mode_limit_invalid   (MODE, test 53/77, 1.50s)
+  raison : le serveur ne repond plus apres +l invalide
+------------------------------------------------------------------------------
+     0.000  [ucffugzq] >> 'PASS pass\r\n'
+     0.000  [ucffugzq] >> 'NICK ucffugzq\r\n'
+     0.000  [ucffugzq] >> 'USER ucffugzq 0 * :Real ucffugzq\r\n'
+     0.000  [ucffugzq] << :ircserv 001 ucffugzq :Welcome to the IRC network ucffugzq!ucffugzq@localhost
+     0.000  [ucffugzq] << :ircserv 002 ucffugzq :Your host is ircserv, running version 1.0
+     0.000  [ucffugzq] << :ircserv 003 ucffugzq :This server was created today
+     0.000  [ucffugzq] << :ircserv 004 ucffugzq ircserv 1.0 o o
+     0.100  [ucffugzq] >> 'JOIN #tumict\r\n'
+     0.101  [ucffugzq] << :ucffugzq JOIN :#tumict
+     0.101  [ucffugzq] << :ircserv 353 ucffugzq = #tumict :@ucffugzq 
+     0.101  [ucffugzq] << :ircserv 366 ucffugzq #tumict :End of /NAMES list
+     0.201  [ucffugzq] >> 'MODE #tumict +l abc\r\n'
+     0.201  [ucffugzq] >> 'MODE #tumict +l\r\n'
+     0.201  [ucffugzq] << :ircserv 696 ucffugzq #tumict :Invalid limit parameter
+     0.201  [ucffugzq] << :ircserv 461 ucffugzq #tumict :Not enough parameters
+     0.501  [ucffugzq] >> 'PING alive\r\n'
+     0.502  [ucffugzq] << :ircserv 421 * PING :Unknown command
+     1.503  !! A VERIFIER : le serveur ne repond plus apres +l invalide
+
+==============================================================================
+[NON VALIDE] mode_operator_give_take   (MODE, test 54/77, 1.91s)
+  raison : MODE -o non diffuse
+------------------------------------------------------------------------------
+     0.000  [uhctebus] >> 'PASS pass\r\n'
+     0.000  [uhctebus] >> 'NICK uhctebus\r\n'
+     0.000  [uhctebus] >> 'USER uhctebus 0 * :Real uhctebus\r\n'
+     0.000  [uhctebus] << :ircserv 001 uhctebus :Welcome to the IRC network uhctebus!uhctebus@localhost
+     0.000  [uhctebus] << :ircserv 002 uhctebus :Your host is ircserv, running version 1.0
+     0.000  [uhctebus] << :ircserv 003 uhctebus :This server was created today
+     0.000  [uhctebus] << :ircserv 004 uhctebus ircserv 1.0 o o
+     0.101  [ugbjcovp] >> 'PASS pass\r\n'
+     0.101  [ugbjcovp] >> 'NICK ugbjcovp\r\n'
+     0.101  [ugbjcovp] >> 'USER ugbjcovp 0 * :Real ugbjcovp\r\n'
+     0.101  [ugbjcovp] << :ircserv 001 ugbjcovp :Welcome to the IRC network ugbjcovp!ugbjcovp@localhost
+     0.101  [ugbjcovp] << :ircserv 002 ugbjcovp :Your host is ircserv, running version 1.0
+     0.101  [ugbjcovp] << :ircserv 003 ugbjcovp :This server was created today
+     0.101  [ugbjcovp] << :ircserv 004 ugbjcovp ircserv 1.0 o o
+     0.201  [ubbfsioy] >> 'PASS pass\r\n'
+     0.201  [ubbfsioy] >> 'NICK ubbfsioy\r\n'
+     0.201  [ubbfsioy] >> 'USER ubbfsioy 0 * :Real ubbfsioy\r\n'
+     0.201  [ubbfsioy] << :ircserv 001 ubbfsioy :Welcome to the IRC network ubbfsioy!ubbfsioy@localhost
+     0.201  [ubbfsioy] << :ircserv 002 ubbfsioy :Your host is ircserv, running version 1.0
+     0.201  [ubbfsioy] << :ircserv 003 ubbfsioy :This server was created today
+     0.201  [ubbfsioy] << :ircserv 004 ubbfsioy ircserv 1.0 o o
+     0.302  [uhctebus] >> 'JOIN #timbzh\r\n'
+     0.302  [uhctebus] << :uhctebus JOIN :#timbzh
+     0.302  [uhctebus] << :ircserv 353 uhctebus = #timbzh :@uhctebus 
+     0.302  [uhctebus] << :ircserv 366 uhctebus #timbzh :End of /NAMES list
+     0.302  [ugbjcovp] >> 'JOIN #timbzh\r\n'
+     0.302  [ugbjcovp] << :ugbjcovp JOIN :#timbzh
+     0.302  [ugbjcovp] << :ircserv 353 ugbjcovp = #timbzh :@uhctebus ugbjcovp 
+     0.302  [ugbjcovp] << :ircserv 366 ugbjcovp #timbzh :End of /NAMES list
+     0.302  [ubbfsioy] >> 'JOIN #timbzh\r\n'
+     0.302  [ubbfsioy] << :ubbfsioy JOIN :#timbzh
+     0.302  [ubbfsioy] << :ircserv 353 ubbfsioy = #timbzh :@uhctebus ugbjcovp ubbfsioy 
+     0.302  [ubbfsioy] << :ircserv 366 ubbfsioy #timbzh :End of /NAMES list
+     0.302  [uhctebus] << :ugbjcovp JOIN :#timbzh
+     0.302  [uhctebus] << :ubbfsioy JOIN :#timbzh
+     0.402  [ugbjcovp] << :ubbfsioy JOIN :#timbzh
+     0.603  [uhctebus] >> 'MODE #timbzh +o ugbjcovp\r\n'
+     0.603  [ugbjcovp] << :uhctebus!uhctebus@localhost MODE #timbzh +o ugbjcovp
+     0.603  [ubbfsioy] << :uhctebus!uhctebus@localhost MODE #timbzh +o ugbjcovp
+     0.603  [ugbjcovp] >> 'KICK #timbzh ubbfsioy\r\n'
+     0.603  [ubbfsioy] << :ugbjcovp!ugbjcovp@localhost KICK #timbzh ubbfsioy :ugbjcovp
+     0.604  [ubbfsioy] >> 'JOIN #timbzh\r\n'
+     0.604  [ubbfsioy] << :ubbfsioy JOIN :#timbzh
+     0.604  [ubbfsioy] << :ircserv 353 ubbfsioy = #timbzh :@uhctebus @ugbjcovp ubbfsioy 
+     0.604  [ubbfsioy] << :ircserv 366 ubbfsioy #timbzh :End of /NAMES list
+     0.904  [uhctebus] >> 'MODE #timbzh -o ugbjcovp\r\n'
+     0.904  [ugbjcovp] << :ugbjcovp!ugbjcovp@localhost KICK #timbzh ubbfsioy :ugbjcovp
+     0.904  [ugbjcovp] << :ubbfsioy JOIN :#timbzh
+     1.906  !! ECHEC : MODE -o non diffuse
+
+==============================================================================
+[VALIDE] mode_non_operator   (MODE, test 55/77, 0.40s)
+------------------------------------------------------------------------------
+     0.000  [uqetovow] >> 'PASS pass\r\n'
+     0.000  [uqetovow] >> 'NICK uqetovow\r\n'
+     0.000  [uqetovow] >> 'USER uqetovow 0 * :Real uqetovow\r\n'
+     0.000  [uqetovow] << :ircserv 001 uqetovow :Welcome to the IRC network uqetovow!uqetovow@localhost
+     0.000  [uqetovow] << :ircserv 002 uqetovow :Your host is ircserv, running version 1.0
+     0.000  [uqetovow] << :ircserv 003 uqetovow :This server was created today
+     0.000  [uqetovow] << :ircserv 004 uqetovow ircserv 1.0 o o
+     0.101  [usuuyovm] >> 'PASS pass\r\n'
+     0.101  [usuuyovm] >> 'NICK usuuyovm\r\n'
+     0.101  [usuuyovm] >> 'USER usuuyovm 0 * :Real usuuyovm\r\n'
+     0.101  [usuuyovm] << :ircserv 001 usuuyovm :Welcome to the IRC network usuuyovm!usuuyovm@localhost
+     0.101  [usuuyovm] << :ircserv 002 usuuyovm :Your host is ircserv, running version 1.0
+     0.101  [usuuyovm] << :ircserv 003 usuuyovm :This server was created today
+     0.101  [usuuyovm] << :ircserv 004 usuuyovm ircserv 1.0 o o
+     0.201  [uqetovow] >> 'JOIN #tzgpvk\r\n'
+     0.201  [uqetovow] << :uqetovow JOIN :#tzgpvk
+     0.201  [uqetovow] << :ircserv 353 uqetovow = #tzgpvk :@uqetovow 
+     0.201  [uqetovow] << :ircserv 366 uqetovow #tzgpvk :End of /NAMES list
+     0.201  [usuuyovm] >> 'JOIN #tzgpvk\r\n'
+     0.201  [usuuyovm] << :usuuyovm JOIN :#tzgpvk
+     0.201  [usuuyovm] << :ircserv 353 usuuyovm = #tzgpvk :@uqetovow usuuyovm 
+     0.201  [usuuyovm] << :ircserv 366 usuuyovm #tzgpvk :End of /NAMES list
+     0.201  [uqetovow] << :usuuyovm JOIN :#tzgpvk
+     0.402  [usuuyovm] >> 'MODE #tzgpvk +i\r\n'
+     0.402  [usuuyovm] << :ircserv 482 usuuyovm :You're not channel operator
+     0.402  [usuuyovm] >> 'MODE #tzgpvk +o usuuyovm\r\n'
+     0.402  [usuuyovm] << :ircserv 482 usuuyovm :You're not channel operator
+
+==============================================================================
+[VALIDE] mode_errors   (MODE, test 56/77, 0.20s)
+------------------------------------------------------------------------------
+     0.000  [urahpvej] >> 'PASS pass\r\n'
+     0.000  [urahpvej] >> 'NICK urahpvej\r\n'
+     0.000  [urahpvej] >> 'USER urahpvej 0 * :Real urahpvej\r\n'
+     0.000  [urahpvej] << :ircserv 001 urahpvej :Welcome to the IRC network urahpvej!urahpvej@localhost
+     0.000  [urahpvej] << :ircserv 002 urahpvej :Your host is ircserv, running version 1.0
+     0.000  [urahpvej] << :ircserv 003 urahpvej :This server was created today
+     0.000  [urahpvej] << :ircserv 004 urahpvej ircserv 1.0 o o
+     0.101  [urahpvej] >> 'JOIN #tlkuie\r\n'
+     0.101  [urahpvej] << :urahpvej JOIN :#tlkuie
+     0.101  [urahpvej] << :ircserv 353 urahpvej = #tlkuie :@urahpvej 
+     0.101  [urahpvej] << :ircserv 366 urahpvej #tlkuie :End of /NAMES list
+     0.201  [urahpvej] >> 'MODE #tlkuie +o ghosthqa\r\n'
+     0.201  [urahpvej] << :ircserv 441 urahpvej ghosthqa :They aren't on that channel
+     0.201  [urahpvej] >> 'MODE #tlkuie +k\r\n'
+     0.201  [urahpvej] << :ircserv 461 urahpvej #tlkuie :Not enough parameters
+     0.201  [urahpvej] >> 'MODE #tlkuie +z\r\n'
+     0.201  [urahpvej] << :ircserv 472 urahpvej :is unknown mode char to me
+     0.201  [urahpvej] >> 'MODE #nochantzfj +i\r\n'
+     0.201  [urahpvej] << :ircserv 403 urahpvej #nochantzfj :No such channel
+
+==============================================================================
+[NON VALIDE] mode_combined   (MODE, test 57/77, 2.31s)
+  raison : le canal reste verrouille apres retrait de tous les modes
+------------------------------------------------------------------------------
+     0.000  [uxrbcfsp] >> 'PASS pass\r\n'
+     0.000  [uxrbcfsp] >> 'NICK uxrbcfsp\r\n'
+     0.000  [uxrbcfsp] >> 'USER uxrbcfsp 0 * :Real uxrbcfsp\r\n'
+     0.000  [uxrbcfsp] << :ircserv 001 uxrbcfsp :Welcome to the IRC network uxrbcfsp!uxrbcfsp@localhost
+     0.000  [uxrbcfsp] << :ircserv 002 uxrbcfsp :Your host is ircserv, running version 1.0
+     0.000  [uxrbcfsp] << :ircserv 003 uxrbcfsp :This server was created today
+     0.000  [uxrbcfsp] << :ircserv 004 uxrbcfsp ircserv 1.0 o o
+     0.101  [uxrbcfsp] >> 'JOIN #tjbehe\r\n'
+     0.101  [uxrbcfsp] << :uxrbcfsp JOIN :#tjbehe
+     0.101  [uxrbcfsp] << :ircserv 353 uxrbcfsp = #tjbehe :@uxrbcfsp 
+     0.101  [uxrbcfsp] << :ircserv 366 uxrbcfsp #tjbehe :End of /NAMES list
+     0.201  [uxrbcfsp] >> 'MODE #tjbehe +itk key1\r\n'
+     0.201  [uxrbcfsp] << :uxrbcfsp!uxrbcfsp@localhost MODE #tjbehe +i
+     0.201  [uxrbcfsp] << :uxrbcfsp!uxrbcfsp@localhost MODE #tjbehe +t
+     0.201  [uxrbcfsp] << :uxrbcfsp!uxrbcfsp@localhost MODE #tjbehe +k key1
+     0.201  [uxrbcfsp] >> 'MODE #tjbehe +kl key2 5\r\n'
+     0.201  [uxrbcfsp] >> 'MODE #tjbehe -itk\r\n'
+     0.201  [ujwadvxv] >> 'PASS pass\r\n'
+     0.201  [ujwadvxv] >> 'NICK ujwadvxv\r\n'
+     0.201  [ujwadvxv] >> 'USER ujwadvxv 0 * :Real ujwadvxv\r\n'
+     0.201  [ujwadvxv] << :ircserv 001 ujwadvxv :Welcome to the IRC network ujwadvxv!ujwadvxv@localhost
+     0.201  [ujwadvxv] << :ircserv 002 ujwadvxv :Your host is ircserv, running version 1.0
+     0.201  [ujwadvxv] << :ircserv 003 ujwadvxv :This server was created today
+     0.201  [ujwadvxv] << :ircserv 004 ujwadvxv ircserv 1.0 o o
+     0.302  [ujwadvxv] >> 'JOIN #tjbehe\r\n'
+     0.302  [ujwadvxv] << :ircserv 473 ujwadvxv #tjbehe:Cannot join channel (+i)
+     2.305  !! ECHEC : le canal reste verrouille apres retrait de tous les modes
+
+==============================================================================
+[VALIDE] quit_broadcast   (Deconnexions, test 58/77, 0.50s)
+------------------------------------------------------------------------------
+     0.000  [uklkonud] >> 'PASS pass\r\n'
+     0.000  [uklkonud] >> 'NICK uklkonud\r\n'
+     0.000  [uklkonud] >> 'USER uklkonud 0 * :Real uklkonud\r\n'
+     0.000  [uklkonud] << :ircserv 001 uklkonud :Welcome to the IRC network uklkonud!uklkonud@localhost
+     0.000  [uklkonud] << :ircserv 002 uklkonud :Your host is ircserv, running version 1.0
+     0.000  [uklkonud] << :ircserv 003 uklkonud :This server was created today
+     0.000  [uklkonud] << :ircserv 004 uklkonud ircserv 1.0 o o
+     0.101  [uivjeulj] >> 'PASS pass\r\n'
+     0.101  [uivjeulj] >> 'NICK uivjeulj\r\n'
+     0.101  [uivjeulj] >> 'USER uivjeulj 0 * :Real uivjeulj\r\n'
+     0.101  [uivjeulj] << :ircserv 001 uivjeulj :Welcome to the IRC network uivjeulj!uivjeulj@localhost
+     0.101  [uivjeulj] << :ircserv 002 uivjeulj :Your host is ircserv, running version 1.0
+     0.101  [uivjeulj] << :ircserv 003 uivjeulj :This server was created today
+     0.101  [uivjeulj] << :ircserv 004 uivjeulj ircserv 1.0 o o
+     0.201  [uklkonud] >> 'JOIN #tgnwxa\r\n'
+     0.201  [uklkonud] << :uklkonud JOIN :#tgnwxa
+     0.201  [uklkonud] << :ircserv 353 uklkonud = #tgnwxa :@uklkonud 
+     0.201  [uklkonud] << :ircserv 366 uklkonud #tgnwxa :End of /NAMES list
+     0.201  [uivjeulj] >> 'JOIN #tgnwxa\r\n'
+     0.201  [uivjeulj] << :uivjeulj JOIN :#tgnwxa
+     0.201  [uivjeulj] << :ircserv 353 uivjeulj = #tgnwxa :@uklkonud uivjeulj 
+     0.201  [uivjeulj] << :ircserv 366 uivjeulj #tgnwxa :End of /NAMES list
+     0.201  [uklkonud] << :uivjeulj JOIN :#tgnwxa
+     0.402  [uivjeulj] >> 'QUIT :au revoir\r\n'
+     0.402  [uklkonud] << :uivjeulj!uivjeulj@localhost QUIT :au revoir
+     0.402  [uklkonud] >> 'PRIVMSG #tgnwxa :toujours la\r\n'
+     0.402  [uyeqilil] >> 'PASS pass\r\n'
+     0.402  [uyeqilil] >> 'NICK uyeqilil\r\n'
+     0.402  [uyeqilil] >> 'USER uyeqilil 0 * :Real uyeqilil\r\n'
+     0.402  [uyeqilil] << :ircserv 001 uyeqilil :Welcome to the IRC network uyeqilil!uyeqilil@localhost
+     0.402  [uyeqilil] << :ircserv 002 uyeqilil :Your host is ircserv, running version 1.0
+     0.402  [uyeqilil] << :ircserv 003 uyeqilil :This server was created today
+     0.402  [uyeqilil] << :ircserv 004 uyeqilil ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] abrupt_disconnect   (Deconnexions, test 59/77, 0.70s)
+------------------------------------------------------------------------------
+     0.000  [ukfgxzzq] >> 'PASS pass\r\n'
+     0.000  [ukfgxzzq] >> 'NICK ukfgxzzq\r\n'
+     0.000  [ukfgxzzq] >> 'USER ukfgxzzq 0 * :Real ukfgxzzq\r\n'
+     0.000  [ukfgxzzq] << :ircserv 001 ukfgxzzq :Welcome to the IRC network ukfgxzzq!ukfgxzzq@localhost
+     0.000  [ukfgxzzq] << :ircserv 002 ukfgxzzq :Your host is ircserv, running version 1.0
+     0.000  [ukfgxzzq] << :ircserv 003 ukfgxzzq :This server was created today
+     0.000  [ukfgxzzq] << :ircserv 004 ukfgxzzq ircserv 1.0 o o
+     0.101  [ugcfsqky] >> 'PASS pass\r\n'
+     0.101  [ugcfsqky] >> 'NICK ugcfsqky\r\n'
+     0.101  [ugcfsqky] >> 'USER ugcfsqky 0 * :Real ugcfsqky\r\n'
+     0.101  [ugcfsqky] << :ircserv 001 ugcfsqky :Welcome to the IRC network ugcfsqky!ugcfsqky@localhost
+     0.101  [ugcfsqky] << :ircserv 002 ugcfsqky :Your host is ircserv, running version 1.0
+     0.101  [ugcfsqky] << :ircserv 003 ugcfsqky :This server was created today
+     0.101  [ugcfsqky] << :ircserv 004 ugcfsqky ircserv 1.0 o o
+     0.201  [utlytezg] >> 'PASS pass\r\n'
+     0.201  [utlytezg] >> 'NICK utlytezg\r\n'
+     0.201  [utlytezg] >> 'USER utlytezg 0 * :Real utlytezg\r\n'
+     0.201  [utlytezg] << :ircserv 001 utlytezg :Welcome to the IRC network utlytezg!utlytezg@localhost
+     0.201  [utlytezg] << :ircserv 002 utlytezg :Your host is ircserv, running version 1.0
+     0.201  [utlytezg] << :ircserv 003 utlytezg :This server was created today
+     0.201  [utlytezg] << :ircserv 004 utlytezg ircserv 1.0 o o
+     0.302  [ukfgxzzq] >> 'JOIN #tiavcm\r\n'
+     0.302  [ukfgxzzq] << :ukfgxzzq JOIN :#tiavcm
+     0.302  [ukfgxzzq] << :ircserv 353 ukfgxzzq = #tiavcm :@ukfgxzzq 
+     0.302  [ukfgxzzq] << :ircserv 366 ukfgxzzq #tiavcm :End of /NAMES list
+     0.302  [ugcfsqky] >> 'JOIN #tiavcm\r\n'
+     0.302  [ugcfsqky] << :ugcfsqky JOIN :#tiavcm
+     0.302  [ugcfsqky] << :ircserv 353 ugcfsqky = #tiavcm :@ukfgxzzq ugcfsqky 
+     0.302  [ugcfsqky] << :ircserv 366 ugcfsqky #tiavcm :End of /NAMES list
+     0.302  [utlytezg] >> 'JOIN #tiavcm\r\n'
+     0.302  [utlytezg] << :utlytezg JOIN :#tiavcm
+     0.302  [utlytezg] << :ircserv 353 utlytezg = #tiavcm :@ukfgxzzq ugcfsqky utlytezg 
+     0.302  [utlytezg] << :ircserv 366 utlytezg #tiavcm :End of /NAMES list
+     0.302  [ukfgxzzq] << :ugcfsqky JOIN :#tiavcm
+     0.302  [ukfgxzzq] << :utlytezg JOIN :#tiavcm
+     0.402  [ugcfsqky] << :utlytezg JOIN :#tiavcm
+     0.603  [ukfgxzzq] << :ugcfsqky!ugcfsqky@localhost QUIT :Connection error
+     0.603  [ukfgxzzq] >> 'PRIVMSG #tiavcm :encore la\r\n'
+     0.603  [utlytezg] << :ugcfsqky!ugcfsqky@localhost QUIT :Connection error
+     0.603  [utlytezg] << :ukfgxzzq PRIVMSG #tiavcm :encore la
+     0.603  [ujtpovsf] >> 'PASS pass\r\n'
+     0.603  [ujtpovsf] >> 'NICK ujtpovsf\r\n'
+     0.603  [ujtpovsf] >> 'USER ujtpovsf 0 * :Real ujtpovsf\r\n'
+     0.603  [ujtpovsf] << :ircserv 001 ujtpovsf :Welcome to the IRC network ujtpovsf!ujtpovsf@localhost
+     0.603  [ujtpovsf] << :ircserv 002 ujtpovsf :Your host is ircserv, running version 1.0
+     0.603  [ujtpovsf] << :ircserv 003 ujtpovsf :This server was created today
+     0.603  [ujtpovsf] << :ircserv 004 ujtpovsf ircserv 1.0 o o
+     0.703  [ujtpovsf] >> 'JOIN #tiavcm\r\n'
+     0.704  [ujtpovsf] << :ujtpovsf JOIN :#tiavcm
+     0.704  [ujtpovsf] << :ircserv 353 ujtpovsf = #tiavcm :@ukfgxzzq utlytezg ujtpovsf 
+     0.704  [ujtpovsf] << :ircserv 366 ujtpovsf #tiavcm :End of /NAMES list
+
+==============================================================================
+[VALIDE] disconnect_op_then_channel_alive   (Deconnexions, test 60/77, 1.00s)
+------------------------------------------------------------------------------
+     0.000  [uiwhlgds] >> 'PASS pass\r\n'
+     0.000  [uiwhlgds] >> 'NICK uiwhlgds\r\n'
+     0.000  [uiwhlgds] >> 'USER uiwhlgds 0 * :Real uiwhlgds\r\n'
+     0.000  [uiwhlgds] << :ircserv 001 uiwhlgds :Welcome to the IRC network uiwhlgds!uiwhlgds@localhost
+     0.000  [uiwhlgds] << :ircserv 002 uiwhlgds :Your host is ircserv, running version 1.0
+     0.000  [uiwhlgds] << :ircserv 003 uiwhlgds :This server was created today
+     0.000  [uiwhlgds] << :ircserv 004 uiwhlgds ircserv 1.0 o o
+     0.101  [uoqstkgs] >> 'PASS pass\r\n'
+     0.101  [uoqstkgs] >> 'NICK uoqstkgs\r\n'
+     0.101  [uoqstkgs] >> 'USER uoqstkgs 0 * :Real uoqstkgs\r\n'
+     0.101  [uoqstkgs] << :ircserv 001 uoqstkgs :Welcome to the IRC network uoqstkgs!uoqstkgs@localhost
+     0.101  [uoqstkgs] << :ircserv 002 uoqstkgs :Your host is ircserv, running version 1.0
+     0.101  [uoqstkgs] << :ircserv 003 uoqstkgs :This server was created today
+     0.101  [uoqstkgs] << :ircserv 004 uoqstkgs ircserv 1.0 o o
+     0.201  [uiwhlgds] >> 'JOIN #tlxjeg\r\n'
+     0.201  [uiwhlgds] << :uiwhlgds JOIN :#tlxjeg
+     0.201  [uiwhlgds] << :ircserv 353 uiwhlgds = #tlxjeg :@uiwhlgds 
+     0.201  [uiwhlgds] << :ircserv 366 uiwhlgds #tlxjeg :End of /NAMES list
+     0.201  [uoqstkgs] >> 'JOIN #tlxjeg\r\n'
+     0.201  [uoqstkgs] << :uoqstkgs JOIN :#tlxjeg
+     0.201  [uoqstkgs] << :ircserv 353 uoqstkgs = #tlxjeg :@uiwhlgds uoqstkgs 
+     0.201  [uoqstkgs] << :ircserv 366 uoqstkgs #tlxjeg :End of /NAMES list
+     0.201  [uiwhlgds] << :uoqstkgs JOIN :#tlxjeg
+     0.402  [uoqstkgs] << :uiwhlgds!uiwhlgds@localhost QUIT :Connection closed
+     0.903  [uoqstkgs] >> 'PRIVMSG #tlxjeg :seul\r\n'
+     0.903  [ubnxooyo] >> 'PASS pass\r\n'
+     0.903  [ubnxooyo] >> 'NICK ubnxooyo\r\n'
+     0.903  [ubnxooyo] >> 'USER ubnxooyo 0 * :Real ubnxooyo\r\n'
+     0.903  [ubnxooyo] << :ircserv 001 ubnxooyo :Welcome to the IRC network ubnxooyo!ubnxooyo@localhost
+     0.903  [ubnxooyo] << :ircserv 002 ubnxooyo :Your host is ircserv, running version 1.0
+     0.903  [ubnxooyo] << :ircserv 003 ubnxooyo :This server was created today
+     0.903  [ubnxooyo] << :ircserv 004 ubnxooyo ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] disconnect_during_partial_command   (Deconnexions, test 61/77, 0.40s)
+------------------------------------------------------------------------------
+     0.000  [uflvfksx] >> 'PASS pass\r\n'
+     0.000  [uflvfksx] >> 'NICK uflvfksx\r\n'
+     0.000  [uflvfksx] >> 'USER uflvfksx 0 * :Real uflvfksx\r\n'
+     0.000  [uflvfksx] << :ircserv 001 uflvfksx :Welcome to the IRC network uflvfksx!uflvfksx@localhost
+     0.000  [uflvfksx] << :ircserv 002 uflvfksx :Your host is ircserv, running version 1.0
+     0.000  [uflvfksx] << :ircserv 003 uflvfksx :This server was created today
+     0.000  [uflvfksx] << :ircserv 004 uflvfksx ircserv 1.0 o o
+     0.100  [uflvfksx] >> 'PRIVMSG xx :incompl'
+     0.301  [ugmoudwe] >> 'PASS pass\r\n'
+     0.301  [ugmoudwe] >> 'NICK ugmoudwe\r\n'
+     0.301  [ugmoudwe] >> 'USER ugmoudwe 0 * :Real ugmoudwe\r\n'
+     0.301  [ugmoudwe] << :ircserv 001 ugmoudwe :Welcome to the IRC network ugmoudwe!ugmoudwe@localhost
+     0.301  [ugmoudwe] << :ircserv 002 ugmoudwe :Your host is ircserv, running version 1.0
+     0.301  [ugmoudwe] << :ircserv 003 ugmoudwe :This server was created today
+     0.301  [ugmoudwe] << :ircserv 004 ugmoudwe ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] disconnect_before_registration   (Deconnexions, test 62/77, 0.30s)
+------------------------------------------------------------------------------
+     0.000  [uwvyqieo] >> 'PASS pass\r\nNICK ab'
+     0.201  [ukqrmqxv] >> 'PASS pass\r\n'
+     0.201  [ukqrmqxv] >> 'NICK ukqrmqxv\r\n'
+     0.201  [ukqrmqxv] >> 'USER ukqrmqxv 0 * :Real ukqrmqxv\r\n'
+     0.201  [ukqrmqxv] << :ircserv 001 ukqrmqxv :Welcome to the IRC network ukqrmqxv!ukqrmqxv@localhost
+     0.201  [ukqrmqxv] << :ircserv 002 ukqrmqxv :Your host is ircserv, running version 1.0
+     0.201  [ukqrmqxv] << :ircserv 003 ukqrmqxv :This server was created today
+     0.201  [ukqrmqxv] << :ircserv 004 ukqrmqxv ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] multiple_commands_one_packet   (Donnees partielles, test 63/77, 0.20s)
+------------------------------------------------------------------------------
+     0.000  [uxzdauge] >> 'PASS pass\r\n'
+     0.000  [uxzdauge] >> 'NICK uxzdauge\r\n'
+     0.000  [uxzdauge] >> 'USER uxzdauge 0 * :Real uxzdauge\r\n'
+     0.000  [uxzdauge] << :ircserv 001 uxzdauge :Welcome to the IRC network uxzdauge!uxzdauge@localhost
+     0.000  [uxzdauge] << :ircserv 002 uxzdauge :Your host is ircserv, running version 1.0
+     0.000  [uxzdauge] << :ircserv 003 uxzdauge :This server was created today
+     0.000  [uxzdauge] << :ircserv 004 uxzdauge ircserv 1.0 o o
+     0.101  [ujpyxumc] >> 'PASS pass\r\n'
+     0.101  [ujpyxumc] >> 'NICK ujpyxumc\r\n'
+     0.101  [ujpyxumc] >> 'USER ujpyxumc 0 * :Real ujpyxumc\r\n'
+     0.101  [ujpyxumc] << :ircserv 001 ujpyxumc :Welcome to the IRC network ujpyxumc!ujpyxumc@localhost
+     0.101  [ujpyxumc] << :ircserv 002 ujpyxumc :Your host is ircserv, running version 1.0
+     0.101  [ujpyxumc] << :ircserv 003 ujpyxumc :This server was created today
+     0.101  [ujpyxumc] << :ircserv 004 ujpyxumc ircserv 1.0 o o
+     0.201  [uxzdauge] >> 'PRIVMSG ujpyxumc :un\r\nPRIVMSG ujpyxumc :deux\r\nPRIVMSG ujpyxumc :trois\r\n'
+     0.201  [ujpyxumc] << :uxzdauge PRIVMSG ujpyxumc :un
+     0.201  [ujpyxumc] << :uxzdauge PRIVMSG ujpyxumc :deux
+     0.201  [ujpyxumc] << :uxzdauge PRIVMSG ujpyxumc :trois
+
+==============================================================================
+[VALIDE] multiple_commands_with_partial_tail   (Donnees partielles, test 64/77, 0.40s)
+------------------------------------------------------------------------------
+     0.000  [umwkzoii] >> 'PASS pass\r\n'
+     0.000  [umwkzoii] >> 'NICK umwkzoii\r\n'
+     0.000  [umwkzoii] >> 'USER umwkzoii 0 * :Real umwkzoii\r\n'
+     0.000  [umwkzoii] << :ircserv 001 umwkzoii :Welcome to the IRC network umwkzoii!umwkzoii@localhost
+     0.000  [umwkzoii] << :ircserv 002 umwkzoii :Your host is ircserv, running version 1.0
+     0.000  [umwkzoii] << :ircserv 003 umwkzoii :This server was created today
+     0.000  [umwkzoii] << :ircserv 004 umwkzoii ircserv 1.0 o o
+     0.100  [utiwhbgh] >> 'PASS pass\r\n'
+     0.101  [utiwhbgh] >> 'NICK utiwhbgh\r\n'
+     0.101  [utiwhbgh] >> 'USER utiwhbgh 0 * :Real utiwhbgh\r\n'
+     0.101  [utiwhbgh] << :ircserv 001 utiwhbgh :Welcome to the IRC network utiwhbgh!utiwhbgh@localhost
+     0.101  [utiwhbgh] << :ircserv 002 utiwhbgh :Your host is ircserv, running version 1.0
+     0.101  [utiwhbgh] << :ircserv 003 utiwhbgh :This server was created today
+     0.101  [utiwhbgh] << :ircserv 004 utiwhbgh ircserv 1.0 o o
+     0.201  [umwkzoii] >> 'PRIVMSG utiwhbgh :un\r\nPRIVMSG utiwhbgh :de'
+     0.401  [umwkzoii] >> 'ux\r\n'
+     0.401  [utiwhbgh] << :umwkzoii PRIVMSG utiwhbgh :un
+     0.401  [utiwhbgh] << :umwkzoii PRIVMSG utiwhbgh :deux
+
+==============================================================================
+[VALIDE] empty_lines_and_spaces   (Donnees partielles, test 65/77, 0.50s)
+------------------------------------------------------------------------------
+     0.000  [ultwrppw] >> 'PASS pass\r\n'
+     0.000  [ultwrppw] >> 'NICK ultwrppw\r\n'
+     0.000  [ultwrppw] >> 'USER ultwrppw 0 * :Real ultwrppw\r\n'
+     0.000  [ultwrppw] << :ircserv 001 ultwrppw :Welcome to the IRC network ultwrppw!ultwrppw@localhost
+     0.000  [ultwrppw] << :ircserv 002 ultwrppw :Your host is ircserv, running version 1.0
+     0.000  [ultwrppw] << :ircserv 003 ultwrppw :This server was created today
+     0.000  [ultwrppw] << :ircserv 004 ultwrppw ircserv 1.0 o o
+     0.100  [ultwrppw] >> '\r\n\r\n   \r\n'
+     0.401  [uqirhosk] >> 'PASS pass\r\n'
+     0.401  [uqirhosk] >> 'NICK uqirhosk\r\n'
+     0.401  [uqirhosk] >> 'USER uqirhosk 0 * :Real uqirhosk\r\n'
+     0.401  [uqirhosk] << :ircserv 001 uqirhosk :Welcome to the IRC network uqirhosk!uqirhosk@localhost
+     0.401  [uqirhosk] << :ircserv 002 uqirhosk :Your host is ircserv, running version 1.0
+     0.401  [uqirhosk] << :ircserv 003 uqirhosk :This server was created today
+     0.401  [uqirhosk] << :ircserv 004 uqirhosk ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] half_close_partial   (Donnees partielles, test 66/77, 0.50s)
+------------------------------------------------------------------------------
+     0.000  [uldbkjgs] >> 'PASS pass\r\n'
+     0.000  [uldbkjgs] >> 'NICK uldbkjgs\r\n'
+     0.000  [uldbkjgs] >> 'USER uldbkjgs 0 * :Real uldbkjgs\r\n'
+     0.000  [uldbkjgs] << :ircserv 001 uldbkjgs :Welcome to the IRC network uldbkjgs!uldbkjgs@localhost
+     0.000  [uldbkjgs] << :ircserv 002 uldbkjgs :Your host is ircserv, running version 1.0
+     0.000  [uldbkjgs] << :ircserv 003 uldbkjgs :This server was created today
+     0.000  [uldbkjgs] << :ircserv 004 uldbkjgs ircserv 1.0 o o
+     0.100  [uldbkjgs] >> 'PRIVMSG xx :pas fini'
+     0.401  [uutrodqp] >> 'PASS pass\r\n'
+     0.401  [uutrodqp] >> 'NICK uutrodqp\r\n'
+     0.401  [uutrodqp] >> 'USER uutrodqp 0 * :Real uutrodqp\r\n'
+     0.401  [uutrodqp] << :ircserv 001 uutrodqp :Welcome to the IRC network uutrodqp!uutrodqp@localhost
+     0.401  [uutrodqp] << :ircserv 002 uutrodqp :Your host is ircserv, running version 1.0
+     0.401  [uutrodqp] << :ircserv 003 uutrodqp :This server was created today
+     0.401  [uutrodqp] << :ircserv 004 uutrodqp ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] garbage_binary   (Robustesse, test 67/77, 0.50s)
+------------------------------------------------------------------------------
+     0.000  [urvgtakz] >> 'PASS pass\r\n'
+     0.000  [urvgtakz] >> 'NICK urvgtakz\r\n'
+     0.000  [urvgtakz] >> 'USER urvgtakz 0 * :Real urvgtakz\r\n'
+     0.000  [urvgtakz] << :ircserv 001 urvgtakz :Welcome to the IRC network urvgtakz!urvgtakz@localhost
+     0.000  [urvgtakz] << :ircserv 002 urvgtakz :Your host is ircserv, running version 1.0
+     0.000  [urvgtakz] << :ircserv 003 urvgtakz :This server was created today
+     0.000  [urvgtakz] << :ircserv 004 urvgtakz ircserv 1.0 o o
+     0.101  [urvgtakz] >> '�\x03p�\x11�/�0��T��\x18*Xh�\'\t��猅hvE�\x1c��\x07ei����\x02�ֿ��e<VܶR\x08\x02�<�\x1d���y1\r�\x0e��DD\x04%\x00�\t��{Q��Z+�UB%��:�u,�s"Ǻ��Gq!�R\x03~eY����vo\x01j�\rĤ�\x1coz�\x16iڎ9i\x14+�{\x03��M\x03\x1a�E�Φ��j8�nE��\x02�O��g<t<���q�\x14Y�\x03pi�Ғn8\x13Qǝ�%��cw\x132�3CW\t~c���%��\x16�\x11\x14... (2002 octets au total)'
+     0.102  [urvgtakz] << :ircserv 421 * �P��/�0��T��*XH�'	��猅HVE���EI�����ֿ��E<VܶR�<����Y1���DD% �	��{Q��Z+�UB%��:�U,�S"Ǻ��GQ!�R~EY����VOJ�Ĥ�OZ�Iڎ9I+�{��M�E�Φ��J8�NE���O��G<T<���Q�Y�PI�ҒN8Qǝ�%��CW2�3CW	~C���%���E2{����(},�NS�꒿�Z�5T�..�BY����A�FLS�3	�������E*PҜS�F��F�IK�H*��|��#���BX*...
+     0.102  [urvgtakz] << ���2�(D_�<��X6Ћ�%�T��UK�8Ԃ�Q��U`�+�.<LL�ԝ��,��ʍ�UH�$�TǠ�(�)�������_��KB\��I���ڞNX�+���XR�H�·���C���GI�-�7S
+     0.102  [urvgtakz] << ��L6�EV ��"ѸC�����I1}��� R�B���H|F0E�OА�{�3���.JKՙ��B�<8G����PA�����J����PH�[�6'6��@ U�����M��,�A��M)V|V��&�����E�����F�����WZ��+W[��XOG�8�('ȝ�(ٵKC :Unknown command
+     0.402  [uftdsolg] >> 'PASS pass\r\n'
+     0.402  [uftdsolg] >> 'NICK uftdsolg\r\n'
+     0.402  [uftdsolg] >> 'USER uftdsolg 0 * :Real uftdsolg\r\n'
+     0.403  [uftdsolg] << :ircserv 001 uftdsolg :Welcome to the IRC network uftdsolg!uftdsolg@localhost
+     0.403  [uftdsolg] << :ircserv 002 uftdsolg :Your host is ircserv, running version 1.0
+     0.403  [uftdsolg] << :ircserv 003 uftdsolg :This server was created today
+     0.403  [uftdsolg] << :ircserv 004 uftdsolg ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] long_line   (Robustesse, test 68/77, 0.74s)
+------------------------------------------------------------------------------
+     0.000  [uimeasar] >> 'PASS pass\r\n'
+     0.000  [uimeasar] >> 'NICK uimeasar\r\n'
+     0.000  [uimeasar] >> 'USER uimeasar 0 * :Real uimeasar\r\n'
+     0.000  [uimeasar] << :ircserv 001 uimeasar :Welcome to the IRC network uimeasar!uimeasar@localhost
+     0.000  [uimeasar] << :ircserv 002 uimeasar :Your host is ircserv, running version 1.0
+     0.000  [uimeasar] << :ircserv 003 uimeasar :This server was created today
+     0.000  [uimeasar] << :ircserv 004 uimeasar ircserv 1.0 o o
+     0.101  [uimeasar] >> 'PRIVMSG xx :AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA... (20012 octets au total)'
+     0.301  [uimeasar] >> '\r\n'
+     0.342  [uimeasar] << :ircserv 401 uimeasar xx :No such nick/channel
+     0.642  [uqoyoxsu] >> 'PASS pass\r\n'
+     0.642  [uqoyoxsu] >> 'NICK uqoyoxsu\r\n'
+     0.642  [uqoyoxsu] >> 'USER uqoyoxsu 0 * :Real uqoyoxsu\r\n'
+     0.642  [uqoyoxsu] << :ircserv 001 uqoyoxsu :Welcome to the IRC network uqoyoxsu!uqoyoxsu@localhost
+     0.642  [uqoyoxsu] << :ircserv 002 uqoyoxsu :Your host is ircserv, running version 1.0
+     0.642  [uqoyoxsu] << :ircserv 003 uqoyoxsu :This server was created today
+     0.642  [uqoyoxsu] << :ircserv 004 uqoyoxsu ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] very_long_line_no_newline   (Robustesse, test 69/77, 0.55s)
+------------------------------------------------------------------------------
+     0.000  [uxkprevd] >> 'PASS pass\r\n'
+     0.000  [uxkprevd] >> 'NICK uxkprevd\r\n'
+     0.000  [uxkprevd] >> 'USER uxkprevd 0 * :Real uxkprevd\r\n'
+     0.000  [uxkprevd] << :ircserv 001 uxkprevd :Welcome to the IRC network uxkprevd!uxkprevd@localhost
+     0.000  [uxkprevd] << :ircserv 002 uxkprevd :Your host is ircserv, running version 1.0
+     0.000  [uxkprevd] << :ircserv 003 uxkprevd :This server was created today
+     0.000  [uxkprevd] << :ircserv 004 uxkprevd ircserv 1.0 o o
+     0.101  [uxkprevd] >> 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA... (300000 octets au total)'
+     0.402  [uaxitfce] >> 'PASS pass\r\n'
+     0.402  [uaxitfce] >> 'NICK uaxitfce\r\n'
+     0.402  [uaxitfce] >> 'USER uaxitfce 0 * :Real uaxitfce\r\n'
+     0.446  [uaxitfce] << :ircserv 001 uaxitfce :Welcome to the IRC network uaxitfce!uaxitfce@localhost
+     0.446  [uaxitfce] << :ircserv 002 uaxitfce :Your host is ircserv, running version 1.0
+     0.446  [uaxitfce] << :ircserv 003 uaxitfce :This server was created today
+     0.446  [uaxitfce] << :ircserv 004 uaxitfce ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] huge_params   (Robustesse, test 70/77, 0.87s)
+------------------------------------------------------------------------------
+     0.000  [ukxqpozq] >> 'PASS pass\r\n'
+     0.000  [ukxqpozq] >> 'NICK ukxqpozq\r\n'
+     0.000  [ukxqpozq] >> 'USER ukxqpozq 0 * :Real ukxqpozq\r\n'
+     0.060  [ukxqpozq] << :ircserv 001 ukxqpozq :Welcome to the IRC network ukxqpozq!ukxqpozq@localhost
+     0.060  [ukxqpozq] << :ircserv 002 ukxqpozq :Your host is ircserv, running version 1.0
+     0.060  [ukxqpozq] << :ircserv 003 ukxqpozq :This server was created today
+     0.060  [ukxqpozq] << :ircserv 004 ukxqpozq ircserv 1.0 o o
+     0.160  [ukxqpozq] >> 'JOIN #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx... (5008 octets au total)'
+     0.160  [ukxqpozq] >> 'NICK nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn... (5007 octets au total)'
+     0.160  [ukxqpozq] >> 'MODE #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx... (6012 octets au total)'
+     0.160  [ukxqpozq] >> 'PRIVMSG a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27,a28,a29,a30,a31,a32,a33,a34,a35,a36,a37,a38,a39,a40,a41,a42,a43,a44,a45,a46,a47,a48,a49,a5... (2403 octets au total)'
+     0.426  [ukxqpozq] << :ukxqpozq JOIN :#xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...
+     0.426  [ukxqpozq] << :ircserv 353 ukxqpozq = #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...
+     0.426  [ukxqpozq] << :ircserv 366 ukxqpozq #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...
+     0.677  [ujfxrcdf] >> 'PASS pass\r\n'
+     0.677  [ujfxrcdf] >> 'NICK ujfxrcdf\r\n'
+     0.677  [ujfxrcdf] >> 'USER ujfxrcdf 0 * :Real ujfxrcdf\r\n'
+     0.774  [ujfxrcdf] << :ircserv 001 ujfxrcdf :Welcome to the IRC network ujfxrcdf!ujfxrcdf@localhost
+     0.774  [ujfxrcdf] << :ircserv 002 ujfxrcdf :Your host is ircserv, running version 1.0
+     0.774  [ujfxrcdf] << :ircserv 003 ujfxrcdf :This server was created today
+     0.774  [ujfxrcdf] << :ircserv 004 ujfxrcdf ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] weird_commands   (Robustesse, test 71/77, 0.93s)
+------------------------------------------------------------------------------
+     0.000  [ulnnmhwx] >> 'PASS pass\r\n'
+     0.000  [ulnnmhwx] >> 'NICK ulnnmhwx\r\n'
+     0.000  [ulnnmhwx] >> 'USER ulnnmhwx 0 * :Real ulnnmhwx\r\n'
+     0.099  [ulnnmhwx] << :ircserv 001 ulnnmhwx :Welcome to the IRC network ulnnmhwx!ulnnmhwx@localhost
+     0.099  [ulnnmhwx] << :ircserv 002 ulnnmhwx :Your host is ircserv, running version 1.0
+     0.099  [ulnnmhwx] << :ircserv 003 ulnnmhwx :This server was created today
+     0.099  [ulnnmhwx] << :ircserv 004 ulnnmhwx ircserv 1.0 o o
+     0.199  [ulnnmhwx] >> 'JOIN ,,,\r\n'
+     0.199  [ulnnmhwx] >> 'JOIN #\r\n'
+     0.199  [ulnnmhwx] >> 'JOIN 0\r\n'
+     0.199  [ulnnmhwx] >> 'PART\r\n'
+     0.199  [ulnnmhwx] >> 'PART ,\r\n'
+     0.199  [ulnnmhwx] >> 'KICK # #\r\n'
+     0.199  [ulnnmhwx] >> 'KICK , ,\r\n'
+     0.199  [ulnnmhwx] >> 'MODE\r\n'
+     0.199  [ulnnmhwx] >> 'MODE +\r\n'
+     0.199  [ulnnmhwx] >> 'MODE # +\r\n'
+     0.199  [ulnnmhwx] >> 'MODE # +o\r\n'
+     0.199  [ulnnmhwx] >> 'MODE # -\r\n'
+     0.199  [ulnnmhwx] >> 'INVITE ,\r\n'
+     0.199  [ulnnmhwx] >> 'TOPIC #\r\n'
+     0.199  [ulnnmhwx] >> 'PRIVMSG ,\r\n'
+     0.199  [ulnnmhwx] >> 'PRIVMSG : :\r\n'
+     0.199  [ulnnmhwx] >> 'NICK :\r\n'
+     0.199  [ulnnmhwx] >> 'USER\r\n'
+     0.199  [ulnnmhwx] >> 'USER a\r\n'
+     0.199  [ulnnmhwx] >> 'USER a b c\r\n'
+     0.199  [ulnnmhwx] >> ':prefix JOIN #x\r\n'
+     0.199  [ulnnmhwx] >> 'JOIN #x,#x,#x\r\n'
+     0.199  [ulnnmhwx] >> 'MODE #x +ooooo\r\n'
+     0.199  [ulnnmhwx] >> 'MODE #x +kkkk a b c d\r\n'
+     0.199  [ulnnmhwx] >> 'QUIT\r\n'
+     0.255  [ulnnmhwx] -- connexion fermee par le serveur
+     0.706  [udaemlys] >> 'PASS pass\r\n'
+     0.706  [udaemlys] >> 'NICK udaemlys\r\n'
+     0.706  [udaemlys] >> 'USER udaemlys 0 * :Real udaemlys\r\n'
+     0.827  [udaemlys] << :ircserv 001 udaemlys :Welcome to the IRC network udaemlys!udaemlys@localhost
+     0.827  [udaemlys] << :ircserv 002 udaemlys :Your host is ircserv, running version 1.0
+     0.827  [udaemlys] << :ircserv 003 udaemlys :This server was created today
+     0.827  [udaemlys] << :ircserv 004 udaemlys ircserv 1.0 o o
+
+==============================================================================
+[VALIDE] many_clients   (Robustesse, test 72/77, 16.60s)
+------------------------------------------------------------------------------
+     0.000  [ueddbefv] >> 'PASS pass\r\n'
+     0.000  [ueddbefv] >> 'NICK ueddbefv\r\n'
+     0.000  [ueddbefv] >> 'USER ueddbefv 0 * :Real ueddbefv\r\n'
+     0.150  [ueddbefv] << :ircserv 001 ueddbefv :Welcome to the IRC network ueddbefv!ueddbefv@localhost
+     0.150  [ueddbefv] << :ircserv 002 ueddbefv :Your host is ircserv, running version 1.0
+     0.150  [ueddbefv] << :ircserv 003 ueddbefv :This server was created today
+     0.150  [ueddbefv] << :ircserv 004 ueddbefv ircserv 1.0 o o
+     0.251  [uvylqdka] >> 'PASS pass\r\n'
+     0.251  [uvylqdka] >> 'NICK uvylqdka\r\n'
+     0.251  [uvylqdka] >> 'USER uvylqdka 0 * :Real uvylqdka\r\n'
+     0.388  [uvylqdka] << :ircserv 001 uvylqdka :Welcome to the IRC network uvylqdka!uvylqdka@localhost
+     0.388  [uvylqdka] << :ircserv 002 uvylqdka :Your host is ircserv, running version 1.0
+     0.388  [uvylqdka] << :ircserv 003 uvylqdka :This server was created today
+     0.388  [uvylqdka] << :ircserv 004 uvylqdka ircserv 1.0 o o
+     0.488  [uhjnfjrn] >> 'PASS pass\r\n'
+     0.488  [uhjnfjrn] >> 'NICK uhjnfjrn\r\n'
+     0.488  [uhjnfjrn] >> 'USER uhjnfjrn 0 * :Real uhjnfjrn\r\n'
+     0.637  [uhjnfjrn] << :ircserv 001 uhjnfjrn :Welcome to the IRC network uhjnfjrn!uhjnfjrn@localhost
+     0.637  [uhjnfjrn] << :ircserv 002 uhjnfjrn :Your host is ircserv, running version 1.0
+     0.637  [uhjnfjrn] << :ircserv 003 uhjnfjrn :This server was created today
+     0.637  [uhjnfjrn] << :ircserv 004 uhjnfjrn ircserv 1.0 o o
+     0.737  [ufivijzw] >> 'PASS pass\r\n'
+     0.737  [ufivijzw] >> 'NICK ufivijzw\r\n'
+     0.737  [ufivijzw] >> 'USER ufivijzw 0 * :Real ufivijzw\r\n'
+     0.898  [ufivijzw] << :ircserv 001 ufivijzw :Welcome to the IRC network ufivijzw!ufivijzw@localhost
+     0.898  [ufivijzw] << :ircserv 002 ufivijzw :Your host is ircserv, running version 1.0
+     0.898  [ufivijzw] << :ircserv 003 ufivijzw :This server was created today
+     0.898  [ufivijzw] << :ircserv 004 ufivijzw ircserv 1.0 o o
+     0.999  [uyrwfyyf] >> 'PASS pass\r\n'
+     0.999  [uyrwfyyf] >> 'NICK uyrwfyyf\r\n'
+     0.999  [uyrwfyyf] >> 'USER uyrwfyyf 0 * :Real uyrwfyyf\r\n'
+     1.167  [uyrwfyyf] << :ircserv 001 uyrwfyyf :Welcome to the IRC network uyrwfyyf!uyrwfyyf@localhost
+     1.167  [uyrwfyyf] << :ircserv 002 uyrwfyyf :Your host is ircserv, running version 1.0
+     1.167  [uyrwfyyf] << :ircserv 003 uyrwfyyf :This server was created today
+     1.167  [uyrwfyyf] << :ircserv 004 uyrwfyyf ircserv 1.0 o o
+     1.268  [uwfzwzuq] >> 'PASS pass\r\n'
+     1.268  [uwfzwzuq] >> 'NICK uwfzwzuq\r\n'
+     1.268  [uwfzwzuq] >> 'USER uwfzwzuq 0 * :Real uwfzwzuq\r\n'
+     1.448  [uwfzwzuq] << :ircserv 001 uwfzwzuq :Welcome to the IRC network uwfzwzuq!uwfzwzuq@localhost
+     1.448  [uwfzwzuq] << :ircserv 002 uwfzwzuq :Your host is ircserv, running version 1.0
+     1.448  [uwfzwzuq] << :ircserv 003 uwfzwzuq :This server was created today
+     1.448  [uwfzwzuq] << :ircserv 004 uwfzwzuq ircserv 1.0 o o
+     1.548  [udgegcab] >> 'PASS pass\r\n'
+     1.549  [udgegcab] >> 'NICK udgegcab\r\n'
+     1.549  [udgegcab] >> 'USER udgegcab 0 * :Real udgegcab\r\n'
+     1.742  [udgegcab] << :ircserv 001 udgegcab :Welcome to the IRC network udgegcab!udgegcab@localhost
+     1.742  [udgegcab] << :ircserv 002 udgegcab :Your host is ircserv, running version 1.0
+     1.742  [udgegcab] << :ircserv 003 udgegcab :This server was created today
+     1.742  [udgegcab] << :ircserv 004 udgegcab ircserv 1.0 o o
+     1.842  [uauwetgh] >> 'PASS pass\r\n'
+     1.842  [uauwetgh] >> 'NICK uauwetgh\r\n'
+     1.842  [uauwetgh] >> 'USER uauwetgh 0 * :Real uauwetgh\r\n'
+     2.045  [uauwetgh] << :ircserv 001 uauwetgh :Welcome to the IRC network uauwetgh!uauwetgh@localhost
+     2.045  [uauwetgh] << :ircserv 002 uauwetgh :Your host is ircserv, running version 1.0
+     2.045  [uauwetgh] << :ircserv 003 uauwetgh :This server was created today
+     2.045  [uauwetgh] << :ircserv 004 uauwetgh ircserv 1.0 o o
+     2.146  [uywhexfq] >> 'PASS pass\r\n'
+     2.146  [uywhexfq] >> 'NICK uywhexfq\r\n'
+     2.146  [uywhexfq] >> 'USER uywhexfq 0 * :Real uywhexfq\r\n'
+     2.307  [uywhexfq] << :ircserv 001 uywhexfq :Welcome to the IRC network uywhexfq!uywhexfq@localhost
+     2.307  [uywhexfq] << :ircserv 002 uywhexfq :Your host is ircserv, running version 1.0
+     2.307  [uywhexfq] << :ircserv 003 uywhexfq :This server was created today
+     2.307  [uywhexfq] << :ircserv 004 uywhexfq ircserv 1.0 o o
+     2.407  [uqndttpt] >> 'PASS pass\r\n'
+     2.407  [uqndttpt] >> 'NICK uqndttpt\r\n'
+     2.407  [uqndttpt] >> 'USER uqndttpt 0 * :Real uqndttpt\r\n'
+     2.577  [uqndttpt] << :ircserv 001 uqndttpt :Welcome to the IRC network uqndttpt!uqndttpt@localhost
+     2.577  [uqndttpt] << :ircserv 002 uqndttpt :Your host is ircserv, running version 1.0
+     2.577  [uqndttpt] << :ircserv 003 uqndttpt :This server was created today
+     2.577  [uqndttpt] << :ircserv 004 uqndttpt ircserv 1.0 o o
+     2.677  [upnblriq] >> 'PASS pass\r\n'
+     2.677  [upnblriq] >> 'NICK upnblriq\r\n'
+     2.677  [upnblriq] >> 'USER upnblriq 0 * :Real upnblriq\r\n'
+     2.855  [upnblriq] << :ircserv 001 upnblriq :Welcome to the IRC network upnblriq!upnblriq@localhost
+     2.855  [upnblriq] << :ircserv 002 upnblriq :Your host is ircserv, running version 1.0
+     2.855  [upnblriq] << :ircserv 003 upnblriq :This server was created today
+     2.855  [upnblriq] << :ircserv 004 upnblriq ircserv 1.0 o o
+     2.955  [uprjwcpn] >> 'PASS pass\r\n'
+     2.955  [uprjwcpn] >> 'NICK uprjwcpn\r\n'
+     2.955  [uprjwcpn] >> 'USER uprjwcpn 0 * :Real uprjwcpn\r\n'
+     3.139  [uprjwcpn] << :ircserv 001 uprjwcpn :Welcome to the IRC network uprjwcpn!uprjwcpn@localhost
+     3.139  [uprjwcpn] << :ircserv 002 uprjwcpn :Your host is ircserv, running version 1.0
+     3.139  [uprjwcpn] << :ircserv 003 uprjwcpn :This server was created today
+     3.139  [uprjwcpn] << :ircserv 004 uprjwcpn ircserv 1.0 o o
+     3.239  [unmdlsxg] >> 'PASS pass\r\n'
+     3.239  [unmdlsxg] >> 'NICK unmdlsxg\r\n'
+     3.239  [unmdlsxg] >> 'USER unmdlsxg 0 * :Real unmdlsxg\r\n'
+     3.431  [unmdlsxg] << :ircserv 001 unmdlsxg :Welcome to the IRC network unmdlsxg!unmdlsxg@localhost
+     3.431  [unmdlsxg] << :ircserv 002 unmdlsxg :Your host is ircserv, running version 1.0
+     3.431  [unmdlsxg] << :ircserv 003 unmdlsxg :This server was created today
+     3.431  [unmdlsxg] << :ircserv 004 unmdlsxg ircserv 1.0 o o
+     3.531  [uqpyxcob] >> 'PASS pass\r\n'
+     3.531  [uqpyxcob] >> 'NICK uqpyxcob\r\n'
+     3.531  [uqpyxcob] >> 'USER uqpyxcob 0 * :Real uqpyxcob\r\n'
+     3.731  [uqpyxcob] << :ircserv 001 uqpyxcob :Welcome to the IRC network uqpyxcob!uqpyxcob@localhost
+     3.731  [uqpyxcob] << :ircserv 002 uqpyxcob :Your host is ircserv, running version 1.0
+     3.731  [uqpyxcob] << :ircserv 003 uqpyxcob :This server was created today
+     3.731  [uqpyxcob] << :ircserv 004 uqpyxcob ircserv 1.0 o o
+     3.832  [uktqttkh] >> 'PASS pass\r\n'
+     3.832  [uktqttkh] >> 'NICK uktqttkh\r\n'
+     3.832  [uktqttkh] >> 'USER uktqttkh 0 * :Real uktqttkh\r\n'
+     4.038  [uktqttkh] << :ircserv 001 uktqttkh :Welcome to the IRC network uktqttkh!uktqttkh@localhost
+     4.038  [uktqttkh] << :ircserv 002 uktqttkh :Your host is ircserv, running version 1.0
+     4.038  [uktqttkh] << :ircserv 003 uktqttkh :This server was created today
+     4.038  [uktqttkh] << :ircserv 004 uktqttkh ircserv 1.0 o o
+     4.139  [uiepfuzy] >> 'PASS pass\r\n'
+     4.139  [uiepfuzy] >> 'NICK uiepfuzy\r\n'
+     4.139  [uiepfuzy] >> 'USER uiepfuzy 0 * :Real uiepfuzy\r\n'
+     4.354  [uiepfuzy] << :ircserv 001 uiepfuzy :Welcome to the IRC network uiepfuzy!uiepfuzy@localhost
+     4.354  [uiepfuzy] << :ircserv 002 uiepfuzy :Your host is ircserv, running version 1.0
+     4.354  [uiepfuzy] << :ircserv 003 uiepfuzy :This server was created today
+     4.354  [uiepfuzy] << :ircserv 004 uiepfuzy ircserv 1.0 o o
+     4.454  [uvdyvyak] >> 'PASS pass\r\n'
+     4.454  [uvdyvyak] >> 'NICK uvdyvyak\r\n'
+     4.454  [uvdyvyak] >> 'USER uvdyvyak 0 * :Real uvdyvyak\r\n'
+     4.678  [uvdyvyak] << :ircserv 001 uvdyvyak :Welcome to the IRC network uvdyvyak!uvdyvyak@localhost
+     4.678  [uvdyvyak] << :ircserv 002 uvdyvyak :Your host is ircserv, running version 1.0
+     4.678  [uvdyvyak] << :ircserv 003 uvdyvyak :This server was created today
+     4.678  [uvdyvyak] << :ircserv 004 uvdyvyak ircserv 1.0 o o
+     4.779  [uclwetfz] >> 'PASS pass\r\n'
+     4.779  [uclwetfz] >> 'NICK uclwetfz\r\n'
+     4.779  [uclwetfz] >> 'USER uclwetfz 0 * :Real uclwetfz\r\n'
+     5.010  [uclwetfz] << :ircserv 001 uclwetfz :Welcome to the IRC network uclwetfz!uclwetfz@localhost
+     5.010  [uclwetfz] << :ircserv 002 uclwetfz :Your host is ircserv, running version 1.0
+     5.010  [uclwetfz] << :ircserv 003 uclwetfz :This server was created today
+     5.010  [uclwetfz] << :ircserv 004 uclwetfz ircserv 1.0 o o
+     5.110  [uukcvhfe] >> 'PASS pass\r\n'
+     5.110  [uukcvhfe] >> 'NICK uukcvhfe\r\n'
+     5.110  [uukcvhfe] >> 'USER uukcvhfe 0 * :Real uukcvhfe\r\n'
+     5.350  [uukcvhfe] << :ircserv 001 uukcvhfe :Welcome to the IRC network uukcvhfe!uukcvhfe@localhost
+     5.350  [uukcvhfe] << :ircserv 002 uukcvhfe :Your host is ircserv, running version 1.0
+     5.350  [uukcvhfe] << :ircserv 003 uukcvhfe :This server was created today
+     5.350  [uukcvhfe] << :ircserv 004 uukcvhfe ircserv 1.0 o o
+     5.450  [ussfvcjf] >> 'PASS pass\r\n'
+     5.450  [ussfvcjf] >> 'NICK ussfvcjf\r\n'
+     5.450  [ussfvcjf] >> 'USER ussfvcjf 0 * :Real ussfvcjf\r\n'
+     5.698  [ussfvcjf] << :ircserv 001 ussfvcjf :Welcome to the IRC network ussfvcjf!ussfvcjf@localhost
+     5.698  [ussfvcjf] << :ircserv 002 ussfvcjf :Your host is ircserv, running version 1.0
+     5.698  [ussfvcjf] << :ircserv 003 ussfvcjf :This server was created today
+     5.698  [ussfvcjf] << :ircserv 004 ussfvcjf ircserv 1.0 o o
+     5.798  [uhkarvzn] >> 'PASS pass\r\n'
+     5.798  [uhkarvzn] >> 'NICK uhkarvzn\r\n'
+     5.798  [uhkarvzn] >> 'USER uhkarvzn 0 * :Real uhkarvzn\r\n'
+     6.054  [uhkarvzn] << :ircserv 001 uhkarvzn :Welcome to the IRC network uhkarvzn!uhkarvzn@localhost
+     6.054  [uhkarvzn] << :ircserv 002 uhkarvzn :Your host is ircserv, running version 1.0
+     6.054  [uhkarvzn] << :ircserv 003 uhkarvzn :This server was created today
+     6.054  [uhkarvzn] << :ircserv 004 uhkarvzn ircserv 1.0 o o
+     6.154  [uobzjbkt] >> 'PASS pass\r\n'
+     6.154  [uobzjbkt] >> 'NICK uobzjbkt\r\n'
+     6.154  [uobzjbkt] >> 'USER uobzjbkt 0 * :Real uobzjbkt\r\n'
+     6.419  [uobzjbkt] << :ircserv 001 uobzjbkt :Welcome to the IRC network uobzjbkt!uobzjbkt@localhost
+     6.419  [uobzjbkt] << :ircserv 002 uobzjbkt :Your host is ircserv, running version 1.0
+     6.419  [uobzjbkt] << :ircserv 003 uobzjbkt :This server was created today
+     6.419  [uobzjbkt] << :ircserv 004 uobzjbkt ircserv 1.0 o o
+     6.519  [uwulisjs] >> 'PASS pass\r\n'
+     6.519  [uwulisjs] >> 'NICK uwulisjs\r\n'
+     6.519  [uwulisjs] >> 'USER uwulisjs 0 * :Real uwulisjs\r\n'
+     6.795  [uwulisjs] << :ircserv 001 uwulisjs :Welcome to the IRC network uwulisjs!uwulisjs@localhost
+     6.795  [uwulisjs] << :ircserv 002 uwulisjs :Your host is ircserv, running version 1.0
+     6.795  [uwulisjs] << :ircserv 003 uwulisjs :This server was created today
+     6.795  [uwulisjs] << :ircserv 004 uwulisjs ircserv 1.0 o o
+     6.895  [ufyipwib] >> 'PASS pass\r\n'
+     6.895  [ufyipwib] >> 'NICK ufyipwib\r\n'
+     6.895  [ufyipwib] >> 'USER ufyipwib 0 * :Real ufyipwib\r\n'
+     7.180  [ufyipwib] << :ircserv 001 ufyipwib :Welcome to the IRC network ufyipwib!ufyipwib@localhost
+     7.181  [ufyipwib] << :ircserv 002 ufyipwib :Your host is ircserv, running version 1.0
+     7.181  [ufyipwib] << :ircserv 003 ufyipwib :This server was created today
+     7.181  [ufyipwib] << :ircserv 004 ufyipwib ircserv 1.0 o o
+     7.281  [ubnrmyyp] >> 'PASS pass\r\n'
+     7.281  [ubnrmyyp] >> 'NICK ubnrmyyp\r\n'
+     7.281  [ubnrmyyp] >> 'USER ubnrmyyp 0 * :Real ubnrmyyp\r\n'
+     7.573  [ubnrmyyp] << :ircserv 001 ubnrmyyp :Welcome to the IRC network ubnrmyyp!ubnrmyyp@localhost
+     7.573  [ubnrmyyp] << :ircserv 002 ubnrmyyp :Your host is ircserv, running version 1.0
+     7.573  [ubnrmyyp] << :ircserv 003 ubnrmyyp :This server was created today
+     7.573  [ubnrmyyp] << :ircserv 004 ubnrmyyp ircserv 1.0 o o
+     7.673  [ufjyofxv] >> 'PASS pass\r\n'
+     7.673  [ufjyofxv] >> 'NICK ufjyofxv\r\n'
+     7.673  [ufjyofxv] >> 'USER ufjyofxv 0 * :Real ufjyofxv\r\n'
+     7.973  [ufjyofxv] << :ircserv 001 ufjyofxv :Welcome to the IRC network ufjyofxv!ufjyofxv@localhost
+     7.973  [ufjyofxv] << :ircserv 002 ufjyofxv :Your host is ircserv, running version 1.0
+     7.973  [ufjyofxv] << :ircserv 003 ufjyofxv :This server was created today
+     7.973  [ufjyofxv] << :ircserv 004 ufjyofxv ircserv 1.0 o o
+     8.073  [uqklsmri] >> 'PASS pass\r\n'
+     8.073  [uqklsmri] >> 'NICK uqklsmri\r\n'
+     8.073  [uqklsmri] >> 'USER uqklsmri 0 * :Real uqklsmri\r\n'
+     8.381  [uqklsmri] << :ircserv 001 uqklsmri :Welcome to the IRC network uqklsmri!uqklsmri@localhost
+     8.381  [uqklsmri] << :ircserv 002 uqklsmri :Your host is ircserv, running version 1.0
+     8.381  [uqklsmri] << :ircserv 003 uqklsmri :This server was created today
+     8.381  [uqklsmri] << :ircserv 004 uqklsmri ircserv 1.0 o o
+     8.481  [umgixiqt] >> 'PASS pass\r\n'
+     8.481  [umgixiqt] >> 'NICK umgixiqt\r\n'
+     8.481  [umgixiqt] >> 'USER umgixiqt 0 * :Real umgixiqt\r\n'
+     8.801  [umgixiqt] << :ircserv 001 umgixiqt :Welcome to the IRC network umgixiqt!umgixiqt@localhost
+     8.801  [umgixiqt] << :ircserv 002 umgixiqt :Your host is ircserv, running version 1.0
+     8.801  [umgixiqt] << :ircserv 003 umgixiqt :This server was created today
+     8.801  [umgixiqt] << :ircserv 004 umgixiqt ircserv 1.0 o o
+     8.902  [uhxukayn] >> 'PASS pass\r\n'
+     8.902  [uhxukayn] >> 'NICK uhxukayn\r\n'
+     8.902  [uhxukayn] >> 'USER uhxukayn 0 * :Real uhxukayn\r\n'
+     9.228  [uhxukayn] << :ircserv 001 uhxukayn :Welcome to the IRC network uhxukayn!uhxukayn@localhost
+            ... 818 echanges omis ...
+    16.016  [uwpsjabx] << :ircserv 366 uwpsjabx #manyedss :End of /NAMES list
+    16.016  [uwpsjabx] << :ulbwkynp JOIN :#manyedss
+    16.016  [uwpsjabx] << :uqosdugg JOIN :#manyedss
+    16.016  [uwpsjabx] << :uodqhmfp JOIN :#manyedss
+    16.016  [uwpsjabx] << :urscwkrj JOIN :#manyedss
+    16.016  [uwpsjabx] << :unkckwgu JOIN :#manyedss
+    16.016  [uwpsjabx] << :uqsliiak JOIN :#manyedss
+    16.066  [ulbwkynp] << :ulbwkynp JOIN :#manyedss
+    16.066  [ulbwkynp] << :ircserv 353 ulbwkynp = #manyedss :@ueddbefv uvylqdka uhjnfjrn ufivijzw uyrwfyyf uwfzwzuq udgegcab uauwetgh uywhexfq uqndttpt upnblriq uprjwcpn unmdlsxg uqpyxcob uktqttkh uiepfuzy uvdyvyak uclwetfz uukcvhfe ussfvcjf uhkarvzn uobzjbkt uwulisjs ufyipwib ubnrmyyp ufjyofxv uqklsmri umgixiqt uhxukayn uqw...
+    16.066  [ulbwkynp] << :ircserv 366 ulbwkynp #manyedss :End of /NAMES list
+    16.066  [ulbwkynp] << :uqosdugg JOIN :#manyedss
+    16.066  [ulbwkynp] << :uodqhmfp JOIN :#manyedss
+    16.066  [ulbwkynp] << :urscwkrj JOIN :#manyedss
+    16.066  [ulbwkynp] << :unkckwgu JOIN :#manyedss
+    16.066  [ulbwkynp] << :uqsliiak JOIN :#manyedss
+    16.116  [uqosdugg] << :uqosdugg JOIN :#manyedss
+    16.116  [uqosdugg] << :ircserv 353 uqosdugg = #manyedss :@ueddbefv uvylqdka uhjnfjrn ufivijzw uyrwfyyf uwfzwzuq udgegcab uauwetgh uywhexfq uqndttpt upnblriq uprjwcpn unmdlsxg uqpyxcob uktqttkh uiepfuzy uvdyvyak uclwetfz uukcvhfe ussfvcjf uhkarvzn uobzjbkt uwulisjs ufyipwib ubnrmyyp ufjyofxv uqklsmri umgixiqt uhxukayn uqw...
+    16.116  [uqosdugg] << :ircserv 366 uqosdugg #manyedss :End of /NAMES list
+    16.116  [uqosdugg] << :uodqhmfp JOIN :#manyedss
+    16.116  [uqosdugg] << :urscwkrj JOIN :#manyedss
+    16.116  [uqosdugg] << :unkckwgu JOIN :#manyedss
+    16.116  [uqosdugg] << :uqsliiak JOIN :#manyedss
+    16.166  [uodqhmfp] << :uodqhmfp JOIN :#manyedss
+    16.166  [uodqhmfp] << :ircserv 353 uodqhmfp = #manyedss :@ueddbefv uvylqdka uhjnfjrn ufivijzw uyrwfyyf uwfzwzuq udgegcab uauwetgh uywhexfq uqndttpt upnblriq uprjwcpn unmdlsxg uqpyxcob uktqttkh uiepfuzy uvdyvyak uclwetfz uukcvhfe ussfvcjf uhkarvzn uobzjbkt uwulisjs ufyipwib ubnrmyyp ufjyofxv uqklsmri umgixiqt uhxukayn uqw...
+    16.166  [uodqhmfp] << :ircserv 366 uodqhmfp #manyedss :End of /NAMES list
+    16.166  [uodqhmfp] << :urscwkrj JOIN :#manyedss
+    16.166  [uodqhmfp] << :unkckwgu JOIN :#manyedss
+    16.166  [uodqhmfp] << :uqsliiak JOIN :#manyedss
+    16.216  [urscwkrj] << :urscwkrj JOIN :#manyedss
+    16.216  [urscwkrj] << :ircserv 353 urscwkrj = #manyedss :@ueddbefv uvylqdka uhjnfjrn ufivijzw uyrwfyyf uwfzwzuq udgegcab uauwetgh uywhexfq uqndttpt upnblriq uprjwcpn unmdlsxg uqpyxcob uktqttkh uiepfuzy uvdyvyak uclwetfz uukcvhfe ussfvcjf uhkarvzn uobzjbkt uwulisjs ufyipwib ubnrmyyp ufjyofxv uqklsmri umgixiqt uhxukayn uqw...
+    16.216  [urscwkrj] << :ircserv 366 urscwkrj #manyedss :End of /NAMES list
+    16.216  [urscwkrj] << :unkckwgu JOIN :#manyedss
+    16.216  [urscwkrj] << :uqsliiak JOIN :#manyedss
+    16.266  [unkckwgu] << :unkckwgu JOIN :#manyedss
+    16.266  [unkckwgu] << :ircserv 353 unkckwgu = #manyedss :@ueddbefv uvylqdka uhjnfjrn ufivijzw uyrwfyyf uwfzwzuq udgegcab uauwetgh uywhexfq uqndttpt upnblriq uprjwcpn unmdlsxg uqpyxcob uktqttkh uiepfuzy uvdyvyak uclwetfz uukcvhfe ussfvcjf uhkarvzn uobzjbkt uwulisjs ufyipwib ubnrmyyp ufjyofxv uqklsmri umgixiqt uhxukayn uqw...
+    16.266  [unkckwgu] << :ircserv 366 unkckwgu #manyedss :End of /NAMES list
+    16.266  [unkckwgu] << :uqsliiak JOIN :#manyedss
+    16.316  [uqsliiak] << :uqsliiak JOIN :#manyedss
+    16.316  [uqsliiak] << :ircserv 353 uqsliiak = #manyedss :@ueddbefv uvylqdka uhjnfjrn ufivijzw uyrwfyyf uwfzwzuq udgegcab uauwetgh uywhexfq uqndttpt upnblriq uprjwcpn unmdlsxg uqpyxcob uktqttkh uiepfuzy uvdyvyak uclwetfz uukcvhfe ussfvcjf uhkarvzn uobzjbkt uwulisjs ufyipwib ubnrmyyp ufjyofxv uqklsmri umgixiqt uhxukayn uqw...
+    16.316  [uqsliiak] << :ircserv 366 uqsliiak #manyedss :End of /NAMES list
+    16.366  [ueddbefv] >> 'PRIVMSG #manyedss :broadcast-all\r\n'
+    16.366  [uvylqdka] << :uvylqdka JOIN :#manyedss
+    16.366  [uvylqdka] << :ircserv 353 uvylqdka = #manyedss :@ueddbefv uvylqdka 
+    16.366  [uvylqdka] << :ircserv 366 uvylqdka #manyedss :End of /NAMES list
+    16.366  [uvylqdka] << :uhjnfjrn JOIN :#manyedss
+    16.366  [uvylqdka] << :ufivijzw JOIN :#manyedss
+    16.366  [uvylqdka] << :uyrwfyyf JOIN :#manyedss
+    16.366  [uvylqdka] << :uwfzwzuq JOIN :#manyedss
+    16.366  [uvylqdka] << :udgegcab JOIN :#manyedss
+    16.366  [uvylqdka] << :uauwetgh JOIN :#manyedss
+    16.366  [uvylqdka] << :uywhexfq JOIN :#manyedss
+    16.366  [uvylqdka] << :uqndttpt JOIN :#manyedss
+    16.366  [uvylqdka] << :upnblriq JOIN :#manyedss
+    16.366  [uvylqdka] << :uprjwcpn JOIN :#manyedss
+    16.366  [uvylqdka] << :unmdlsxg JOIN :#manyedss
+    16.366  [uvylqdka] << :uqpyxcob JOIN :#manyedss
+    16.366  [uvylqdka] << :uktqttkh JOIN :#manyedss
+    16.366  [uvylqdka] << :uiepfuzy JOIN :#manyedss
+    16.366  [uvylqdka] << :uvdyvyak JOIN :#manyedss
+    16.366  [uvylqdka] << :uclwetfz JOIN :#manyedss
+    16.366  [uvylqdka] << :uukcvhfe JOIN :#manyedss
+    16.366  [uvylqdka] << :ussfvcjf JOIN :#manyedss
+    16.366  [uvylqdka] << :uhkarvzn JOIN :#manyedss
+    16.366  [uvylqdka] << :uobzjbkt JOIN :#manyedss
+    16.366  [uvylqdka] << :uwulisjs JOIN :#manyedss
+    16.366  [uvylqdka] << :ufyipwib JOIN :#manyedss
+    16.366  [uvylqdka] << :ubnrmyyp JOIN :#manyedss
+    16.366  [uvylqdka] << :ufjyofxv JOIN :#manyedss
+    16.366  [uvylqdka] << :uqklsmri JOIN :#manyedss
+    16.366  [uvylqdka] << :umgixiqt JOIN :#manyedss
+    16.366  [uvylqdka] << :uhxukayn JOIN :#manyedss
+    16.366  [uvylqdka] << :uqwysjhv JOIN :#manyedss
+    16.366  [uvylqdka] << :ucbjriut JOIN :#manyedss
+    16.366  [uvylqdka] << :utdhsllz JOIN :#manyedss
+    16.366  [uvylqdka] << :ufbpavfe JOIN :#manyedss
+    16.366  [uvylqdka] << :uwpsjabx JOIN :#manyedss
+    16.366  [uvylqdka] << :ulbwkynp JOIN :#manyedss
+    16.366  [uvylqdka] << :uqosdugg JOIN :#manyedss
+    16.366  [uvylqdka] << :uodqhmfp JOIN :#manyedss
+    16.366  [uvylqdka] << :urscwkrj JOIN :#manyedss
+    16.366  [uvylqdka] << :unkckwgu JOIN :#manyedss
+    16.366  [uvylqdka] << :uqsliiak JOIN :#manyedss
+    16.603  [uvylqdka] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.603  [uhjnfjrn] << :uhjnfjrn JOIN :#manyedss
+    16.603  [uhjnfjrn] << :ircserv 353 uhjnfjrn = #manyedss :@ueddbefv uvylqdka uhjnfjrn 
+    16.603  [uhjnfjrn] << :ircserv 366 uhjnfjrn #manyedss :End of /NAMES list
+    16.603  [uhjnfjrn] << :ufivijzw JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uyrwfyyf JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uwfzwzuq JOIN :#manyedss
+    16.603  [uhjnfjrn] << :udgegcab JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uauwetgh JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uywhexfq JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uqndttpt JOIN :#manyedss
+    16.603  [uhjnfjrn] << :upnblriq JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uprjwcpn JOIN :#manyedss
+    16.603  [uhjnfjrn] << :unmdlsxg JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uqpyxcob JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uktqttkh JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uiepfuzy JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uvdyvyak JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uclwetfz JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uukcvhfe JOIN :#manyedss
+    16.603  [uhjnfjrn] << :ussfvcjf JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uhkarvzn JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uobzjbkt JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uwulisjs JOIN :#manyedss
+    16.603  [uhjnfjrn] << :ufyipwib JOIN :#manyedss
+    16.603  [uhjnfjrn] << :ubnrmyyp JOIN :#manyedss
+    16.603  [uhjnfjrn] << :ufjyofxv JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uqklsmri JOIN :#manyedss
+    16.603  [uhjnfjrn] << :umgixiqt JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uhxukayn JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uqwysjhv JOIN :#manyedss
+    16.603  [uhjnfjrn] << :ucbjriut JOIN :#manyedss
+    16.603  [uhjnfjrn] << :utdhsllz JOIN :#manyedss
+    16.603  [uhjnfjrn] << :ufbpavfe JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uwpsjabx JOIN :#manyedss
+    16.603  [uhjnfjrn] << :ulbwkynp JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uqosdugg JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uodqhmfp JOIN :#manyedss
+    16.603  [uhjnfjrn] << :urscwkrj JOIN :#manyedss
+    16.603  [uhjnfjrn] << :unkckwgu JOIN :#manyedss
+    16.603  [uhjnfjrn] << :uqsliiak JOIN :#manyedss
+    16.603  [uhjnfjrn] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.603  [ufivijzw] << :ufivijzw JOIN :#manyedss
+    16.603  [ufivijzw] << :ircserv 353 ufivijzw = #manyedss :@ueddbefv uvylqdka uhjnfjrn ufivijzw 
+    16.603  [ufivijzw] << :ircserv 366 ufivijzw #manyedss :End of /NAMES list
+    16.603  [ufivijzw] << :uyrwfyyf JOIN :#manyedss
+    16.603  [ufivijzw] << :uwfzwzuq JOIN :#manyedss
+    16.603  [ufivijzw] << :udgegcab JOIN :#manyedss
+    16.603  [ufivijzw] << :uauwetgh JOIN :#manyedss
+    16.603  [ufivijzw] << :uywhexfq JOIN :#manyedss
+    16.603  [ufivijzw] << :uqndttpt JOIN :#manyedss
+    16.603  [ufivijzw] << :upnblriq JOIN :#manyedss
+    16.603  [ufivijzw] << :uprjwcpn JOIN :#manyedss
+    16.603  [ufivijzw] << :unmdlsxg JOIN :#manyedss
+    16.603  [ufivijzw] << :uqpyxcob JOIN :#manyedss
+    16.603  [ufivijzw] << :uktqttkh JOIN :#manyedss
+    16.603  [ufivijzw] << :uiepfuzy JOIN :#manyedss
+    16.603  [ufivijzw] << :uvdyvyak JOIN :#manyedss
+    16.603  [ufivijzw] << :uclwetfz JOIN :#manyedss
+    16.603  [ufivijzw] << :uukcvhfe JOIN :#manyedss
+    16.603  [ufivijzw] << :ussfvcjf JOIN :#manyedss
+    16.603  [ufivijzw] << :uhkarvzn JOIN :#manyedss
+    16.603  [ufivijzw] << :uobzjbkt JOIN :#manyedss
+    16.603  [ufivijzw] << :uwulisjs JOIN :#manyedss
+    16.603  [ufivijzw] << :ufyipwib JOIN :#manyedss
+    16.603  [ufivijzw] << :ubnrmyyp JOIN :#manyedss
+    16.603  [ufivijzw] << :ufjyofxv JOIN :#manyedss
+    16.603  [ufivijzw] << :uqklsmri JOIN :#manyedss
+    16.603  [ufivijzw] << :umgixiqt JOIN :#manyedss
+    16.603  [ufivijzw] << :uhxukayn JOIN :#manyedss
+    16.603  [ufivijzw] << :uqwysjhv JOIN :#manyedss
+    16.603  [ufivijzw] << :ucbjriut JOIN :#manyedss
+    16.603  [ufivijzw] << :utdhsllz JOIN :#manyedss
+    16.603  [ufivijzw] << :ufbpavfe JOIN :#manyedss
+    16.603  [ufivijzw] << :uwpsjabx JOIN :#manyedss
+    16.603  [ufivijzw] << :ulbwkynp JOIN :#manyedss
+    16.603  [ufivijzw] << :uqosdugg JOIN :#manyedss
+    16.603  [ufivijzw] << :uodqhmfp JOIN :#manyedss
+    16.603  [ufivijzw] << :urscwkrj JOIN :#manyedss
+    16.603  [ufivijzw] << :unkckwgu JOIN :#manyedss
+    16.603  [ufivijzw] << :uqsliiak JOIN :#manyedss
+    16.603  [ufivijzw] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.603  [uyrwfyyf] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.603  [uwfzwzuq] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.603  [udgegcab] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uauwetgh] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uywhexfq] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uqndttpt] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [upnblriq] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uprjwcpn] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [unmdlsxg] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uqpyxcob] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uktqttkh] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uiepfuzy] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uvdyvyak] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uclwetfz] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uukcvhfe] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [ussfvcjf] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uhkarvzn] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uobzjbkt] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uwulisjs] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [ufyipwib] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [ubnrmyyp] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [ufjyofxv] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uqklsmri] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [umgixiqt] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uhxukayn] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uqwysjhv] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [ucbjriut] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [utdhsllz] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [ufbpavfe] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uwpsjabx] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [ulbwkynp] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uqosdugg] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uodqhmfp] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [urscwkrj] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [unkckwgu] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+    16.604  [uqsliiak] << :ueddbefv PRIVMSG #manyedss :broadcast-all
+
+==============================================================================
+[VALIDE] many_messages_ordering   (Robustesse, test 73/77, 3.45s)
+------------------------------------------------------------------------------
+     0.000  [uugpstpz] >> 'PASS pass\r\n'
+     0.000  [uugpstpz] >> 'NICK uugpstpz\r\n'
+     0.000  [uugpstpz] >> 'USER uugpstpz 0 * :Real uugpstpz\r\n'
+     0.398  [uugpstpz] << :ircserv 001 uugpstpz :Welcome to the IRC network uugpstpz!uugpstpz@localhost
+     0.398  [uugpstpz] << :ircserv 002 uugpstpz :Your host is ircserv, running version 1.0
+     0.398  [uugpstpz] << :ircserv 003 uugpstpz :This server was created today
+     0.398  [uugpstpz] << :ircserv 004 uugpstpz ircserv 1.0 o o
+     0.498  [uvtpahpu] >> 'PASS pass\r\n'
+     0.498  [uvtpahpu] >> 'NICK uvtpahpu\r\n'
+     0.498  [uvtpahpu] >> 'USER uvtpahpu 0 * :Real uvtpahpu\r\n'
+     0.848  [uvtpahpu] << :ircserv 001 uvtpahpu :Welcome to the IRC network uvtpahpu!uvtpahpu@localhost
+     0.848  [uvtpahpu] << :ircserv 002 uvtpahpu :Your host is ircserv, running version 1.0
+     0.848  [uvtpahpu] << :ircserv 003 uvtpahpu :This server was created today
+     0.848  [uvtpahpu] << :ircserv 004 uvtpahpu ircserv 1.0 o o
+     0.948  [uugpstpz] >> 'JOIN #tzodgw\r\n'
+     1.191  [uugpstpz] << :uugpstpz JOIN :#tzodgw
+     1.191  [uugpstpz] << :ircserv 353 uugpstpz = #tzodgw :@uugpstpz 
+     1.191  [uugpstpz] << :ircserv 366 uugpstpz #tzodgw :End of /NAMES list
+     1.191  [uvtpahpu] >> 'JOIN #tzodgw\r\n'
+     1.536  [uvtpahpu] << :uvtpahpu JOIN :#tzodgw
+     1.536  [uvtpahpu] << :ircserv 353 uvtpahpu = #tzodgw :@uugpstpz uvtpahpu 
+     1.536  [uvtpahpu] << :ircserv 366 uvtpahpu #tzodgw :End of /NAMES list
+     1.536  [uugpstpz] << :uvtpahpu JOIN :#tzodgw
+     1.736  [uugpstpz] >> 'PRIVMSG #tzodgw :m0\r\nPRIVMSG #tzodgw :m1\r\nPRIVMSG #tzodgw :m2\r\nPRIVMSG #tzodgw :m3\r\nPRIVMSG #tzodgw :m4\r\nPRIVMSG #tzodgw :m5\r\nPRIVMSG #tzodgw :m6\r\nPRIVMSG #tzodgw :m7\r\nPRIVMSG #tzodgw :m8\r\nPRIVMSG #tz... (6790 octets au total)'
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m0
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m1
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m2
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m3
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m4
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m5
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m6
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m7
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m8
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m9
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m10
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m11
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m12
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m13
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m14
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m15
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m16
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m17
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m18
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m19
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m20
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m21
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m22
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m23
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m24
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m25
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m26
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m27
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m28
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m29
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m30
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m31
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m32
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m33
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m34
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m35
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m36
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m37
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m38
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m39
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m40
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m41
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m42
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m43
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m44
+     2.003  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m45
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m46
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m47
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m48
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m49
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m50
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m51
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m52
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m53
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m54
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m55
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m56
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m57
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m58
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m59
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m60
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m61
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m62
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m63
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m64
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m65
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m66
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m67
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m68
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m69
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m70
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m71
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m72
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m73
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m74
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m75
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m76
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m77
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m78
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m79
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m80
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m81
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m82
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m83
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m84
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m85
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m86
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m87
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m88
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m89
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m90
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m91
+     2.240  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m92
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m93
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m94
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m95
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m96
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m97
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m98
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m99
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m100
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m101
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m102
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m103
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m104
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m105
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m106
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m107
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m108
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m109
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m110
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m111
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m112
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m113
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m114
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m115
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m116
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m117
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m118
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m119
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m120
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m121
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m122
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m123
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m124
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m125
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m126
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m127
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m128
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m129
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m130
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m131
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m132
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m133
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m134
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m135
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m136
+     2.479  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m137
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m138
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m139
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m140
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m141
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m142
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m143
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m144
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m145
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m146
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m147
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m148
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m149
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m150
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m151
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m152
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m153
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m154
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m155
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m156
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m157
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m158
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m159
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m160
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m161
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m162
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m163
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m164
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m165
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m166
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m167
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m168
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m169
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m170
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m171
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m172
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m173
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m174
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m175
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m176
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m177
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m178
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m179
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m180
+     2.718  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m181
+     2.959  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m182
+     2.959  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m183
+     2.959  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m184
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m185
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m186
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m187
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m188
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m189
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m190
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m191
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m192
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m193
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m194
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m195
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m196
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m197
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m198
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m199
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m200
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m201
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m202
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m203
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m204
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m205
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m206
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m207
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m208
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m209
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m210
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m211
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m212
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m213
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m214
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m215
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m216
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m217
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m218
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m219
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m220
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m221
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m222
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m223
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m224
+     2.960  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m225
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m226
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m227
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m228
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m229
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m230
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m231
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m232
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m233
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m234
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m235
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m236
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m237
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m238
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m239
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m240
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m241
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m242
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m243
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m244
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m245
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m246
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m247
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m248
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m249
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m250
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m251
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m252
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m253
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m254
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m255
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m256
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m257
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m258
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m259
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m260
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m261
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m262
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m263
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m264
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m265
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m266
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m267
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m268
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m269
+     3.205  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m270
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m271
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m272
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m273
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m274
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m275
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m276
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m277
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m278
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m279
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m280
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m281
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m282
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m283
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m284
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m285
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m286
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m287
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m288
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m289
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m290
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m291
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m292
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m293
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m294
+     3.450  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m295
+     3.451  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m296
+     3.451  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m297
+     3.451  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m298
+     3.451  [uvtpahpu] << :uugpstpz PRIVMSG #tzodgw :m299
+
+==============================================================================
+[A VERIFIER] slow_reader_does_not_block_server   (Robustesse, test 74/77, 3.57s)
+  raison : le lecteur lent n'a recu que 0 messages
+------------------------------------------------------------------------------
+     0.000  [uwldtgcm] >> 'PASS pass\r\n'
+     0.000  [uwldtgcm] >> 'NICK uwldtgcm\r\n'
+     0.000  [uwldtgcm] >> 'USER uwldtgcm 0 * :Real uwldtgcm\r\n'
+     0.563  [uwldtgcm] << :ircserv 001 uwldtgcm :Welcome to the IRC network uwldtgcm!uwldtgcm@localhost
+     0.563  [uwldtgcm] << :ircserv 002 uwldtgcm :Your host is ircserv, running version 1.0
+     0.563  [uwldtgcm] << :ircserv 003 uwldtgcm :This server was created today
+     0.563  [uwldtgcm] << :ircserv 004 uwldtgcm ircserv 1.0 o o
+     0.664  [uyxtxirh] >> 'PASS pass\r\n'
+     0.664  [uyxtxirh] >> 'NICK uyxtxirh\r\n'
+     0.664  [uyxtxirh] >> 'USER uyxtxirh 0 * :Real uyxtxirh\r\n'
+     1.060  [uyxtxirh] << :ircserv 001 uyxtxirh :Welcome to the IRC network uyxtxirh!uyxtxirh@localhost
+     1.060  [uyxtxirh] << :ircserv 002 uyxtxirh :Your host is ircserv, running version 1.0
+     1.060  [uyxtxirh] << :ircserv 003 uyxtxirh :This server was created today
+     1.060  [uyxtxirh] << :ircserv 004 uyxtxirh ircserv 1.0 o o
+     1.160  [uwldtgcm] >> 'JOIN #toshep\r\n'
+     1.434  [uwldtgcm] << :uwldtgcm JOIN :#toshep
+     1.434  [uwldtgcm] << :ircserv 353 uwldtgcm = #toshep :@uwldtgcm 
+     1.434  [uwldtgcm] << :ircserv 366 uwldtgcm #toshep :End of /NAMES list
+     1.434  [uyxtxirh] >> 'JOIN #toshep\r\n'
+     1.813  [uyxtxirh] << :uyxtxirh JOIN :#toshep
+     1.813  [uyxtxirh] << :ircserv 353 uyxtxirh = #toshep :@uwldtgcm uyxtxirh 
+     1.813  [uyxtxirh] << :ircserv 366 uyxtxirh #toshep :End of /NAMES list
+     1.813  [uwldtgcm] << :uyxtxirh JOIN :#toshep
+     2.014  [uwldtgcm] >> 'PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX... (1047500 octets au total)'
+     2.014  [uegskagl] >> 'PASS pass\r\n'
+     2.014  [uegskagl] >> 'NICK uegskagl\r\n'
+     2.014  [uegskagl] >> 'USER uegskagl 0 * :Real uegskagl\r\n'
+     2.454  [uegskagl] << :ircserv 001 uegskagl :Welcome to the IRC network uegskagl!uegskagl@localhost
+     2.454  [uegskagl] << :ircserv 002 uegskagl :Your host is ircserv, running version 1.0
+     2.454  [uegskagl] << :ircserv 003 uegskagl :This server was created today
+     2.454  [uegskagl] << :ircserv 004 uegskagl ircserv 1.0 o o
+     2.554  [uyxtxirh] << :uwldtgcm PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...
+     2.554  [uyxtxirh] << :uwldtgcm PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...
+     2.584  [uyxtxirh] << :uwldtgcm PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...
+     2.584  [uyxtxirh] << :uwldtgcm PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...
+     2.843  [uyxtxirh] << :uwldtgcm PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...
+     2.843  [uyxtxirh] << :uwldtgcm PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...
+     2.843  [uyxtxirh] << :uwldtgcm PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...
+     3.103  [uyxtxirh] << :uwldtgcm PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...
+     3.103  [uyxtxirh] << :uwldtgcm PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...
+     3.366  [uyxtxirh] << :uwldtgcm PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...
+     3.366  [uyxtxirh] << :uwldtgcm PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...
+     3.366  [uyxtxirh] << :uwldtgcm PRIVMSG #toshep :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...
+     3.566  !! A VERIFIER : le lecteur lent n'a recu que 0 messages
+
+==============================================================================
+[NON VALIDE] connect_disconnect_storm   (Robustesse, test 75/77, 3.31s)
+  raison : pas de 001 (RPL_WELCOME) apres PASS/NICK/USER pour uqmcunjm
+------------------------------------------------------------------------------
+     0.000  [?] >> 'PASS pass\r\nNICK sjobhfv\r\n'
+     0.000  [?] >> 'PASS pass\r\nNICK szgmdcq\r\n'
+     0.000  [?] >> 'PASS pass\r\nNICK snqmcma\r\n'
+     0.000  [?] >> 'PASS pass\r\nNICK snepqrp\r\n'
+     0.000  [?] >> 'PASS pass\r\nNICK soqlytf\r\n'
+     0.000  [?] >> 'PASS pass\r\nNICK stdollo\r\n'
+     0.000  [?] >> 'PASS pass\r\nNICK sdffrgg\r\n'
+     0.000  [?] >> 'PASS pass\r\nNICK srrhtff\r\n'
+     0.000  [?] >> 'PASS pass\r\nNICK smdigim\r\n'
+     0.000  [?] >> 'PASS pass\r\nNICK sollmfg\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK shtoiod\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK sgrulqt\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK sepoesi\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK sgalocy\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK sjkvgfy\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK setoavu\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK sfvjpix\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK sdnxlmy\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK spxrxrn\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK sfyoygz\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK saujglp\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK sxgrieg\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK saruipg\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK skgmlun\r\n'
+     0.001  [?] >> 'PASS pass\r\nNICK svgpnxe\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK sjdmico\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK swtwhsy\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK syykldt\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK stamqat\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK sqdwude\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK srryxlr\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK srsbxuu\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK svvdees\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK scmoosy\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK srjkyvw\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK sjflrsk\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK srokipc\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK sapzkck\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK snksfzx\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK smxgeqo\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK swvjyta\r\n'
+     0.002  [?] >> 'PASS pass\r\nNICK susbuzj\r\n'
+     0.303  [uqmcunjm] >> 'PASS pass\r\n'
+     0.303  [uqmcunjm] >> 'NICK uqmcunjm\r\n'
+     0.303  [uqmcunjm] >> 'USER uqmcunjm 0 * :Real uqmcunjm\r\n'
+     3.307  !! ECHEC : pas de 001 (RPL_WELCOME) apres PASS/NICK/USER pour uqmcunjm
+
+==============================================================================
+[NON VALIDE] simultaneous_nick_race   (Robustesse, test 76/77, 10.01s)
+  raison : 0 clients ont obtenu le meme nick (attendu: 1)
+------------------------------------------------------------------------------
+     0.000  [ueqtgprg] >> 'PASS pass\r\n'
+     0.000  [ueqtgprg] >> 'NICK raceild\r\n'
+     0.000  [ueqtgprg] >> 'USER x 0 * :x\r\n'
+     0.000  [unwdzojr] >> 'PASS pass\r\n'
+     0.000  [unwdzojr] >> 'NICK raceild\r\n'
+     0.000  [unwdzojr] >> 'USER x 0 * :x\r\n'
+     0.000  [uwzrsdbc] >> 'PASS pass\r\n'
+     0.000  [uwzrsdbc] >> 'NICK raceild\r\n'
+     0.000  [uwzrsdbc] >> 'USER x 0 * :x\r\n'
+     0.000  [ubymejed] >> 'PASS pass\r\n'
+     0.000  [ubymejed] >> 'NICK raceild\r\n'
+     0.000  [ubymejed] >> 'USER x 0 * :x\r\n'
+     0.000  [uligkbgc] >> 'PASS pass\r\n'
+     0.000  [uligkbgc] >> 'NICK raceild\r\n'
+     0.000  [uligkbgc] >> 'USER x 0 * :x\r\n'
+    10.013  !! ECHEC : 0 clients ont obtenu le meme nick (attendu: 1)
+
+==============================================================================
+[NON VALIDE] zz_final_liveness   (Robustesse, test 77/77, 3.00s)
+  raison : pas de 001 (RPL_WELCOME) apres PASS/NICK/USER pour ujhxipoa
+------------------------------------------------------------------------------
+     0.000  [ujhxipoa] >> 'PASS pass\r\n'
+     0.000  [ujhxipoa] >> 'NICK ujhxipoa\r\n'
+     0.000  [ujhxipoa] >> 'USER ujhxipoa 0 * :Real ujhxipoa\r\n'
+     3.004  !! ECHEC : pas de 001 (RPL_WELCOME) apres PASS/NICK/USER pour ujhxipoa
+
+==============================================================================
+RESUME : 62 valides, 8 a verifier, 7 non valides (sur 77 tests, 96.1s)
+  NON VALIDE  partial_bare_lf : terminaison '\n' seul non geree (nc sans -C)
+  NON VALIDE  mode_key : JOIN refuse apres MODE -k
+  NON VALIDE  mode_operator_give_take : MODE -o non diffuse
+  NON VALIDE  mode_combined : le canal reste verrouille apres retrait de tous les modes
+  NON VALIDE  connect_disconnect_storm : pas de 001 (RPL_WELCOME) apres PASS/NICK/USER pour uqmcunjm
+  NON VALIDE  simultaneous_nick_race : 0 clients ont obtenu le meme nick (attendu: 1)
+  NON VALIDE  zz_final_liveness : pas de 001 (RPL_WELCOME) apres PASS/NICK/USER pour ujhxipoa
+  A VERIFIER  auth_pass_twice_after_register : pas de 462 (ERR_ALREADYREGISTRED) apres un second PASS
+  A VERIFIER  unknown_command : PING sans PONG
+  A VERIFIER  privmsg_to_channel_not_member : pas de 404 (ERR_CANNOTSENDTOCHAN) pour un non-membre (+n par defaut sur les vrais serveurs)
+  A VERIFIER  notice : NOTICE non gere
+  A VERIFIER  privmsg_multiple_targets : cibles multiples non gerees
+  A VERIFIER  topic_clear : effacement du topic (TOPIC #c :) non gere
+  A VERIFIER  mode_limit_invalid : le serveur ne repond plus apres +l invalide
+  A VERIFIER  slow_reader_does_not_block_server : le lecteur lent n'a recu que 0 messages

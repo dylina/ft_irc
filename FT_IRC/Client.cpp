@@ -164,7 +164,7 @@ void Client::flushSendBuffer()
 		return;
 
 	// appele uniquement depuis Server::on() en reponse a un POLLOUT : jamais d'appel "libre" a send()
-	ssize_t sent = send(this->_fd, this->_sendBuffer.c_str(), this->_sendBuffer.size(), 0);
+	ssize_t sent = send(this->_fd, this->_sendBuffer.c_str(), this->_sendBuffer.size(), MSG_NOSIGNAL);
 
 	// pas d'inspection d'errno : en cas d'echec on retente simplement au prochain cycle POLLOUT
 	if (sent > 0)
