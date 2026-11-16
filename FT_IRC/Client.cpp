@@ -208,7 +208,11 @@ void Client::parseCommand()
 {
 	size_t end = this->_dataBuffer.find("\r\n");
 	if (end == std::string::npos)
-		return;
+	{
+		end = this->_dataBuffer.find("\n");
+		if (end == std::string::npos)
+			return;
+	}
 
 	std::string line = this->_dataBuffer.substr(0, end);
 	this->_dataBuffer.erase(0, end + 2);
@@ -337,6 +341,8 @@ void Client::addData(std::string buffer, std::string clientFd)
 	this->printBufferEnhance();
 
 	while (this->_dataBuffer.find("\r\n") != std::string::npos)
+		this->parseCommand();
+	while (this->_dataBuffer.find("\n") != std::string::npos)
 		this->parseCommand();
 }
 

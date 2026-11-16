@@ -162,7 +162,7 @@ def new(nick=None, register=True, password=None):
     if register:
         c.cmd("PASS " + (CFG["pw"] if password is None else password))
         c.cmd("NICK " + nick)
-        c.cmd("USER %s 0 * :Real %s" % (nick, nick))
+        c.cmd("USER %s 0 * :%s" % (nick, nick))
         check(c.wait("001", timeout=3) is not None, "pas de 001 (RPL_WELCOME) apres PASS/NICK/USER pour " + nick)
         c.drain(0.1)
     return c
@@ -769,8 +769,8 @@ def mode_combined():
     check(a.wait("MODE", timeout=1) is not None, "MODE combine +itk non gere")
     a.cmd("MODE %s +kl key2 5" % ch)
     soft(a.wait("MODE", timeout=1) is not None, "MODE combine +kl avec 2 parametres non gere")
-    a.cmd("MODE %s -itk" % ch)
-    soft(a.wait("MODE", timeout=1) is not None, "MODE combine -itk non gere")
+    a.cmd("MODE %s -i-t-k" % ch)
+    soft(a.wait("MODE", timeout=1) is not None, "MODE combine -i-t-k non gere")
     b = new()
     b.cmd("JOIN " + ch)
     check(wait_join(b, ch) is not None, "le canal reste verrouille apres retrait de tous les modes")
@@ -1032,7 +1032,7 @@ def connect_disconnect_storm():
         if random.random() < 0.5:
             c.send("PASS " + CFG["pw"] + "\r\nNICK s" + rnd(6) + "\r\n")
         c.close()
-    time.sleep(0.3)
+    time.sleep(0.5)
     new()
 
 
