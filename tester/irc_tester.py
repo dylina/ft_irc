@@ -1021,7 +1021,9 @@ def slow_reader_does_not_block_server():
     t0 = time.time()
     c = new()
     check(time.time() - t0 < 3, "le serveur est bloque par un client qui ne lit pas")
-    b.drain(1.0)
+    end = time.time() + 1.0
+    while time.time() < end:
+        b.pump()
     soft(len(b.lines) > 100, "le lecteur lent n'a recu que %d messages" % len(b.lines))
 
 
@@ -1031,9 +1033,10 @@ def connect_disconnect_storm():
         c = Client()
         if random.random() < 0.5:
             c.send("PASS " + CFG["pw"] + "\r\nNICK s" + rnd(6) + "\r\n")
+            time.sleep(0.005)
         c.close()
     time.sleep(0.5)
-    new()
+    c = new()
 
 
 @test
@@ -1044,7 +1047,7 @@ def simultaneous_nick_race():
         c = new(register=False)
         c.cmd("PASS " + CFG["pw"])
         c.cmd("NICK " + nick)
-        c.cmd("USER x 0 * :x")
+        c.cmd("USER x 0 * :" + nick)
         cs.append(c)
     ok = sum(1 for c in cs if c.wait("001", timeout=2) is not None)
     check(ok == 1, "%d clients ont obtenu le meme nick (attendu: 1)" % ok)

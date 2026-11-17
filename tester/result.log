@@ -2,44 +2,17 @@
 [1;32mThis user is Registered[0m
 Address : 16777343
 Family : 2
-Port : 16002
+Port : 41145
 Sin Zero : 
 Mode : -1
 User Name : test
 Nick Name : test
-Client [38;5;246m4[0m have no data in attempt
+Client [38;5;19m4[0m have no data in attempt
 responses sends :
+[1m[96m:mleschev!mleschevu@localhost NICK :test[0m
 [1m[96m:ircserv 001 test :Welcome to the IRC network test!test@localhost[0m
 [1m[96m:ircserv 002 test :Your host is ircserv, running version 1.0[0m
 [1m[96m:ircserv 003 test :This server was created today[0m
 [1m[96m:ircserv 004 test ircserv 1.0 o o[0m
-[1m[96m:test JOIN :#canal[0m
-[1m[96m:ircserv 353 test = #canal :@test [0m
-[1m[96m:ircserv 366 test #canal :End of /NAMES list[0m
-[1m[96m:test2 JOIN :#canal[0m
-[1m[96m:test!test@localhost MODE #canal +o test2[0m
 ------------end--------------
-------------new--------------
-[1;32mThis user is Registered[0m
-Address : 16777343
-Family : 2
-Port : 16536
-Sin Zero : 
-Mode : -1
-User Name : test2
-Nick Name : test2
-Client [38;5;176m5[0m have no data in attempt
-responses sends :
-[1m[96m:ircserv 001 test2 :Welcome to the IRC network test2!test2@localhost[0m
-[1m[96m:ircserv 002 test2 :Your host is ircserv, running version 1.0[0m
-[1m[96m:ircserv 003 test2 :This server was created today[0m
-[1m[96m:ircserv 004 test2 ircserv 1.0 o o[0m
-[1m[96m:test2 JOIN :#canal[0m
-[1m[96m:ircserv 353 test2 = #canal :@test test2 [0m
-[1m[96m:ircserv 366 test2 #canal :End of /NAMES list[0m
-[1m[96m:test!test@localhost MODE #canal +o test2[0m
-[1m[96m:ircserv 441 test2 :They aren't on that channel[0m
-------------end--------------
-------------list channel--------------
-#canal  Have 2 users actives
-------------end channel--------------
+No channel

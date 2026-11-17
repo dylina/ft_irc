@@ -55,7 +55,7 @@ void Client::setFD(int fd)
 void Client::sendReply(const std::string &msg)
 {
 	std::string reply = msg + "\r\n";
-	std::cerr << BOLD BRIGHT_CYAN << "SENDING: " << msg << RESET << std::endl; // ← ajouter
+	// std::cerr << BOLD BRIGHT_CYAN << "SENDING: " << msg << RESET << std::endl; // ← ajouter
 	this->_lastResponse = BOLD BRIGHT_CYAN + msg + RESET;
 	this->_responseSend.push_back(_lastResponse);
 	this->queueMessage(reply);
@@ -335,10 +335,10 @@ void Client::printCommands(std::ostream& out) const
 void Client::addData(std::string buffer, std::string clientFd)
 {
 	this->_clientFd = clientFd;
-	std::cerr << "new data from client fd [" << clientFd << "] stored in buffer client:" << std::endl;
+	// std::cerr << "new data from client fd [" << clientFd << "] stored in buffer client:" << std::endl;
 	this->_dataBuffer += buffer;
 
-	this->printBufferEnhance();
+	// this->printBufferEnhance();
 
 	while (this->_dataBuffer.find("\r\n") != std::string::npos)
 		this->parseCommand();

@@ -17,6 +17,7 @@
 #define ERR_UNKNOWNCOMMAND      421 // Commande inconnue
 #define ERR_NOMOTD              422 // Message MOTD indisponible
 #define ERR_NOTOPIC				331 // Elle indique que le canal auquel vous tentez d'accéder ou d'interroger n'a aucun sujet (topic) défini pour le moment.
+#define RPL_ENDOFWHO			315 //  Il est envoyé par le serveur IRC pour indiquer qu'il a fini de transmettre tous les résultats d'une commande 
 
 // ============================================
 // NICK

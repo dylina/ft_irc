@@ -30,6 +30,17 @@ const char *Server::Clean::what() const throw()
 Server::Server(int domain, std::string ip, std::string port, std::string password)
 	: _serverSocket(domain, ip, port), _password(password)
 {
+	if (_password.empty())
+		throw BindErr();
+	if (!_password.empty() && _password[0] == ' ') // test mot de passe vide de merde
+		throw BindErr();
+
+	for (std::string::iterator it = this->_password.begin(); it != this->_password.end(); it++)
+	{
+		if ((*it) == ' ')
+			throw BindErr();
+	}
+
 
 	if (bind(
 			this->_serverSocket.getFd(),
@@ -192,8 +203,8 @@ void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
 	newClientClass->setFD(clientFd);
 	this->clients[newClientStruct.fd] = newClientClass;
 
-	std::vector<struct pollfd>::iterator it = fds.end() - 1;
-	std::cerr << GREEN << "New client add, fd: [" << (*it).fd << "], connected" << RESET << std::endl;
+	// std::vector<struct pollfd>::iterator it = fds.end() - 1;
+	// std::cerr << GREEN << "New client add, fd: [" << (*it).fd << "], connected" << RESET << std::endl;
 }
 
 void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
@@ -213,7 +224,7 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 	if (retRecv > 0)
 	{
 		std::string data(buffer, retRecv);
-		std::cerr << retRecv << " bytes received from " << fd << " fd" << std::endl;
+		// std::cerr << retRecv << " bytes received from " << fd << " fd" << std::endl;
 		client->addData(data, client->getFdWithColor());
 		this->processCommands(client); // apres quit client invalid
 	}
@@ -562,7 +573,7 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 
 		client->sendReply(names);
 
-		client->sendReply(":ircserv 366 " + client->getNickName()
+		client->sendReply(":ircserv 315 " + client->getNickName()
     		+ " " + chan + " :End of /NAMES list");
 
 		// Envoyer le topic existant au nouvel arrivant
