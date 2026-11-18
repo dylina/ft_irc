@@ -72,6 +72,7 @@ private:
 	void cmdJoin(Client *client, Client::parsedCommand &cmd);
 	void cmdPart(Client *client, Client::parsedCommand &cmd);
 	void cmdPrivmsg(Client *client, Client::parsedCommand &cmd);
+	void cmdNotice(Client *client, Client::parsedCommand &cmd);
 	void cmdPing(Client *client, Client::parsedCommand &cmd);
 	void cmdKick(Client *client, Client::parsedCommand &cmd);
 	void cmdTopic(Client *client, Client::parsedCommand &cmd);
