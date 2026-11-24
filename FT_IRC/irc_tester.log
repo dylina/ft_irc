@@ -1,0 +1,5 @@
+ft_irc tester - log detaille  (2026-11-17 13:00:06)
+serveur : 127.0.0.1:6667   mot de passe : 'pass'   executable : (deja lance)
+>> = envoye par le testeur    << = recu du serveur    !! = verification echouee
+temps en secondes depuis le debut de chaque test
+

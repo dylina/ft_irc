@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "Client.hpp"
+#include <fcntl.h>
 
 const char *Server::BindErr::what() const throw()
 {
@@ -29,6 +30,17 @@ const char *Server::Clean::what() const throw()
 Server::Server(int domain, std::string ip, std::string port, std::string password)
 	: _serverSocket(domain, ip, port), _password(password)
 {
+	if (_password.empty())
+		throw BindErr();
+	if (!_password.empty() && _password[0] == ' ') // test mot de passe vide de merde
+		throw BindErr();
+
+	for (std::string::iterator it = this->_password.begin(); it != this->_password.end(); it++)
+	{
+		if ((*it) == ' ')
+			throw BindErr();
+	}
+
 
 	if (bind(
 			this->_serverSocket.getFd(),
@@ -114,7 +126,7 @@ void Server::on()
 						std::cerr << BOLD BRIGHT_RED << e.what() << RESET << std::endl;
 					}
 				}
-				continue;
+				//continue;
 			}
 
 			if (i < fds.size() && (fds[i].revents & POLLOUT))
@@ -138,6 +150,7 @@ static std::string formatMessage(
 	std::string channelTarget = "")
 {
 	std::ostringstream oss;
+
 	oss << ":ircserv "
 		<< std::setfill('0') << std::setw(3) << error
 		<< " " << client->getNickName();
@@ -170,6 +183,14 @@ void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
 {
 	if (clientFd < 0)
 		throw AcceptErr();
+
+	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
+    {
+        perror("fcntl");
+        close(clientFd);
+        throw AcceptErr();
+    }
+
 	struct pollfd newClientStruct;
 
 	newClientStruct.fd = clientFd;
@@ -182,8 +203,8 @@ void Server::addNewClient(int clientFd, sockaddr_in sockAddrClient)
 	newClientClass->setFD(clientFd);
 	this->clients[newClientStruct.fd] = newClientClass;
 
-	std::vector<struct pollfd>::iterator it = fds.end() - 1;
-	std::cerr << GREEN << "New client add, fd: [" << (*it).fd << "], connected" << RESET << std::endl;
+	// std::vector<struct pollfd>::iterator it = fds.end() - 1;
+	// std::cerr << GREEN << "New client add, fd: [" << (*it).fd << "], connected" << RESET << std::endl;
 }
 
 void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
@@ -203,14 +224,20 @@ void Server::dataReceived(std::vector<struct pollfd> &fds, int i)
 	if (retRecv > 0)
 	{
 		std::string data(buffer, retRecv);
-		std::cerr << retRecv << " bytes received from " << fd << " fd" << std::endl;
+		// std::cerr << retRecv << " bytes received from " << fd << " fd" << std::endl;
 		client->addData(data, client->getFdWithColor());
 		this->processCommands(client); // apres quit client invalid
 	}
-	else
+	else if (retRecv == 0)
 	{
 		this->broadcastQuit(client, "Connection closed");
 		this->removeClient(fd);
+	}
+	else
+	{
+		perror("recv");
+    	this->broadcastQuit(client, "Connection error");
+    	this->removeClient(fd);
 	}
 }
 
@@ -267,8 +294,45 @@ void Server::handleNICK(Client *client, std::vector<std::string> &params)
 
 	if (isNickIsAlreadyUse(client, nick) == true)
 		return;
+
+	bool isNickChange = client->hasNick();
+	std::string oldMask = client->getMask();
+
 	client->setNickName(nick);
 	client->setHasNick(true);
+
+	if (isNickChange)
+    client->sendReply(oldMask + " NICK :" + nick);
+
+	if (isNickChange)
+	{
+    	std::string nickMsg = oldMask + " NICK :" + nick;
+
+    	for (std::map<int, Client *>::iterator it = this->clients.begin();
+        	it != this->clients.end(); ++it)
+    	{
+        	Client *other = it->second;
+
+        	if (other == client)
+           		continue;
+
+        	bool sharesChannel = false;
+
+        	for (std::map<std::string, Channel *>::iterator ch = this->_channels.begin();
+            	ch != this->_channels.end(); ++ch)
+        	{
+            	if (ch->second->isInChannel(client)
+                	&& ch->second->isInChannel(other))
+            	{
+                	sharesChannel = true;
+                	break;
+          		}
+        	}
+
+        	if (sharesChannel)
+        	    other->sendReply(nickMsg);
+    	}
+	}
 	finalizeRegistration(client);
 }
 
@@ -296,8 +360,8 @@ void Server::handleUSER(Client *client, std::vector<std::string> &params, std::s
 	}
 
 	client->setUsername(params[0]);
-	client->setNickName(realname);
-	client->setHasNick(true);
+	// client->setNickName(realname);
+	// client->setHasNick(true);
 	client->setHasUser(true);
 
 	finalizeRegistration(client);
@@ -306,7 +370,10 @@ void Server::handleUSER(Client *client, std::vector<std::string> &params, std::s
 void Server::finalizeRegistration(Client *client)
 {
 	if (client->isRegistered())
+	{
+		client->sendReply(formatMessage(ERR_ALREADYREGISTERED, MSG_ALREADYREGISTERED, client));
 		return ;
+	}
 	if (client->isPassOk() && client->hasNick() && client->hasUser())
 	{
 		client->setRegistered(true);
@@ -349,8 +416,8 @@ void Server::processCommands(Client *client)
 			cmdPrivmsg(client, cmd);
 		// else if (cmd.command == "NOTICE")
 		// cmdNotice(client, cmd);
-		// else if (cmd.command == "PING")
-		// 	cmdPing(client, cmd);
+		else if (cmd.command == "PING")
+			cmdPing(client, cmd);
 		else if (cmd.command == "QUIT")
 		{
 			cmdQuit(client, cmd);
@@ -481,6 +548,40 @@ void Server::cmdJoin(Client *client, Client::parsedCommand &cmd)
 
 		// envoier a tous meme le new client
 		this->_channels[chan]->sendToAll(joinMsg);
+
+		// NAMES : liste des utilisateurs
+		std::string names = ":ircserv 353 " + client->getNickName()
+    		+ " = " + chan + " :";
+
+		std::vector<int> users = this->_channels[chan]->getAllUsers();
+
+		for (size_t i = 0; i < users.size(); ++i)
+		{
+    		// Récupérer les clients pour obtenir leurs nicknames
+    		for (std::map<int, Client *>::iterator it = this->clients.begin();
+        		it != this->clients.end(); ++it)
+    		{
+        		if (it->first == users[i])
+        		{
+            		if (this->_channels[chan]->isOperator(it->second))
+                		names += "@";
+            		names += it->second->getNickName() + " ";
+            		break;
+        		}
+    		}
+		}
+
+		client->sendReply(names);
+
+		client->sendReply(":ircserv 315 " + client->getNickName()
+    		+ " " + chan + " :End of /NAMES list");
+
+		// Envoyer le topic existant au nouvel arrivant
+		if (this->_channels[chan]->haveTopic())
+		{
+    		client->sendReply(":ircserv 332 " + client->getNickName()
+        		+ " " + chan + " :" + this->_channels[chan]->getTopic());
+		}
 	}
 }
 
@@ -591,8 +692,89 @@ void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
 
 void Server::cmdKick(Client *client, Client::parsedCommand &cmd)
 {
-	(void)client;
-	(void)cmd;
+	if (cmd.parametresMiddle.size() < 2)
+    {
+        client->sendReply(":ircserv 461 " + client->getNickName()
+            + " INVITE :Not enough parameters");
+        return;
+    }
+
+	std::string channelName = cmd.parametresMiddle[0];
+	std::string targetNick = cmd.parametresMiddle[1];
+
+	//verification if the channel exist
+	std::map<std::string, Channel *>::iterator it = this->_channels.find(channelName);
+	if (it == this->_channels.end())
+	{
+		client->sendReply(":ircerv 403 " + client->getNickname()
+			+ " " + channelName + " :No such channel");
+		return;
+	}
+	Channel *channel = it->second;
+
+	//verif if the expeditor is in channel
+	if (!channel->isInChannel(client))
+	{
+		client->sendReply(":ircserv 442 " + client->getNickName()
+			+ " " + channelName + " :You're not on that channel");
+		return;
+	}
+
+	//verification if is the operator
+	if (!channel->isOperator(client))
+	{
+		client->sendReply(":ircserv 482 " + client->getNickName()
+			+ " " + channelName + " :You're not channel operator");
+		return;
+	}
+
+	//search for the user to delete
+	Client *target = NULL;
+
+	for (std::map<int, Client *>::iterator user = this->clients.begin();
+		user != this->clients.end(); ++user)
+	{
+		if (user->second->getNickName() == targetNick)
+		{
+			target = user->second;
+			break;
+		}
+	}
+
+	if (target == NULL)
+	{
+		client->sendReply(":ircserv 401 " + client->getNickName()
+			+ " " + targetNick + " :No such nick");
+		return;
+	}
+
+	//verif if the user to kick is in the channel
+	if (!channel->isInChannel(target))
+	{
+		client->sendReply(":ircserv 441 " + client->getNickName()
+			+ " " + targetNick + " :They aren't on that channel");
+		return;
+	}
+
+	//the kick message
+	std::string reason = cmd.trailing.empty()
+		? client->getNickName()
+		: cmd.trailing;
+	std::string cmdKickmessage = client->getMask() + " KICK " + channelName
+		+ " " + targetNick + " :" + reason;
+
+	//send the message to all channel members
+	channel->sendToAll(cmdKickmessage);
+
+	//delete user fron channel
+	channel->leaveChannel(target);
+
+	//if no more members delete the channel
+	if (channel->getNbrConnected() == 0)
+	{
+		delete channel;
+		this->_channels.erase(it);
+	}
 }
 
 void Server::cmdInvite(Client *client, Client::parsedCommand &cmd)
@@ -813,7 +995,6 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 	{
 		if ((*it).del) // si c'est un +
 		{
-			std::cerr << "debug: add mode" << std::endl; // debug
 
 			if ((*it).mode == "k" || (*it).mode == "l" || (*it).mode == "o") // on verifie les params de k et de l (mdp et limite de nbr)
 			{
@@ -832,6 +1013,7 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 							client->sendReply(formatMessage(ERR_INVALIDMODEPARAM, MSG_INVALIDMODEPARAM, client, channelTarget->getName()));
 							return;
 						}
+
 					}
 				}
 
@@ -853,46 +1035,36 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 				countNbrChann++;
 			}
 		}
-		else // si c'est un -
+		else
 		{
-			std::cerr << "debug: supp mode" << std::endl; // debug
-
-			if ((*it).mode == "k") // on verifie les params de k
+			if ((*it).mode == "o") // on verif les args pour -o
 			{
 				size_t isExist = countNbrChann + 1;
-				if (isExist >= cmd.parametresMiddle.size()) // pas de params on pleures
+				for (std::map<int, Client*>::iterator ite = this->clients.begin(); ite != this->clients.end(); ite++)
 				{
-					client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
-					return;
+					if (cmd.parametresMiddle[isExist] == (*ite).second->getNickname())
+					{
+						(*it).parameter = cmd.parametresMiddle[isExist];
+						(*it).targetUser = (*ite).second;
+						break;
+					}
 				}
-				if ((*it).haveParameter && (*it).parameter.empty())
-					(*it).parameter = cmd.parametresMiddle[isExist]; // on rajoute le param du mode si c'est k
 				countNbrChann++;
 			}
 		}
 	}
 
 	size_t paramsNbr = countNbrChann + 1;
-	if (paramsNbr != cmd.parametresMiddle.size()) // si il y a trop de parametres dans le mode, on pleures encore
+	if (paramsNbr != cmd.parametresMiddle.size()) // si il y a trop de parametres dans le mode
 	{
 		client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS, client, channelTarget->getName()));
 		return;
 	}
 
-	// wip -------------------------------------------------
-	// wip gestion des modes une fois que tout est bien valide (normalement le parsing au dessu est bon (inch') (non il faut traiter mode sans rien apres car la sa segfault))
+	// gestion des modes une fois que tout est bien valide
 
 	for (size_t i = 0; i < _modeWantPair.size(); i++)
 	{
-		// std::cout << "debug " << i + 1 << ": \n" << "Del: "; msg debug ---------
-		// if (_modeWantPair[i].del)
-		// 	std::cout << "+" << std::endl;
-		// else
-		// 	std::cout << "-" << std::endl;
-		// std::cout << "mode: " << _modeWantPair[i].mode << std::endl;
-		// if (_modeWantPair[i].haveParameter)
-		// 	std::cout << "parameter: " << _modeWantPair[i].parameter << std::endl;---
-
 		int ret = -1;
 
 		if (_modeWantPair[i].del == false) // si le mode est -
@@ -900,7 +1072,7 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 		else // si le mode est +
 			ret = channelTarget->mode.setMode(_modeWantPair[i].mode, client, _modeWantPair[i].targetUser, _modeWantPair[i].parameter, channelTarget);
 
-		if (ret == -1) // erreur qui ne devrait pas arriver #jepuelamerdenecode
+		if (ret == -1) // erreur qui ne devrait pas arriver
 			continue ;
 
 
@@ -942,7 +1114,6 @@ void Server::cmdMode(Client *client, Client::parsedCommand &cmd)
 
 		channelTarget->sendToAll(msg);
 	}
-	// 	---------------------------------------------------
 }
 
 bool Server::isModeIsHandle(char &mode)

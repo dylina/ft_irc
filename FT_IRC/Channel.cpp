@@ -1,3 +1,5 @@
+#include <climits>
+
 #include "Channel.hpp"
 #include "Client.hpp"
 
@@ -8,6 +10,8 @@ Channel::Channel(Client *creator, std::string &topic, std::string name) : _name(
 	else
 		this->_topic = topic;
 	this->_users.push_back(creator);
+	creator->join(_name);
+
 	this->mode.setOwner(creator);
 	this->mode.setMode("o", creator, creator, creator->getNickName());
 }
@@ -82,6 +86,7 @@ void Channel::leaveChannel(Client *user)
 	{
 		if (*it == user)
 		{
+			this->mode.removeInviteUser(user);
 			// removeoperator cherche dans tous les op et si le user en est un le supprime de sa db
 			this->mode.removeOperator(user);
 
@@ -248,7 +253,10 @@ int Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, s
 	else if (mode == "l")
 	{
 		this->_l = true;
-		this->_limitNbr = std::atoi(param.c_str());
+		if (param.size() > INT_MAX)
+			_limitNbr = INT_MAX;
+		else
+			this->_limitNbr = std::atoi(param.c_str());
 		return _l;
 	}
 	else if (mode == "o")
@@ -264,7 +272,6 @@ int Channel::Mode::setMode(std::string mode, Client *user, Client *userTarget, s
 
 int Channel::Mode::suppMode(std::string mode, Client *user, Client *userTarget, std::string param, Channel *chann) // a utiliser pour -
 {
-	// wip
 	if (!this->isOp(user)) //verif si user est un operateur
 		return ERR_CHANOPRIVSNEEDED;
 
@@ -281,10 +288,7 @@ int Channel::Mode::suppMode(std::string mode, Client *user, Client *userTarget, 
 	}
 	else if (mode == "k")
 	{
-		if (this->checkKey(param))
-			_password = "";
-		else
-			return ERR_KEYSET;
+		_password = "";
 
 		this->_k = false;
 		return 1;
