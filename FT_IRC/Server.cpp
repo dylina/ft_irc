@@ -402,8 +402,8 @@ void Server::processCommands(Client *client)
 			cmdPrivmsg(client, cmd);
 		// else if (cmd.command == "NOTICE")
 		// cmdNotice(client, cmd);
-		// else if (cmd.command == "PING")
-		// 	cmdPing(client, cmd);
+		else if (cmd.command == "PING")
+			cmdPing(client, cmd);
 		else if (cmd.command == "QUIT")
 		{
 			cmdQuit(client, cmd);
@@ -1149,38 +1149,60 @@ void Server::cmdPrivmsg(Client *client, Client::parsedCommand &cmd)
 		return;
 	}
 
-	std::string target = cmd.parametresMiddle[0];
-	std::string msg = ":" + client->getNickName() + " PRIVMSG " + target + " :" + cmd.trailing;
+	std::string targets = cmd.parametresMiddle[0];
+	std::stringstream ss(targets);
+	std::string target;
+	while (std::getline(ss, target, ','))
+{
+    if (target.empty())
+        continue;
 
-	if (target[0] == '#')
-	{
-		std::map<std::string, Channel *>::iterator it = this->_channels.find(target);
-		if (it == this->_channels.end()) // pas trouver le channels
-		{
-			client->sendReply(formatMessage(ERR_NOSUCHCHANNEL, MSG_NOSUCHCHANNEL, client, target));
-			return;
-		}
-		if (!(*it).second->isInChannel(client))
-		{
-			client->sendReply(formatMessage(ERR_NOTONCHANNEL, MSG_NOTONCHANNEL, client, target));
-			return;
-		}
-		// envoi a tous sauf expediteur
-		(*it).second->sendToAllOtherClient(msg, client);
-	}
-	else
-	{
-		// message prive a un nick
-		for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
-		{
-			if (it->second->getNickName() == target)
-			{
-				it->second->sendReply(msg);
-				return;
-			}
-		}
-		client->sendReply(formatMessage(ERR_NOSUCHNICK, MSG_NOSUCHNICK, client, target));
-	}
+    std::string msg = ":" + client->getNickName()
+        + " PRIVMSG " + target + " :" + cmd.trailing;
+
+    if (target[0] == '#')
+    {
+        std::map<std::string, Channel *>::iterator it =
+            this->_channels.find(target);
+
+        if (it == this->_channels.end())
+        {
+            client->sendReply(formatMessage(
+                ERR_NOSUCHCHANNEL, MSG_NOSUCHCHANNEL, client, target));
+            continue;
+        }
+
+        if (!it->second->isInChannel(client))
+        {
+            client->sendReply(formatMessage(
+                ERR_NOTONCHANNEL, MSG_NOTONCHANNEL, client, target));
+            continue;
+        }
+
+        it->second->sendToAllOtherClient(msg, client);
+    }
+    else
+    {
+        bool found = false;
+
+        for (std::map<int, Client *>::iterator it = clients.begin();
+             it != clients.end(); ++it)
+        {
+            if (it->second->getNickName() == target)
+            {
+                it->second->sendReply(msg);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            client->sendReply(formatMessage(
+                ERR_NOSUCHNICK, MSG_NOSUCHNICK, client, target));
+        }
+    }
+}
 }
 
 void Server::cmdPing(Client *client, Client::parsedCommand &cmd) // a verif je crois qu'il manques des trucs
