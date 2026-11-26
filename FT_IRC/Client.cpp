@@ -333,10 +333,7 @@ void Client::printCommands(std::ostream& out) const
 void Client::addData(std::string buffer, std::string clientFd)
 {
 	this->_clientFd = clientFd;
-	std::cerr << "new data from client fd [" << clientFd << "] stored in buffer client:" << std::endl;
 	this->_dataBuffer += buffer;
-
-	this->printBufferEnhance();
 
 	while (this->_dataBuffer.find('\n') != std::string::npos)
 		this->parseCommand();

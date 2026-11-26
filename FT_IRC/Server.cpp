@@ -293,11 +293,6 @@ void Server::broadcastToSharedChannels(Client *client, const std::string &msg)
 
 void Server::handleNICK(Client *client, std::vector<std::string> &params)
 {
-	if (!client->isPassOk())
-	{
-		client->sendReply(formatMessage(ERR_PASSWDMISMATCH, MSG_PASSWDMISMATCH, client));
-		return;
-	}
 	if (params.empty())
 	{
 		client->sendReply(formatMessage(ERR_NONICKNAMEGIVEN, MSG_NONICKNAMEGIVEN, client));
@@ -327,11 +322,6 @@ void Server::handleNICK(Client *client, std::vector<std::string> &params)
 
 void Server::handleUSER(Client *client, std::vector<std::string> &params, std::string trailing)
 {
-	if (!client->isPassOk())
-	{
-		client->sendReply(formatMessage(ERR_PASSWDMISMATCH, MSG_PASSWDMISMATCH, client));
-		return;
-	}
 	if (client->isRegistered())
 	{
 		client->sendReply(formatMessage(ERR_ALREADYREGISTERED, MSG_ALREADYREGISTERED, client));
@@ -347,7 +337,7 @@ void Server::handleUSER(Client *client, std::vector<std::string> &params, std::s
 		client->sendReply(formatMessage(ERR_NEEDMOREPARAMS, "USER " MSG_NEEDMOREPARAMS, client));
 		return;
 	}
-
+	client->setNickName(realname);
 	client->setUsername(params[0]);
 	client->setHasUser(true);
 	finalizeRegistration(client);
@@ -671,7 +661,10 @@ void Server::cmdTopic(Client *client, Client::parsedCommand &cmd)
 
 
 	std::string topicMsg;
-	topicMsg = client->getMask() + " TOPIC " + channel + " :" + cmd.trailing;
+	if (cmd.trailing.size() == 1 && cmd.trailing[0] == ':')
+		topicMsg = client->getMask() + " TOPIC " + channel + " :";
+	else
+		topicMsg = client->getMask() + " TOPIC " + channel + " :" + cmd.trailing;
 
 	this->_channels[channel]->sendToAll(topicMsg);
 }

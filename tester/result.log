@@ -1,0 +1,30 @@
+------------new--------------
+[1;32mThis user is Registered[0m
+Address : 16777343
+Family : 2
+Port : 38030
+Sin Zero : 
+Mode : -1
+User Name : flm
+Nick Name : o s k o u r
+Client [38;5;1m4[0m have no data in attempt
+responses sends :
+[1m[96m:ircserv 001 o s k o u r :Welcome to the IRC network o s k o u r!flm@localhost[0m
+[1m[96m:ircserv 002 o s k o u r :Your host is ircserv, running version 1.0[0m
+[1m[96m:ircserv 003 o s k o u r :This server was created today[0m
+[1m[96m:ircserv 004 o s k o u r ircserv 1.0 o itkol kol[0m
+[1m[96m:ircserv 005 o s k o u r CHANTYPES=# PREFIX=(o)@ CHANMODES=,k,l,it NICKLEN=9 :are supported by this server[0m
+------------end--------------
+------------new--------------
+[1;31m! This user is Not Registered ![0m
+Address : 16777343
+Family : 2
+Port : 202
+Sin Zero : 
+Mode : -1
+User Name : mleschevu
+Nick Name : realname
+Client [38;5;196m5[0m have no data in attempt
+No response from server send
+------------end--------------
+No channel

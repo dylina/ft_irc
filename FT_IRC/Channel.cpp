@@ -183,7 +183,10 @@ bool Channel::haveTopic()
 
 void Channel::setTopic(std::string &topic)
 {
-	this->_topic = topic;
+	if (topic.size() == 1 && topic[0] == ':')
+		this->_topic = "";
+	else
+		this->_topic = topic;
 }
 
 Channel::Mode::Mode() : _i(false), _t(false), _k(false), _o(), _l(false), _limitNbr(-1)
