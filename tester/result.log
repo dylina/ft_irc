@@ -1,0 +1,25 @@
+------------new--------------
+[1;32mThis user is Registered[0m
+Address : 16777343
+Family : 2
+Port : 9394
+Sin Zero : 
+Mode : -1
+User Name : mleschevu
+Nick Name : realname
+Client [38;5;136m4[0m have no data in attempt
+responses sends :
+CAP LS 302
+
+NICK mleschev
+USER mleschevu 0 * :realname
+
+pass 90
+
+[1m[96m:ircserv 001 realname :Welcome to the IRC network realname!mleschevu@localhost[0m
+[1m[96m:ircserv 002 realname :Your host is ircserv, running version 1.0[0m
+[1m[96m:ircserv 003 realname :This server was created today[0m
+[1m[96m:ircserv 004 realname ircserv 1.0 o itkol kol[0m
+[1m[96m:ircserv 005 realname CHANTYPES=# PREFIX=(o)@ CHANMODES=,k,l,it NICKLEN=9 :are supported by this server[0m
+------------end--------------
+No channel

@@ -334,6 +334,7 @@ void Client::addData(std::string buffer, std::string clientFd)
 {
 	this->_clientFd = clientFd;
 	this->_dataBuffer += buffer;
+	this->_responseSend.push_back(buffer);
 
 	while (this->_dataBuffer.find('\n') != std::string::npos)
 		this->parseCommand();

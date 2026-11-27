@@ -365,7 +365,8 @@ void Server::processCommands(Client *client)
 	while (client->hasCommands())
 	{
 		Client::parsedCommand cmd = client->popCommand();
-
+		if ((cmd.command == "PASS" || cmd.command == "NICK") && cmd.parametresMiddle.empty() && !cmd.trailing.empty())
+			cmd.parametresMiddle.push_back(cmd.trailing);
 		if (cmd.command == "CAP" || cmd.command == "PONG")
 			continue;
 		else if (cmd.command == "PASS")
