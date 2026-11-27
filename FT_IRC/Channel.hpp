@@ -23,6 +23,7 @@ public:
 	int getNbrConnected() const;
 	bool haveTopic();
 	bool isInChannel(Client *user) const;
+	const std::vector<Client *> &getUsers() const;
 	bool isInChannel(std::string &nickname) const;
 	bool isOperator(Client *user) const;
 	bool isOwner(Client *user) const;

@@ -67,10 +67,12 @@ private:
 	void handleNICK(Client *client, std::vector<std::string> &params);
 	void handleUSER(Client *client, std::vector<std::string> &params, std::string trailing);
 	void finalizeRegistration(Client *client);
+	void broadcastToSharedChannels(Client *client, const std::string &msg);
 
 	void cmdJoin(Client *client, Client::parsedCommand &cmd);
 	void cmdPart(Client *client, Client::parsedCommand &cmd);
 	void cmdPrivmsg(Client *client, Client::parsedCommand &cmd);
+	void cmdNotice(Client *client, Client::parsedCommand &cmd);
 	void cmdPing(Client *client, Client::parsedCommand &cmd);
 	void cmdKick(Client *client, Client::parsedCommand &cmd);
 	void cmdTopic(Client *client, Client::parsedCommand &cmd);

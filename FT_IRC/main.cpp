@@ -45,8 +45,12 @@ int main(int argc, char **argv)
 	{
 		std::string port = argv[1];
     	std::string password = argv[2];  // ← récupérer le password
+		if (password.empty())
+		{
+			std::cerr << "Error : password cannot be empty" << std::endl;
+			return 1;
+		}
 		// start with 127.0.0.1 == "localhost"
-
     	Server irc(AF_INET, "127.0.0.1", port, password);  // ← passer au serveur
 		std::srand(std::time(NULL));
 

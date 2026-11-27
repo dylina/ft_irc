@@ -164,7 +164,7 @@ void Client::flushSendBuffer()
 		return;
 
 	// appele uniquement depuis Server::on() en reponse a un POLLOUT : jamais d'appel "libre" a send()
-	ssize_t sent = send(this->_fd, this->_sendBuffer.c_str(), this->_sendBuffer.size(), 0);
+	ssize_t sent = send(this->_fd, this->_sendBuffer.c_str(), this->_sendBuffer.size(), MSG_NOSIGNAL);
 
 	// pas d'inspection d'errno : en cas d'echec on retente simplement au prochain cycle POLLOUT
 	if (sent > 0)
@@ -206,12 +206,14 @@ void Client::clearStructCommand(Client::parsedCommand &newCommand)
 
 void Client::parseCommand()
 {
-	size_t end = this->_dataBuffer.find("\r\n");
+	size_t end = this->_dataBuffer.find('\n');
 	if (end == std::string::npos)
 		return;
 
 	std::string line = this->_dataBuffer.substr(0, end);
-	this->_dataBuffer.erase(0, end + 2);
+	this->_dataBuffer.erase(0, end + 1);
+	if (!line.empty() && line[line.size() - 1] == '\r')
+		line.erase(line.size() - 1);
 
 	if (line.empty())
 		return;
@@ -331,17 +333,15 @@ void Client::printCommands(std::ostream& out) const
 void Client::addData(std::string buffer, std::string clientFd)
 {
 	this->_clientFd = clientFd;
-	std::cerr << "new data from client fd [" << clientFd << "] stored in buffer client:" << std::endl;
 	this->_dataBuffer += buffer;
 
-	this->printBufferEnhance();
-
-	while (this->_dataBuffer.find("\r\n") != std::string::npos)
+	while (this->_dataBuffer.find('\n') != std::string::npos)
 		this->parseCommand();
 }
 
 void Client::printBufferEnhance() const
 {
+	return;
 	if (this->_dataBuffer.empty())
 	{
 		std::cerr << "Client " << this->_clientFd
