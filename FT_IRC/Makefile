@@ -18,12 +18,10 @@ $(NAME): $(OBJ)
 
 clean:
 		rm -f $(OBJ)
-# 		delete fifo for debug tester
 		rm -f /tmp/ircserv_dump
 
 fclean: clean
 		rm -f $(NAME)
-# 		delete .log for debug tester
 		rm -f ../tester/client/result.log
 		echo "All files are clean up !"
 
